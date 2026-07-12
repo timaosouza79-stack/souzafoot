@@ -3025,120 +3025,118 @@ function renderSquad() {
 }
 
 function selectPitchPlayer(playerId) {
+    const player = myTeam.squad.find(p => p.id === playerId);
+    if (!player) return;
+
+    // Se já há um reserva selecionado, faz a troca titular ↔ reserva
     if (selectedReservePlayerId !== null) {
-        swapPlayers(playerId, selectedReservePlayerId);
+        performSwap(playerId, selectedReservePlayerId);
         selectedPitchPlayerId = null;
         selectedReservePlayerId = null;
-    } else {
-        selectedPitchPlayerId = (selectedPitchPlayerId === playerId) ? null : playerId;
+        renderSquad();
+        return;
     }
+
+    // Se já há outro titular selecionado, troca as posições entre titulares
+    if (selectedPitchPlayerId !== null && selectedPitchPlayerId !== playerId) {
+        // Troca titular ↔ titular: simplesmente re-renderiza (a posição visual muda pois o mapeamento se ajusta)
+        // Para dar feedback visual, podemos trocar a ordem no array
+        const idx1 = myTeam.squad.findIndex(p => p.id === selectedPitchPlayerId);
+        const idx2 = myTeam.squad.findIndex(p => p.id === playerId);
+        if (idx1 !== -1 && idx2 !== -1) {
+            [myTeam.squad[idx1], myTeam.squad[idx2]] = [myTeam.squad[idx2], myTeam.squad[idx1]];
+        }
+        selectedPitchPlayerId = null;
+        saveGame();
+        renderSquad();
+        return;
+    }
+
+    // Toggle de seleção (primeiro clique ou cancelar)
+    selectedPitchPlayerId = (selectedPitchPlayerId === playerId) ? null : playerId;
     renderSquad();
 }
 
 function selectReservePlayer(playerId) {
-    if (selectedPitchPlayerId !== null) {
-        swapPlayers(selectedPitchPlayerId, playerId);
-        selectedPitchPlayerId = null;
-        selectedReservePlayerId = null;
-    } else {
-        selectedReservePlayerId = (selectedReservePlayerId === playerId) ? null : playerId;
-    }
-    renderSquad();
-}
-
-function swapPlayers(starterId, reserveId) {
-    const starter = myTeam.squad.find(p => p.id === starterId);
-    const reserve = myTeam.squad.find(p => p.id === reserveId);
-    
-    if (starter && reserve) {
-        starter.isStarter = false;
-        reserve.isStarter = true;
-        
-        // Mantém capitão e cobradores sincronizados
-        if (myTeam.tactics) {
-            if (myTeam.tactics.captain === starterId) myTeam.tactics.captain = reserveId;
-            if (myTeam.tactics.freekicks === starterId) myTeam.tactics.freekicks = reserveId;
-            if (myTeam.tactics.corners === starterId) myTeam.tactics.corners = reserveId;
-        }
-
-        updateTeamStrength();
-        saveGame();
-        updateDashboardUI();
-    }
-}
-
-function selectPlayerToSwap(playerId) {
     const player = myTeam.squad.find(p => p.id === playerId);
     if (!player) return;
 
+    // Validação de lesão/suspensão
+    if (player.injuryRounds > 0) {
+        alert("Este jogador está lesionado e não pode jogar!");
+        return;
+    }
+    if (player.suspensionRounds > 0) {
+        alert("Este jogador está suspenso e não pode jogar!");
+        return;
+    }
+
+    // Se já há um titular selecionado no campo, faz a troca titular ↔ reserva
+    if (selectedPitchPlayerId !== null) {
+        performSwap(selectedPitchPlayerId, playerId);
+        selectedPitchPlayerId = null;
+        selectedReservePlayerId = null;
+        renderSquad();
+        return;
+    }
+
+    // Se o time tem menos de 11 titulares, promove diretamente o reserva
     const startersCount = myTeam.squad.filter(p => p.isStarter).length;
-
-    // Se o time tem menos de 11 titulares e o jogador clicado é um reserva saudável, promove diretamente
-    if (startersCount < 11 && !player.isStarter) {
-        if (player.injuryRounds > 0) {
-            alert("Você não pode escalar um jogador lesionado!");
-            return;
-        }
-        if (player.suspensionRounds > 0) {
-            alert("Você não pode escalar um jogador suspenso!");
-            return;
-        }
+    if (startersCount < 11) {
         player.isStarter = true;
-        playerToSwapId = null;
+        selectedReservePlayerId = null;
         updateTeamStrength();
+        saveGame();
         renderSquad();
         return;
     }
 
-    // Se o time tem mais de 11 titulares e o jogador clicado é titular, rebaixa diretamente
-    if (startersCount > 11 && player.isStarter) {
-        player.isStarter = false;
-        playerToSwapId = null;
-        updateTeamStrength();
-        renderSquad();
-        return;
-    }
-
-    if (playerToSwapId === null) {
-        // Primeiro clique: seleciona o jogador
-        playerToSwapId = playerId;
-    } else if (playerToSwapId === playerId) {
-        // Clicou no mesmo: cancela
-        playerToSwapId = null;
-    } else {
-        // Segundo clique: realiza a troca se for titular x reserva ou vice-versa
-        const p1 = myTeam.squad.find(p => p.id === playerToSwapId);
-        const p2 = myTeam.squad.find(p => p.id === playerId);
-
-        if (p2.injuryRounds > 0) {
-            alert("Você não pode escalar um jogador lesionado!");
-            playerToSwapId = null;
-            renderSquad();
-            return;
-        }
-
-        if (p2.suspensionRounds > 0) {
-            alert("Você não pode escalar um jogador suspenso!");
-            playerToSwapId = null;
-            renderSquad();
-            return;
-        }
-
-        if (p1 && p2) {
-            if (p1.isStarter !== p2.isStarter) {
-                // Troca os status
-                const temp = p1.isStarter;
-                p1.isStarter = p2.isStarter;
-                p2.isStarter = temp;
-            } else {
-                alert("Você só pode trocar um titular por um reserva.");
-            }
-        }
-        playerToSwapId = null; // Reseta após tentar trocar
-        updateTeamStrength(); // Atualiza a força ao trocar
-    }
-    
+    // Toggle de seleção (primeiro clique ou cancelar)
+    selectedReservePlayerId = (selectedReservePlayerId === playerId) ? null : playerId;
     renderSquad();
+}
+
+function performSwap(starterId, reserveId) {
+    const starter = myTeam.squad.find(p => p.id === starterId);
+    const reserve = myTeam.squad.find(p => p.id === reserveId);
+    
+    if (!starter || !reserve) return;
+
+    // Validação extra de segurança
+    if (reserve.injuryRounds > 0) {
+        alert("Este jogador está lesionado e não pode jogar!");
+        return;
+    }
+    if (reserve.suspensionRounds > 0) {
+        alert("Este jogador está suspenso e não pode jogar!");
+        return;
+    }
+
+    // Troca os status de titularidade
+    starter.isStarter = false;
+    reserve.isStarter = true;
+    
+    // Mantém capitão e cobradores sincronizados
+    if (myTeam.tactics) {
+        if (myTeam.tactics.captain === starterId) myTeam.tactics.captain = reserveId;
+        if (myTeam.tactics.freekicks === starterId) myTeam.tactics.freekicks = reserveId;
+        if (myTeam.tactics.corners === starterId) myTeam.tactics.corners = reserveId;
+    }
+
+    updateTeamStrength();
+    saveGame();
+    updateDashboardUI();
+}
+
+// Legacy: redireciona para o novo sistema de seleção do campo 2D
+function selectPlayerToSwap(playerId) {
+    const player = myTeam.squad.find(p => p.id === playerId);
+    if (!player) return;
+    if (player.isStarter) {
+        selectPitchPlayer(playerId);
+    } else {
+        selectReservePlayer(playerId);
+    }
 }
 
 // Alterna entre abas na tela de escalação
