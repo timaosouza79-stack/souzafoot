@@ -57,14 +57,14 @@ const realSquads = {
             { name: 'Neto', pos: 'GOL', str: 79 },
             { name: 'Bastos', pos: 'ZAG', str: 82 }, { name: 'Alexander Barboza', pos: 'ZAG', str: 81 },
             { name: 'Alex Telles', pos: 'LAT', str: 82 }, { name: 'Vitinho', pos: 'LAT', str: 80 },
-            { name: 'Cristian Medina', pos: 'MEI', str: 83 }, { name: 'Santi Rodríguez', pos: 'MEI', str: 81 }, { name: 'Danilo', pos: 'MEI', str: 80 },
-            { name: 'Joaquín Correa', pos: 'ATA', str: 83 }, { name: 'Júnior Santos', pos: 'ATA', str: 83 }, { name: 'Matheus Martins', pos: 'ATA', str: 82 },
+            { name: 'Thiago Almada', pos: 'MEI', str: 85 }, { name: 'Cristian Medina', pos: 'MEI', str: 83 }, { name: 'Marlon Freitas', pos: 'MEI', str: 81 },
+            { name: 'Luiz Henrique', pos: 'ATA', str: 84 }, { name: 'Júnior Santos', pos: 'ATA', str: 83 }, { name: 'Igor Jesus', pos: 'ATA', str: 82 },
             // Reservas
             { name: 'Léo Linck', pos: 'GOL', str: 78 }, { name: 'Raul', pos: 'GOL', str: 77 },
             { name: 'Ferraresi', pos: 'ZAG', str: 79 }, { name: 'Ythallo', pos: 'ZAG', str: 74 },
             { name: 'Mateo Ponte', pos: 'LAT', str: 78 }, { name: 'Marçal', pos: 'LAT', str: 76 }, { name: 'Caio Roque', pos: 'LAT', str: 74 },
-            { name: 'Allan', pos: 'MEI', str: 79 }, { name: 'Álvaro Montoro', pos: 'MEI', str: 78 }, { name: 'Newton', pos: 'MEI', str: 77 }, { name: 'Edenilson', pos: 'MEI', str: 76 },
-            { name: 'Arthur Cabral', pos: 'ATA', str: 81 }, { name: 'Chris Ramos', pos: 'ATA', str: 80 }, { name: 'Nathan Fernandes', pos: 'ATA', str: 78 }
+            { name: 'Allan', pos: 'MEI', str: 79 }, { name: 'Santi Rodríguez', pos: 'MEI', str: 81 }, { name: 'Newton', pos: 'MEI', str: 77 }, { name: 'Edenilson', pos: 'MEI', str: 76 },
+            { name: 'Matheus Martins', pos: 'ATA', str: 82 }, { name: 'Arthur Cabral', pos: 'ATA', str: 81 }, { name: 'Nathan Fernandes', pos: 'ATA', str: 78 }
         ]
     },
     bragantino: {
@@ -133,16 +133,16 @@ const realSquads = {
         players: [
             // Titulares (11)
             { name: 'Cássio', pos: 'GOL', str: 83 },
-            { name: 'Fabrício Bruno', pos: 'ZAG', str: 83 }, { name: 'João Marcelo', pos: 'ZAG', str: 79 },
-            { name: 'William', pos: 'LAT', str: 82 }, { name: 'Fágner', pos: 'LAT', str: 78 },
-            { name: 'Gerson', pos: 'MEI', str: 87 }, { name: 'Matheus Pereira', pos: 'MEI', str: 86 }, { name: 'Matheus Henrique', pos: 'MEI', str: 81 }, { name: 'Walace', pos: 'MEI', str: 80 }, { name: 'Lucas Romero', pos: 'MEI', str: 79 },
-            { name: 'Sinisterra', pos: 'ATA', str: 83 },
+            { name: 'Zé Ivaldo', pos: 'ZAG', str: 80 }, { name: 'João Marcelo', pos: 'ZAG', str: 79 },
+            { name: 'William', pos: 'LAT', str: 82 }, { name: 'Marlon', pos: 'LAT', str: 79 },
+            { name: 'Matheus Pereira', pos: 'MEI', str: 86 }, { name: 'Matheus Henrique', pos: 'MEI', str: 81 }, { name: 'Walace', pos: 'MEI', str: 80 }, { name: 'Lucas Romero', pos: 'MEI', str: 79 }, { name: 'Christian', pos: 'MEI', str: 78 },
+            { name: 'Kaio Jorge', pos: 'ATA', str: 82 },
             // Reservas
             { name: 'Matheus Cunha', pos: 'GOL', str: 81 }, { name: 'Otávio', pos: 'GOL', str: 70 },
             { name: 'Lucas Villalba', pos: 'ZAG', str: 78 }, { name: 'Jonathan Jesus', pos: 'ZAG', str: 75 },
             { name: 'Kaiki', pos: 'LAT', str: 76 }, { name: 'Kauã Moraes', pos: 'LAT', str: 72 },
-            { name: 'Christian', pos: 'MEI', str: 78 }, { name: 'Lucas Silva', pos: 'MEI', str: 77 }, { name: 'Japa', pos: 'MEI', str: 75 },
-            { name: 'Kaio Jorge', pos: 'ATA', str: 82 }, { name: 'Bruno Rodrigues', pos: 'ATA', str: 79 }, { name: 'Chico da Costa', pos: 'ATA', str: 78 }, { name: 'Keny Arroyo', pos: 'ATA', str: 75 }, { name: 'Néiser Villarreal', pos: 'ATA', str: 75 }
+            { name: 'Lucas Silva', pos: 'MEI', str: 77 }, { name: 'Japa', pos: 'MEI', str: 75 },
+            { name: 'Sinisterra', pos: 'ATA', str: 83 }, { name: 'Lautaro Díaz', pos: 'ATA', str: 80 }, { name: 'Bruno Rodrigues', pos: 'ATA', str: 79 }, { name: 'Chico da Costa', pos: 'ATA', str: 78 }, { name: 'Keny Arroyo', pos: 'ATA', str: 75 }
         ]
     },
     flamengo: {
@@ -150,16 +150,16 @@ const realSquads = {
         players: [
             // Titulares (11)
             { name: 'Rossi', pos: 'GOL', str: 83 },
-            { name: 'Léo Pereira', pos: 'ZAG', str: 84 }, { name: 'Léo Ortiz', pos: 'ZAG', str: 84 },
-            { name: 'Alex Sandro', pos: 'LAT', str: 82 }, { name: 'Emerson Royal', pos: 'LAT', str: 81 },
-            { name: 'Lucas Paquetá', pos: 'MEI', str: 91 }, { name: 'De Arrascaeta', pos: 'MEI', str: 87 }, { name: 'De la Cruz', pos: 'MEI', str: 86 },
-            { name: 'Pedro', pos: 'ATA', str: 88 }, { name: 'Samuel Lino', pos: 'ATA', str: 85 }, { name: 'Everton', pos: 'ATA', str: 83 },
+            { name: 'Léo Pereira', pos: 'ZAG', str: 84 }, { name: 'Fabrício Bruno', pos: 'ZAG', str: 83 },
+            { name: 'Alex Sandro', pos: 'LAT', str: 82 }, { name: 'Ayrton Lucas', pos: 'LAT', str: 81 },
+            { name: 'Gerson', pos: 'MEI', str: 87 }, { name: 'De Arrascaeta', pos: 'MEI', str: 87 }, { name: 'De la Cruz', pos: 'MEI', str: 86 },
+            { name: 'Pedro', pos: 'ATA', str: 88 }, { name: 'Luiz Araújo', pos: 'ATA', str: 81 }, { name: 'Everton', pos: 'ATA', str: 83 },
             // Reservas
             { name: 'Andrew', pos: 'GOL', str: 81 }, { name: 'Dyogo Alves', pos: 'GOL', str: 71 },
-            { name: 'Danilo', pos: 'ZAG', str: 82 }, { name: 'Vitão', pos: 'ZAG', str: 82 }, { name: 'João Victor', pos: 'ZAG', str: 80 },
-            { name: 'Ayrton Lucas', pos: 'LAT', str: 81 }, { name: 'Varela', pos: 'LAT', str: 78 },
-            { name: 'Saúl Ñíguez', pos: 'MEI', str: 83 }, { name: 'Erick Pulgar', pos: 'MEI', str: 82 }, { name: 'Jorge Carrascal', pos: 'MEI', str: 81 }, { name: 'Jorginho', pos: 'MEI', str: 81 }, { name: 'Evertton Araújo', pos: 'MEI', str: 77 },
-            { name: 'Bruno Henrique', pos: 'ATA', str: 82 }, { name: 'Luiz Araújo', pos: 'ATA', str: 81 }, { name: 'Gonzalo Plata', pos: 'ATA', str: 81 }
+            { name: 'Léo Ortiz', pos: 'ZAG', str: 84 }, { name: 'Danilo', pos: 'ZAG', str: 82 }, { name: 'Vitão', pos: 'ZAG', str: 82 },
+            { name: 'Varela', pos: 'LAT', str: 78 }, { name: 'Emerson Royal', pos: 'LAT', str: 81 },
+            { name: 'Carlos Alcaraz', pos: 'MEI', str: 81 }, { name: 'Erick Pulgar', pos: 'MEI', str: 82 }, { name: 'Saúl Ñíguez', pos: 'MEI', str: 83 }, { name: 'Evertton Araújo', pos: 'MEI', str: 77 },
+            { name: 'Bruno Henrique', pos: 'ATA', str: 82 }, { name: 'Gonzalo Plata', pos: 'ATA', str: 81 }, { name: 'Michael', pos: 'ATA', str: 81 }
         ]
     },
     fluminense: {
@@ -167,16 +167,16 @@ const realSquads = {
         players: [
             // Titulares (11)
             { name: 'Fábio', pos: 'GOL', str: 82 },
-            { name: 'Ignácio', pos: 'ZAG', str: 79 }, { name: 'Igor Rabello', pos: 'ZAG', str: 78 },
+            { name: 'Thiago Silva', pos: 'ZAG', str: 82 }, { name: 'Ignácio', pos: 'ZAG', str: 79 },
             { name: 'Guilherme Arana', pos: 'LAT', str: 85 }, { name: 'Samuel Xavier', pos: 'LAT', str: 77 },
-            { name: 'Savarino', pos: 'MEI', str: 82 }, { name: 'PH Ganso', pos: 'MEI', str: 82 }, { name: 'Lucho Acosta', pos: 'MEI', str: 82 },
-            { name: 'Hulk', pos: 'ATA', str: 86 }, { name: 'Germán Cano', pos: 'ATA', str: 83 }, { name: 'Soteldo', pos: 'ATA', str: 82 },
+            { name: 'PH Ganso', pos: 'MEI', str: 82 }, { name: 'Facundo Bernal', pos: 'MEI', str: 80 }, { name: 'Martinelli', pos: 'MEI', str: 80 },
+            { name: 'Germán Cano', pos: 'ATA', str: 83 }, { name: 'Kevin Serna', pos: 'ATA', str: 79 }, { name: 'John Kennedy', pos: 'ATA', str: 79 },
             // Reservas
             { name: 'Vitor Eudes', pos: 'GOL', str: 71 }, { name: 'Marcelo Pitaluga', pos: 'GOL', str: 72 },
-            { name: 'Jemmes', pos: 'ZAG', str: 77 }, { name: 'Julián Millán', pos: 'ZAG', str: 77 }, { name: 'Freytes', pos: 'ZAG', str: 76 },
+            { name: 'Igor Rabello', pos: 'ZAG', str: 78 }, { name: 'Jemmes', pos: 'ZAG', str: 77 }, { name: 'Freytes', pos: 'ZAG', str: 76 },
             { name: 'Renê', pos: 'LAT', str: 77 }, { name: 'Guga', pos: 'LAT', str: 75 },
-            { name: 'Otávio', pos: 'MEI', str: 81 }, { name: 'Facundo Bernal', pos: 'MEI', str: 80 }, { name: 'Martinelli', pos: 'MEI', str: 80 }, { name: 'Hércules', pos: 'MEI', str: 79 }, { name: 'Alisson', pos: 'MEI', str: 76 }, { name: 'Nonato', pos: 'MEI', str: 76 },
-            { name: 'Canobbio', pos: 'ATA', str: 81 }, { name: 'Kevin Serna', pos: 'ATA', str: 79 }, { name: 'John Kennedy', pos: 'ATA', str: 79 }, { name: 'Rodrigo Castillo', pos: 'ATA', str: 76 }
+            { name: 'Savarino', pos: 'MEI', str: 82 }, { name: 'Lucho Acosta', pos: 'MEI', str: 82 }, { name: 'Hércules', pos: 'MEI', str: 79 }, { name: 'Nonato', pos: 'MEI', str: 76 },
+            { name: 'Hulk', pos: 'ATA', str: 86 }, { name: 'Soteldo', pos: 'ATA', str: 82 }, { name: 'Canobbio', pos: 'ATA', str: 81 }
         ]
     },
     gremio: {
@@ -228,17 +228,17 @@ const realSquads = {
         formation: '4-2-3-1',
         players: [
             // Titulares (11)
-            { name: 'Carlos Miguel', pos: 'GOL', str: 83 },
+            { name: 'Weverton', pos: 'GOL', str: 83 },
             { name: 'Gustavo Gómez', pos: 'ZAG', str: 85 }, { name: 'Murilo', pos: 'ZAG', str: 83 },
-            { name: 'Joaquín Piquerez', pos: 'LAT', str: 83 }, { name: 'Khellven', pos: 'LAT', str: 80 },
-            { name: 'Andreas Pereira', pos: 'MEI', str: 84 }, { name: 'Felipe Anderson', pos: 'MEI', str: 83 }, { name: 'Maurício', pos: 'MEI', str: 82 }, { name: 'Lucas Evangelista', pos: 'MEI', str: 80 }, { name: 'Marlon Freitas', pos: 'MEI', str: 81 },
-            { name: 'Vitor Roque', pos: 'ATA', str: 86 }, { name: 'Jhon Arias', pos: 'ATA', str: 86 },
+            { name: 'Joaquín Piquerez', pos: 'LAT', str: 83 }, { name: 'Agustín Giay', pos: 'LAT', str: 78 },
+            { name: 'Felipe Anderson', pos: 'MEI', str: 83 }, { name: 'Aníbal Moreno', pos: 'MEI', str: 82 }, { name: 'Maurício', pos: 'MEI', str: 82 }, { name: 'Richard Ríos', pos: 'MEI', str: 81 }, { name: 'Raphael Veiga', pos: 'MEI', str: 84 },
+            { name: 'Estêvão', pos: 'ATA', str: 84 },
             // Reservas
             { name: 'Marcelo Lomba', pos: 'GOL', str: 76 }, { name: 'Aranha', pos: 'GOL', str: 70 },
-            { name: 'Bruno Fuchs', pos: 'ZAG', str: 79 }, { name: 'Koné', pos: 'ZAG', str: 77 }, { name: 'Robson', pos: 'ZAG', str: 75 }, { name: 'Benedetti', pos: 'ZAG', str: 74 },
-            { name: 'Agustín Giay', pos: 'LAT', str: 78 }, { name: 'Jefté', pos: 'LAT', str: 77 },
-            { name: 'Emiliano Martínez', pos: 'MEI', str: 79 }, { name: 'Figueiredo', pos: 'MEI', str: 76 },
-            { name: 'Paulinho', pos: 'ATA', str: 84 }, { name: 'Flaco López', pos: 'ATA', str: 82 }, { name: 'Ramón Sosa', pos: 'ATA', str: 80 }, { name: 'Luighi', pos: 'ATA', str: 75 }
+            { name: 'Bruno Fuchs', pos: 'ZAG', str: 79 }, { name: 'Koné', pos: 'ZAG', str: 77 }, { name: 'Robson', pos: 'ZAG', str: 75 },
+            { name: 'Khellven', pos: 'LAT', str: 80 }, { name: 'Jefté', pos: 'LAT', str: 77 },
+            { name: 'Andreas Pereira', pos: 'MEI', str: 84 }, { name: 'Lucas Evangelista', pos: 'MEI', str: 80 }, { name: 'Marlon Freitas', pos: 'MEI', str: 81 }, { name: 'Figueiredo', pos: 'MEI', str: 76 },
+            { name: 'Vitor Roque', pos: 'ATA', str: 86 }, { name: 'Jhon Arias', pos: 'ATA', str: 86 }, { name: 'Flaco López', pos: 'ATA', str: 82 }, { name: 'Ramón Sosa', pos: 'ATA', str: 80 }
         ]
     },
     remo: {
@@ -295,16 +295,16 @@ const realSquads = {
         players: [
             // Titulares (11)
             { name: 'Léo Jardim', pos: 'GOL', str: 83 },
-            { name: 'Robert Renan', pos: 'ZAG', str: 80 }, { name: 'Carlos Cuesta', pos: 'ZAG', str: 79 },
-            { name: 'Lucas Piton', pos: 'LAT', str: 81 }, { name: 'Cuiabano', pos: 'LAT', str: 80 },
-            { name: 'Matheus França', pos: 'MEI', str: 80 }, { name: 'Thiago Mendes', pos: 'MEI', str: 79 }, { name: 'Tchê Tchê', pos: 'MEI', str: 78 },
-            { name: 'Andrés Gómez', pos: 'ATA', str: 78 }, { name: 'Adson', pos: 'ATA', str: 78 }, { name: 'David', pos: 'ATA', str: 77 },
+            { name: 'Robert Renan', pos: 'ZAG', str: 80 }, { name: 'João Victor', pos: 'ZAG', str: 79 },
+            { name: 'Lucas Piton', pos: 'LAT', str: 81 }, { name: 'Puma Rodríguez', pos: 'LAT', str: 76 },
+            { name: 'Philippe Coutinho', pos: 'MEI', str: 82 }, { name: 'Hugo Moura', pos: 'MEI', str: 78 }, { name: 'Mateus Carvalho', pos: 'MEI', str: 76 },
+            { name: 'Pablo Vegetti', pos: 'ATA', str: 82 }, { name: 'Adson', pos: 'ATA', str: 78 }, { name: 'David', pos: 'ATA', str: 77 },
             // Reservas
             { name: 'Daniel Fuzato', pos: 'GOL', str: 74 }, { name: 'Pablo', pos: 'GOL', str: 71 },
-            { name: 'Alan Saldivia', pos: 'ZAG', str: 78 }, { name: 'Lucas Freitas', pos: 'ZAG', str: 74 },
-            { name: 'Paulo Henrique', pos: 'LAT', str: 76 }, { name: 'Puma Rodríguez', pos: 'LAT', str: 75 },
-            { name: 'Jair', pos: 'MEI', str: 77 }, { name: 'Hugo Moura', pos: 'MEI', str: 78 }, { name: 'Mateus Carvalho', pos: 'MEI', str: 76 }, { name: 'Johan Rojas', pos: 'MEI', str: 77 }, { name: 'JP', pos: 'MEI', str: 74 },
-            { name: 'Brenner', pos: 'ATA', str: 77 }, { name: 'Nuno Moreira', pos: 'ATA', str: 76 }
+            { name: 'Carlos Cuesta', pos: 'ZAG', str: 79 }, { name: 'Alan Saldivia', pos: 'ZAG', str: 78 }, { name: 'Lucas Freitas', pos: 'ZAG', str: 74 },
+            { name: 'Cuiabano', pos: 'LAT', str: 80 }, { name: 'Paulo Henrique', pos: 'LAT', str: 76 },
+            { name: 'Dimitri Payet', pos: 'MEI', str: 81 }, { name: 'Tchê Tchê', pos: 'MEI', str: 78 }, { name: 'Jair', pos: 'MEI', str: 77 }, { name: 'JP', pos: 'MEI', str: 74 },
+            { name: 'Andrés Gómez', pos: 'ATA', str: 78 }, { name: 'Brenner', pos: 'ATA', str: 77 }
         ]
     },
     vitoria: {
