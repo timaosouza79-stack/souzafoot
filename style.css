@@ -1240,6 +1240,16 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     text-align: center;
 }
 
+/* Feedback visual: Jogador fora de posição (penalizado) */
+.pitch-player-node.out-of-position .pitch-player-badge.penalty-badge {
+    border-color: #ffa726;
+    box-shadow: 0 0 8px rgba(255, 167, 38, 0.5);
+}
+
+.pitch-player-node.out-of-position .pitch-player-name {
+    color: #ffa726;
+}
+
 /* Banco de Suplentes */
 .squad-reserves-container {
     background: var(--surface-color);

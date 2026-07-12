@@ -2796,7 +2796,8 @@ function calculateTeamStrength(team) {
     const starters = team.squad.filter(p => p.isStarter);
     if (starters.length === 0) return 0;
     
-    const totalStrength = starters.reduce((acc, p) => acc + p.strength, 0);
+    // Usa a força efetiva (com penalização de posição) se disponível
+    const totalStrength = starters.reduce((acc, p) => acc + (p.effectiveStrength || p.strength), 0);
     // Divide pela quantidade ideal (11) para penalizar times que jogam desfalcados
     return Math.round(totalStrength / 11);
 }
@@ -2809,6 +2810,38 @@ function updateTeamStrength() {
     
     const strengthEl = document.getElementById('my-team-strength');
     if (strengthEl) strengthEl.innerText = myTeam.strength;
+}
+
+// ============================================================
+// ⚽ SISTEMA DE PENALIZAÇÃO FORA DE POSIÇÃO
+// Mapeamento de posições ideais e cálculo de força efetiva
+// ============================================================
+
+const OUT_OF_POSITION_PENALTY = 0.85; // 15% de redução
+
+// Mapeamento: para cada posição base do jogador (GOL, ZAG, LAT, MEI, ATA),
+// define quais siglas táticas do campo 2D são consideradas compatíveis.
+const positionCompatibility = {
+    'GOL': ['GO'],
+    'ZAG': ['ZC', 'AD', 'AE'],
+    'LAT': ['LD', 'LE', 'AD', 'AE'],
+    'MEI': ['VO', 'MC', 'AM', 'MD', 'ME'],
+    'ATA': ['CA', 'PD', 'PE', 'AT']
+};
+
+// Calcula a força efetiva de um jogador na posição tática atribuída no campo.
+// Retorna { effectiveStrength, isOutOfPosition }
+function calcEffectiveStrength(player, slotPosText) {
+    if (!player || !slotPosText) return { effectiveStrength: player.strength, isOutOfPosition: false };
+    
+    const compatible = positionCompatibility[player.position] || [];
+    const isOutOfPosition = !compatible.includes(slotPosText);
+    
+    const effectiveStrength = isOutOfPosition 
+        ? Math.floor(player.strength * OUT_OF_POSITION_PENALTY) 
+        : player.strength;
+    
+    return { effectiveStrength, isOutOfPosition };
 }
 
 // Variáveis para a mecânica de substituição no campo 2D
@@ -2944,14 +2977,19 @@ function renderSquad() {
             }
         });
 
-        // Renderiza cada titular no campo 2D
+        // Renderiza cada titular no campo 2D com sistema de penalização
         mapping.forEach(item => {
             if (!item.player) return;
             const player = item.player;
             const slot = item.slot;
 
+            // Calcula a força efetiva com base na posição tática atribuída
+            const { effectiveStrength, isOutOfPosition } = calcEffectiveStrength(player, slot.posText);
+            player.effectiveStrength = effectiveStrength; // Guarda para cálculo de força do time
+
             const node = document.createElement('div');
             node.className = `pitch-player-node ${selectedPitchPlayerId === player.id ? 'selected' : ''}`;
+            if (isOutOfPosition) node.classList.add('out-of-position');
             node.style.left = `${slot.left}%`;
             node.style.top = `${slot.top}%`;
             
@@ -2962,20 +3000,27 @@ function renderSquad() {
             const injuryIcon = isInjured ? " 🤕" : "";
             const suspIcon = isSuspended ? " 🚫" : "";
 
+            // Cor da força: verde normal, amarelo penalizado
+            const strColor = isOutOfPosition ? '#ffa726' : 'var(--primary-color)';
+            const strDisplay = isOutOfPosition ? `${effectiveStrength} ⚠` : `${effectiveStrength}`;
+
             node.onclick = (e) => {
                 e.stopPropagation();
                 selectPitchPlayer(player.id);
             };
 
             node.innerHTML = `
-                <div class="pitch-player-badge">
+                <div class="pitch-player-badge${isOutOfPosition ? ' penalty-badge' : ''}">
                     <span class="pitch-pos-box sector-${slot.sector}">${slot.posText}</span>
-                    <span class="pitch-str-box">${player.strength}</span>
+                    <span class="pitch-str-box" style="color: ${strColor}">${strDisplay}</span>
                 </div>
-                <div class="pitch-player-name" title="${player.name}">${player.name}${injuryIcon}${suspIcon}</div>
+                <div class="pitch-player-name" title="${player.name}${isOutOfPosition ? ' (Fora de Posição: -15%)' : ''}">${player.name}${injuryIcon}${suspIcon}</div>
             `;
             pitchField.appendChild(node);
         });
+
+        // Recalcula a força do time com as penalizações aplicadas
+        updateTeamStrength();
     }
 
     // 2. RENDERIZAR O BANCO DE RESERVAS (LADO DIREITO)
