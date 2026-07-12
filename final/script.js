@@ -1367,22 +1367,34 @@ function simulateDisciplines(m, minute) {
         const player = getRandomPlayerObj(targetTeam);
         if (player) {
             player.yellowCards = (player.yellowCards || 0) + 1;
+            player.matchYellowCards = (player.matchYellowCards || 0) + 1;
+            
             if (m === userSimMatch) {
                 addCommentaryItem(`🟨 Cartão amarelo para <strong>${player.name}</strong> (${targetTeam.name}).`, 'yellow-card', minute);
+            }
+
+            // Segundo cartão amarelo = Expulsão
+            if (player.matchYellowCards >= 2) {
+                player.suspensionRounds = 2; // 2 rodadas na simulação = 1 de punição real na próxima rodada
+                player.isStarter = false;
+                if (m === userSimMatch) {
+                    addCommentaryItem(`🟥 <strong>Segundo cartão amarelo!</strong> <strong>${player.name}</strong> (${targetTeam.name}) foi expulso do jogo!`, 'red-card', minute);
+                    playSFX('whistle');
+                }
             }
         }
     }
     
-    // Cartão vermelho (chance de 0.2% por minuto)
+    // Cartão vermelho direto (chance de 0.2% por minuto)
     if (Math.random() < 0.002) {
         const teams = [m.homeTeam, m.awayTeam];
         const targetTeam = teams[Math.floor(Math.random() * 2)];
         const player = getRandomPlayerObj(targetTeam);
         if (player) {
-            player.suspensionRounds = 1;
+            player.suspensionRounds = 2; // 2 rodadas na simulação = 1 de punição real na próxima rodada
             player.isStarter = false; // Tira dos titulares para a próxima rodada
             if (m === userSimMatch) {
-                addCommentaryItem(`🟥 <strong>Cartão vermelho!</strong> <strong>${player.name}</strong> (${targetTeam.name}) foi expulso do jogo!`, 'red-card', minute);
+                addCommentaryItem(`🟥 <strong>Cartão vermelho direto!</strong> <strong>${player.name}</strong> (${targetTeam.name}) foi expulso do jogo!`, 'red-card', minute);
                 playSFX('whistle');
             }
         }
@@ -1598,8 +1610,19 @@ function playRound() {
 
         if (userHasMatch) {
             const userStarters = myTeam.squad.filter(p => p.isStarter);
-            if (userStarters.length !== 11) {
-                alert(`Escalação Inválida: Você precisa escalar exatamente 11 titulares antes de jogar a rodada! Atualmente você tem ${userStarters.length} titulares.`);
+            const availableHealthy = myTeam.squad.filter(p => p.injuryRounds === 0 && p.suspensionRounds === 0).length;
+            
+            // O número esperado de titulares é o menor entre 11 e o total de atletas saudáveis disponíveis no elenco
+            const expectedStarters = Math.min(11, availableHealthy);
+            
+            if (userStarters.length < expectedStarters) {
+                alert(`Escalação Inválida: Como você possui atletas saudáveis no elenco, você precisa escalar pelo menos ${expectedStarters} titulares antes de jogar a rodada! Atualmente você tem ${userStarters.length} escalados.`);
+                showScreen('screen-squad');
+                renderSquad();
+                return;
+            }
+            if (userStarters.length > 11) {
+                alert(`Escalação Inválida: O limite máximo é de 11 titulares. Atualmente você tem ${userStarters.length} escalados.`);
                 showScreen('screen-squad');
                 renderSquad();
                 return;
@@ -2299,8 +2322,9 @@ function finishMatchSimulation() {
                     // Quem não joga (permanece no banco de reservas toda a partida) recupera 100% da energia
                     p.energy = 100;
                 }
-                // Limpa a flag temporária de todos os jogadores para a próxima rodada
+                // Limpa as flags temporárias de todos os jogadores para a próxima rodada
                 delete p.playedInMatch;
+                delete p.matchYellowCards;
             });
         });
 
@@ -2660,7 +2684,8 @@ function calculateTeamStrength(team) {
     if (starters.length === 0) return 0;
     
     const totalStrength = starters.reduce((acc, p) => acc + p.strength, 0);
-    return Math.round(totalStrength / starters.length);
+    // Divide pela quantidade ideal (11) para penalizar times que jogam desfalcados
+    return Math.round(totalStrength / 11);
 }
 
 // Atualiza a força do time baseado nos 11 titulares
