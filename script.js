@@ -1083,7 +1083,13 @@ function updateDashboardUI() {
             };
             
             stadiumImg.style.display = 'block';
-            stadiumImg.src = home.stadiumImg || `https://loremflickr.com/600/200/stadium,soccer,football?lock=${stadiumLock}`;
+            // Usa o dicionário de estádios reais (mesmo da troca de fundo dinâmico)
+            const realStadiumUrl = stadiumBackgrounds[home.id] || home.stadiumImg || null;
+            if (realStadiumUrl) {
+                stadiumImg.src = realStadiumUrl;
+            } else {
+                stadiumImg.src = `https://loremflickr.com/600/200/stadium,soccer,football?lock=${stadiumLock}`;
+            }
 
             // Atualiza dinamicamente o plano de fundo do jogo com o estádio da equipe da casa (mandante do próximo jogo)
             if (home.id && home.id !== 'BYE') {
