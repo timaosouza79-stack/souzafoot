@@ -2904,6 +2904,7 @@ function renderTacticsPanel() {
             cornersSelect.value = starters[0].id;
         }
     }
+    renderTacticsSummary();
 }
 
 // Salva as alterações feitas no painel de táticas
@@ -2923,6 +2924,7 @@ function updateTactics() {
     
     // Atualiza a força do time
     updateTeamStrength();
+    renderTacticsSummary();
     saveGame();
 }
 
@@ -3464,4 +3466,145 @@ function updateDynamicBackground(teamId) {
     }
     
     bgElement.style.backgroundImage = `url('${bgUrl}')`;
+}
+
+// ============================================================
+// 📊 RESUMO TÁTICO EM CAMPO (TEMPO REAL)
+// Mapeamento e distribuição de jogadores por formação tática
+// ============================================================
+
+const formationTemplates = {
+    '4-3-3': [
+        { name: 'Goleiro', posType: 'GOL' },
+        { name: 'Lateral Direito', posType: 'LAT' },
+        { name: 'Zagueiro Direito', posType: 'ZAG' },
+        { name: 'Zagueiro Esquerdo', posType: 'ZAG' },
+        { name: 'Lateral Esquerdo', posType: 'LAT' },
+        { name: 'Meia Central', posType: 'MEI' },
+        { name: 'Meia Ofensivo', posType: 'MEI' },
+        { name: 'Meia Armador', posType: 'MEI' },
+        { name: 'Ponta Direita', posType: 'ATA' },
+        { name: 'Centroavante', posType: 'ATA' },
+        { name: 'Ponta Esquerda', posType: 'ATA' }
+    ],
+    '4-4-2': [
+        { name: 'Goleiro', posType: 'GOL' },
+        { name: 'Lateral Direito', posType: 'LAT' },
+        { name: 'Zagueiro Direito', posType: 'ZAG' },
+        { name: 'Zagueiro Esquerdo', posType: 'ZAG' },
+        { name: 'Lateral Esquerdo', posType: 'LAT' },
+        { name: 'Volante 1', posType: 'MEI' },
+        { name: 'Volante 2', posType: 'MEI' },
+        { name: 'Meia Direito', posType: 'MEI' },
+        { name: 'Meia Esquerdo', posType: 'MEI' },
+        { name: 'Atacante Direito', posType: 'ATA' },
+        { name: 'Atacante Esquerdo', posType: 'ATA' }
+    ],
+    '4-2-3-1': [
+        { name: 'Goleiro', posType: 'GOL' },
+        { name: 'Lateral Direito', posType: 'LAT' },
+        { name: 'Zagueiro Direito', posType: 'ZAG' },
+        { name: 'Zagueiro Esquerdo', posType: 'ZAG' },
+        { name: 'Lateral Esquerdo', posType: 'LAT' },
+        { name: 'Volante 1', posType: 'MEI' },
+        { name: 'Volante 2', posType: 'MEI' },
+        { name: 'Meia Ofensivo Direito', posType: 'MEI' },
+        { name: 'Meia Central', posType: 'MEI' },
+        { name: 'Meia Ofensivo Esquerdo', posType: 'MEI' },
+        { name: 'Centroavante', posType: 'ATA' }
+    ],
+    '3-5-2': [
+        { name: 'Goleiro', posType: 'GOL' },
+        { name: 'Zagueiro Direito', posType: 'ZAG' },
+        { name: 'Zagueiro Central', posType: 'ZAG' },
+        { name: 'Zagueiro Esquerdo', posType: 'ZAG' },
+        { name: 'Ala Direito', posType: 'LAT' },
+        { name: 'Ala Esquerdo', posType: 'LAT' },
+        { name: 'Volante 1', posType: 'MEI' },
+        { name: 'Volante 2', posType: 'MEI' },
+        { name: 'Meia de Ligação', posType: 'MEI' },
+        { name: 'Atacante Direito', posType: 'ATA' },
+        { name: 'Atacante Esquerdo', posType: 'ATA' }
+    ],
+    '5-3-2': [
+        { name: 'Goleiro', posType: 'GOL' },
+        { name: 'Lateral Direito', posType: 'LAT' },
+        { name: 'Zagueiro Direito', posType: 'ZAG' },
+        { name: 'Zagueiro Central', posType: 'ZAG' },
+        { name: 'Zagueiro Esquerdo', posType: 'ZAG' },
+        { name: 'Lateral Esquerdo', posType: 'LAT' },
+        { name: 'Volante 1', posType: 'MEI' },
+        { name: 'Volante 2', posType: 'MEI' },
+        { name: 'Meia de Criação', posType: 'MEI' },
+        { name: 'Centroavante 1', posType: 'ATA' },
+        { name: 'Centroavante 2', posType: 'ATA' }
+    ]
+};
+
+function renderTacticsSummary() {
+    if (!myTeam || !myTeam.tactics) return;
+    
+    const summaryContainer = document.getElementById('tactics-summary-positions');
+    const formationTitle = document.getElementById('tactics-summary-formation-name');
+    if (!summaryContainer || !formationTitle) return;
+
+    const formation = myTeam.tactics.formation || '4-3-3';
+    formationTitle.innerText = formation;
+    summaryContainer.innerHTML = '';
+
+    const starters = myTeam.squad.filter(p => p.isStarter);
+    const template = formationTemplates[formation] || formationTemplates['4-3-3'];
+
+    let pool = [...starters];
+    const mapping = [];
+
+    // Primeiro passo: preencher as posições com atletas naturais
+    template.forEach(slot => {
+        const playerIdx = pool.findIndex(p => p.position === slot.posType);
+        if (playerIdx !== -1) {
+            mapping.push({ slotName: slot.name, player: pool[playerIdx] });
+            pool.splice(playerIdx, 1);
+        } else {
+            mapping.push({ slotName: slot.name, player: null });
+        }
+    });
+
+    // Segundo passo: preencher vagas restantes com jogadores improvisados
+    mapping.forEach(item => {
+        if (item.player === null && pool.length > 0) {
+            item.player = pool[0];
+            pool.splice(0, 1);
+        }
+    });
+
+    // Renderizar na tela
+    mapping.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'tactics-summary-item';
+        
+        let playerContent = '<span style="color: var(--text-muted); font-style: italic;">Não Escalado</span>';
+        if (item.player) {
+            const isCaptain = item.player.id === myTeam.tactics.captain;
+            const isFk = item.player.id === myTeam.tactics.freekicks;
+            const isCor = item.player.id === myTeam.tactics.corners;
+            
+            let badges = '';
+            if (isCaptain) badges += ' <span class="badge-role" title="Capitão">Ⓒ</span>';
+            if (isFk) badges += ' <span class="badge-role" title="Faltas">Ⓕ</span>';
+            if (isCor) badges += ' <span class="badge-role" title="Escanteios">Ⓢ</span>';
+
+            playerContent = `
+                <span class="player-name-summary"><strong>${item.player.name}</strong>${badges}</span>
+                <span class="player-strength-summary">${item.player.strength}</span>
+            `;
+        }
+
+        div.innerHTML = `
+            <span class="position-label">${item.slotName}</span>
+            <div class="player-mapping-box">
+                ${playerContent}
+            </div>
+        `;
+        summaryContainer.appendChild(div);
+    });
 }
