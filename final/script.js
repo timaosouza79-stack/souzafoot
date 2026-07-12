@@ -397,8 +397,14 @@ function handleLogin() {
     unlockAudio();
     const userInput = document.getElementById('login-username').value;
     const user = userInput ? userInput.trim() : "";
+    const passwordInput = document.getElementById('login-password').value;
+    const password = passwordInput ? passwordInput.trim() : "";
+
     if (!user) {
         return alert("Por favor, digite seu nome de usuário");
+    }
+    if (!password) {
+        return alert("Por favor, digite sua senha");
     }
 
     if (!users || typeof users !== 'object') {
@@ -412,7 +418,11 @@ function handleLogin() {
                 return alert("Este usuário já existe. Tente outro nome ou faça login.");
             }
             
-            users[user] = { gameState: null };
+            // Cria a conta do usuário associando a senha informada
+            users[user] = { 
+                password: password,
+                gameState: null 
+            };
             localStorage.setItem('brasfoot_users', JSON.stringify(users));
             alert("Conta criada com sucesso! Entrando...");
             
@@ -425,6 +435,18 @@ function handleLogin() {
             if (!users[user]) {
                 return alert("Usuário não encontrado. Se é sua primeira vez, clique em 'Criar conta'.");
             }
+            
+            const savedPassword = users[user].password;
+            
+            // Se for uma conta legada sem senha, define a senha digitada como a senha dessa conta
+            if (savedPassword === undefined) {
+                users[user].password = password;
+                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                alert("Senha cadastrada com sucesso para este usuário antigo!");
+            } else if (savedPassword !== password) {
+                return alert("Senha incorreta. Tente novamente.");
+            }
+            
             currentUser = user;
             loadGame(); // Carrega o jogo salvo ou inicia um novo
             renderUserList();
@@ -445,6 +467,11 @@ function logout() {
     saveGame();
     currentUser = null;
     isRegisterMode = false;
+    
+    // Limpar os campos do formulário de login
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+
     // Resetar UI do login
     document.getElementById('login-title').innerText = 'Entrar';
     document.getElementById('btn-login-action').innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
@@ -1878,6 +1905,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginInput = document.getElementById('login-username');
     if (loginInput) {
         loginInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+    }
+    const passwordInput = document.getElementById('login-password');
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleLogin();
         });
     }
