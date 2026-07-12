@@ -453,6 +453,7 @@ function logout() {
     
     showScreen('screen-login');
     renderUserList();
+    updateDynamicBackground(null);
 }
 
 function saveGame() {
@@ -550,6 +551,7 @@ function loadGame() {
         ensureShields();
         showScreen('screen-main');
         updateDashboardUI();
+        updateDynamicBackground(myTeam.id);
     } else {
         // Inicializa dados para um novo jogo do usuário
         console.log("loadGame: Nenhum estado salvo encontrado ou inválido. Inicializando novo jogo.");
@@ -873,6 +875,7 @@ function selectTeam(teamId, league = 'brazil_a') {
     saveGame();
     showScreen('screen-main');
     updateDashboardUI();
+    updateDynamicBackground(teamId);
 }
 
 // Event listener for league selection
@@ -1639,6 +1642,9 @@ function playRound() {
         });
 
     userSimMatch = simulatedRoundMatches.find(m => m.home === myTeam.id || m.away === myTeam.id);
+    if (userSimMatch) {
+        updateDynamicBackground(userSimMatch.homeTeam.id); // Estádio do time mandante
+    }
     
     // Se a lista de jogos estiver vazia, finaliza a rodada automaticamente para não travar
     if (simulatedRoundMatches.length === 0) {
@@ -2308,6 +2314,7 @@ function finishMatchSimulation() {
         updateDashboardUI();
         saveGame();
         showScreen('screen-main');
+        updateDynamicBackground(myTeam.id);
         window.scrollTo(0,0);
     }
 }
@@ -3341,4 +3348,95 @@ function sellPlayer(playerId) {
         updateDashboardUI();
         saveGame();
     }
+}
+
+// ============================================================
+// 🏟️ FUNDO DINÂMICO DE ESTÁDIOS
+// Mapeamento e controle de imagem de fundo baseado no time da casa
+// ============================================================
+
+const stadiumBackgrounds = {
+    // Brasil Série A
+    athleticopr: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Ligga_Arena.jpg/800px-Ligga_Arena.jpg",
+    atleticomg: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Arena_MRV_-_Belo_Horizonte.jpg/800px-Arena_MRV_-_Belo_Horizonte.jpg",
+    bahia: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Itaipava_Arena_Fonte_Nova_-_Salvador_-_Bahia.jpg/800px-Itaipava_Arena_Fonte_Nova_-_Salvador_-_Bahia.jpg",
+    botafogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Engenh%C3%A3o_panor%C3%A2mica.jpg/800px-Engenh%C3%A3o_panor%C3%A2mica.jpg",
+    corinthians: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Est%C3%A1dio_Corinthians_-_Vista_interna_-_Maio_2014.jpg/800px-Est%C3%A1dio_Corinthians_-_Vista_interna_-_Maio_2014.jpg",
+    cruzeiro: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Mineir%C3%A3o_Arena.jpg/800px-Mineir%C3%A3o_Arena.jpg",
+    flamengo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Est%C3%A1dio_do_Maracan%C3%A3_-_Rio_de_Janeiro%2C_Brasil.jpg/800px-Est%C3%A1dio_do_Maracan%C3%A3_-_Rio_de_Janeiro%2C_Brasil.jpg",
+    fluminense: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Est%C3%A1dio_do_Maracan%C3%A3_-_Rio_de_Janeiro%2C_Brasil.jpg/800px-Est%C3%A1dio_do_Maracan%C3%A3_-_Rio_de_Janeiro%2C_Brasil.jpg",
+    gremio: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Arena_do_Gr%C3%AAmio_-_Porto_Alegre.jpg/800px-Arena_do_Gr%C3%AAmio_-_Porto_Alegre.jpg",
+    internacional: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Est%C3%A1dio_Beira-Rio_-_Porto_Alegre.jpg/800px-Est%C3%A1dio_Beira-Rio_-_Porto_Alegre.jpg",
+    palmeiras: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Allianz_Parque_interno.jpg/800px-Allianz_Parque_interno.jpg",
+    santos: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Vila_Belmiro_-_Santos.jpg/800px-Vila_Belmiro_-_Santos.jpg",
+    saopaulo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Est%C3%A1dio_do_Morumbi_-_S%C3%A3o_Paulo.jpg/800px-Est%C3%A1dio_do_Morumbi_-_S%C3%A3o_Paulo.jpg",
+    vasco: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/S%C3%A3o_Janu%C3%A1rio_-_Rio_de_Janeiro.jpg/800px-S%C3%A3o_Janu%C3%A1rio_-_Rio_de_Janeiro.jpg",
+    vitoria: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Barrad%C3%A3o_Stadium.jpg/800px-Barrad%C3%A3o_Stadium.jpg",
+    bragantino: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Est%C3%A1dio_Nabi_Abi_Chedid_-_2021.jpg/800px-Est%C3%A1dio_Nabi_Abi_Chedid_-_2021.jpg",
+    chapecoense: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Arena_Cond%C3%A1_-_Chapecoense.jpg/800px-Arena_Cond%C3%A1_-_Chapecoense.jpg",
+    coritiba: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Couto_Pereira_-_Curitiba.jpg/800px-Couto_Pereira_-_Curitiba.jpg",
+    mirassol: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Estadio_Jose_Maria_de_Campos_Maia.jpg/800px-Estadio_Jose_Maria_de_Campos_Maia.jpg",
+    remo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Est%C3%A1dio_Evandro_Almeida.jpg/800px-Est%C3%A1dio_Evandro_Almeida.jpg",
+
+    // Brasil Série B
+    america: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Est%C3%A1dio_Independ%C3%AAncia_-_Belo_Horizonte.jpg/800px-Est%C3%A1dio_Independ%C3%AAncia_-_Belo_Horizonte.jpg",
+    atleticogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Est%C3%A1dio_Ant%C3%B4nio_Accioly.jpg/800px-Est%C3%A1dio_Ant%C3%B4nio_Accioly.jpg",
+    avai: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Est%C3%A1dio_da_Ressacada.jpg/800px-Est%C3%A1dio_da_Ressacada.jpg",
+    ceara: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Arena_Castel%C3%A3o_-_Vista_a%C3%A9rea.jpg/800px-Arena_Castel%C3%A3o_-_Vista_a%C3%A9rea.jpg",
+    criciuma: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Est%C3%A1dio_Heriberto_H%C3%BClse.jpg/800px-Est%C3%A1dio_Heriberto_H%C3%BClse.jpg",
+    cuiaba: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Arena_Pantanal_-_Cuiaba.jpg/800px-Arena_Pantanal_-_Cuiaba.jpg",
+    fortaleza: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Arena_Castel%C3%A3o_-_Vista_a%C3%A9rea.jpg/800px-Arena_Castel%C3%A3o_-_Vista_a%C3%A9rea.jpg",
+    goias: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Est%C3%A1dio_da_Serrinha.jpg/800px-Est%C3%A1dio_da_Serrinha.jpg",
+    juventude: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Estadio_Alfredo_Jaconi.jpg/800px-Estadio_Alfredo_Jaconi.jpg",
+    novorizontino: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Est%C3%A1dio_Jorge_Ismael_de_Biasi.jpg/800px-Est%C3%A1dio_Jorge_Ismael_de_Biasi.jpg",
+    pontepreta: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Est%C3%A1dio_Mois%C3%A9s_Lucarelli.jpg/800px-Est%C3%A1dio_Mois%C3%A9s_Lucarelli.jpg",
+    sport: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Est%C3%A1dio_Ilha_do_Retiro.jpg/800px-Est%C3%A1dio_Ilha_do_Retiro.jpg",
+
+    // Europa
+    mancity: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/City_of_Manchester_Stadium_aerial_view%2C_2022.jpg/800px-City_of_Manchester_Stadium_aerial_view%2C_2022.jpg",
+    arsenal: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Emirates_Stadium_east_side_exterior.jpg/800px-Emirates_Stadium_east_side_exterior.jpg",
+    liverpool: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Anfield_stadium_Main_Stand.jpg/800px-Anfield_stadium_Main_Stand.jpg",
+    manutd: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Old_Trafford_inside_20060726_1.jpg/800px-Old_Trafford_inside_20060726_1.jpg",
+    chelsea: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Stamford_Bridge_Stadium.jpg/800px-Stamford_Bridge_Stadium.jpg",
+    realmadrid: "https://upload.wikimedia.org/wikipedia/commons/1/10/Estadio_Santiago_Bernab%C3%A9u_Madrid.jpg",
+    barcelona: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Camp_Nou_presidential_box.jpg/800px-Camp_Nou_presidential_box.jpg",
+    bayern: "https://upload.wikimedia.org/wikipedia/commons/f/fc/FC_Bayern_Munich%2C_Allianz_Arena_Stadium_15.jpg",
+    dortmund: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Westfalenstadion_S%C3%BCdtrib%C3%BChne_BVB-PSG_2020.jpg/800px-Westfalenstadion_S%C3%BCdtrib%C3%BChne_BVB-PSG_2020.jpg",
+    juventus: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Juventus_Stadium_panoramica.jpg/800px-Juventus_Stadium_panoramica.jpg",
+    inter: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Stadio_San_Siro_Milano.jpg/800px-Stadio_San_Siro_Milano.jpg",
+    milan: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Stadio_San_Siro_Milano.jpg/800px-Stadio_San_Siro_Milano.jpg",
+    psg: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Parc_des_Princes_Dec_2015.jpg/800px-Parc_des_Princes_Dec_2015.jpg",
+    porto: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Estadio_do_Dragao_Porto.jpg/800px-Estadio_do_Dragao_Porto.jpg",
+    benfica: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Est%C3%A1dio_da_Luz_-_panor%C3%A2mica_-_Benfica_vs_Sporting_%282006%29.jpg/800px-Est%C3%A1dio_da_Luz_-_panor%C3%A2mica_-_Benfica_vs_Sporting_%282006%29.jpg",
+    sporting: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Est%C3%A1dio_Alvalade_XXI_-_Interior_2004.jpg/800px-Est%C3%A1dio_Alvalade_XXI_-_Interior_2004.jpg",
+    
+    // América do Sul
+    bocajuniors: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/La_Bombonera_La_Boca_Buenos_Aires_2.jpg/800px-La_Bombonera_La_Boca_Buenos_Aires_2.jpg",
+    riverplate: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Estadio_Mas_Monumental_en_2023.jpg/800px-Estadio_Mas_Monumental_en_2023.jpg",
+    penarol: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Estadio_Campe%C3%B3n_del_Siglo_vista_a%C3%A9rea.jpg/800px-Estadio_Campe%C3%B3n_del_Siglo_vista_a%C3%A9rea.jpg",
+    nacional: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Gran_Parque_Central_tribuna_Atilio_Garcia_2021.jpg/800px-Gran_Parque_Central_tribuna_Atilio_Garcia_2021.jpg",
+    independientedelvalle: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Arena_MRV_-_Belo_Horizonte.jpg/800px-Arena_MRV_-_Belo_Horizonte.jpg",
+    colocolo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Estadio_monumental.jpg/800px-Estadio_monumental.jpg"
+};
+
+function updateDynamicBackground(teamId) {
+    const bgElement = document.getElementById('dynamic-bg');
+    if (!bgElement) return;
+
+    let bgUrl = "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2070&auto=format&fit=crop"; // Estádio genérico inicial
+
+    if (teamId) {
+        // Tenta buscar no dicionário manual de imagens de alta qualidade
+        if (stadiumBackgrounds[teamId]) {
+            bgUrl = stadiumBackgrounds[teamId];
+        } else {
+            // Fallback para o stadiumImg configurado no teamsData
+            const team = allTeams.find(t => t.id === teamId);
+            if (team && team.stadiumImg) {
+                bgUrl = team.stadiumImg;
+            }
+        }
+    }
+    
+    bgElement.style.backgroundImage = `url('${bgUrl}')`;
 }

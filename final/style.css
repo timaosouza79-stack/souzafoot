@@ -25,19 +25,39 @@
     --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Fundo Dinâmico com Desfoque e Escurecimento (Overlay) */
+.dynamic-background {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: -2;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2070&auto=format&fit=crop'); /* Fundo genérico inicial */
+    transition: background-image 0.8s ease-in-out;
+}
+
+.dynamic-background::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at top right, rgba(11, 14, 20, 0.4), rgba(11, 14, 20, 0.85) 75%);
+    backdrop-filter: blur(12px) brightness(0.4);
+    -webkit-backdrop-filter: blur(12px) brightness(0.4);
+    z-index: -1;
+}
+
 /* Competition Themes */
 body.theme-cup {
     --primary-color: #FFD700;
     --primary-dark: #FFC107;
     --primary-glow: rgba(255, 215, 0, 0.4);
-    background: radial-gradient(circle at top right, rgba(80, 60, 0, 0.8), var(--bg-base) 60%);
 }
 
 body.theme-libertadores {
     --primary-color: #2979FF;
     --primary-dark: #1565C0;
     --primary-glow: rgba(41, 121, 255, 0.4);
-    background: radial-gradient(circle at top right, rgba(0, 30, 80, 0.8), var(--bg-base) 60%);
 }
 
 * {
@@ -49,10 +69,6 @@ body.theme-libertadores {
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-base);
-    background-image: 
-        radial-gradient(circle at 15% 50%, rgba(0, 230, 118, 0.08), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(41, 121, 255, 0.08), transparent 25%);
-    background-attachment: fixed;
     color: var(--text-main);
     line-height: 1.6;
     min-height: 100vh;
