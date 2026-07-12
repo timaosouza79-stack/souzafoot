@@ -21,7 +21,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
     <div id="dynamic-bg" class="dynamic-background"></div>
@@ -248,7 +248,7 @@
         <!-- Tela de Classificação -->
         <section id="screen-standings" class="screen">
             <header class="manager-header" style="justify-content: space-between;">
-                <h2>Classificação - Brasileirão Série A</h2>
+                <h2 id="standings-title">Classificação</h2>
                 <div class="manager-actions">
                     <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
                 </div>
@@ -604,7 +604,7 @@
     </div>
 
     <script src="squads.js"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
     <script>
         // Popula o seletor de competições dinamicamente após os scripts carregarem
         function populateStatsCompetitions() {

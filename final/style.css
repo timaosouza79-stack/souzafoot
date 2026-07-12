@@ -1427,6 +1427,54 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 }
 
 /* ============================================================
+   MERCADO DE TRANSFERÊNCIAS (Layout Responsivo / Mobile)
+   ============================================================ */
+.market-item {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 20px;
+}
+
+.market-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.market-item-top .player-name {
+    font-size: 1.1rem;
+}
+
+.market-item-top .stat-str {
+    font-size: 1.1rem;
+}
+
+.market-item-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.market-item-actions .btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 8px 5px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajustes finos para celular no Mercado */
+@media (max-width: 768px) {
+    .market-item {
+        padding: 18px 14px;
+    }
+}
+
+/* ============================================================
    MEDIA QUERIES — MOBILE (≤ 768px)
    ============================================================ */
 @media (max-width: 768px) {
