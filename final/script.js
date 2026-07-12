@@ -992,14 +992,22 @@ function updateDashboardUI() {
             
             stadiumImg.style.display = 'block';
             stadiumImg.src = home.stadiumImg || `https://loremflickr.com/600/200/stadium,soccer,football?lock=${stadiumLock}`;
+
+            // Atualiza dinamicamente o plano de fundo do jogo com o estádio da equipe da casa (mandante do próximo jogo)
+            if (home.id && home.id !== 'BYE') {
+                updateDynamicBackground(home.id);
+            } else {
+                updateDynamicBackground(myTeam.id);
+            }
         } else {
-            // Se não houver jogo do usuário para a rodada atual, limpa o display
+            // Se não houver jogo do usuário para a rodada atual, limpa o display e usa o do próprio time
             document.getElementById('match-home-name').innerText = 'Aguardando';
             document.getElementById('match-home-shield').src = '';
             document.getElementById('match-away-name').innerText = 'Próximo Jogo';
             document.getElementById('match-away-shield').src = '';
             document.getElementById('match-stadium-info').innerText = 'Fase a definir';
             document.getElementById('match-stadium-img').style.display = 'none';
+            updateDynamicBackground(myTeam.id);
         }
     } else {
         document.getElementById('btn-round-num').innerText = "(Fim)";
@@ -1008,6 +1016,7 @@ function updateDashboardUI() {
         document.getElementById('match-home-shield').src = '';
         document.getElementById('match-away-name').innerText = 'Encerrada';
         document.getElementById('match-away-shield').src = '';
+        updateDynamicBackground(myTeam.id);
     }
 }
 
