@@ -342,6 +342,7 @@ let isLibertadoresMode = false;
 let libertadoresParticipants = []; // Armazena quem se classificou para a próxima Liberta
 let cupWinnerId = null;
 let cupRunnerUpId = null;
+let databaseVersion = "2026-07-12-v1";
 // Som: preferência do usuário
 window.soundEnabled = true;
 
@@ -486,6 +487,7 @@ function logout() {
 function saveGame() {
     if (!currentUser) return;
     users[currentUser].gameState = {
+        databaseVersion,
         myTeamId: myTeam ? myTeam.id : null,
         currentRound,
         matchSchedule,
@@ -533,6 +535,68 @@ function loadGame() {
     
     if (state && state.myTeamId && state.allTeams && state.allTeams.length > 0) {
         allTeams = state.allTeams;
+        
+        // Verifica a versão da base de dados local. Se for antiga (legacy) ou incompatível, força atualização dos elencos da CPU
+        const savedDbVersion = state.databaseVersion || "legacy";
+        const targetDbVersion = "2026-07-12-v1";
+        
+        databaseVersion = targetDbVersion; // Atualiza a variável global
+        
+        myTeam = allTeams.find(t => t.id === state.myTeamId);
+        
+        if (!myTeam) {
+            users[currentUser].gameState = null;
+            loadGame();
+            return;
+        }
+
+        if (savedDbVersion !== targetDbVersion) {
+            console.log("Migrando elencos do banco de dados antigo:", savedDbVersion);
+            
+            allTeams.forEach(team => {
+                if (team.id !== myTeam.id) {
+                    if (typeof realSquads !== 'undefined' && realSquads[team.id]) {
+                        let playerIdCounter = 10000 + Math.floor(Math.random() * 10000);
+                        team.squad = realSquads[team.id].players.map((p, index) => ({
+                            id: playerIdCounter++,
+                            name: p.name,
+                            position: p.pos,
+                            strength: p.str,
+                            energy: 100,
+                            goals: 0,
+                            assists: 0,
+                            yellowCards: 0,
+                            suspensionRounds: 0,
+                            injuryRounds: 0,
+                            redCardInMatch: false,
+                            isStarter: index < 11
+                        }));
+                        team.formation = realSquads[team.id].formation;
+                    }
+                }
+            });
+            
+            // Se o usuário estiver na rodada 1, re-sincroniza também o time dele para obter o elenco de 2026 oficial
+            if (state.currentRound === 1 && typeof realSquads !== 'undefined' && realSquads[myTeam.id]) {
+                let playerIdCounter = 20000;
+                myTeam.squad = realSquads[myTeam.id].players.map((p, index) => ({
+                    id: playerIdCounter++,
+                    name: p.name,
+                    position: p.pos,
+                    strength: p.str,
+                    energy: 100,
+                    goals: 0,
+                    assists: 0,
+                    yellowCards: 0,
+                    suspensionRounds: 0,
+                    injuryRounds: 0,
+                    redCardInMatch: false,
+                    isStarter: index < 11
+                }));
+                myTeam.formation = realSquads[myTeam.id].formation;
+            }
+            saveGame();
+        }
         
         // Migração de dados: garante que todos os jogadores tenham propriedades essenciais
         // (corrige saves antigos onde injuryRounds não era inicializado)
@@ -595,6 +659,7 @@ function loadGame() {
         libertadoresParticipants = [];
         cupWinnerId = null; // Reset cup winner for new season
         cupRunnerUpId = null; // Reset cup runner-up for new season
+        databaseVersion = "2026-07-12-v1";
         
         allTeams = JSON.parse(JSON.stringify(teamsData)); 
         let playerIdCounter = 1;
