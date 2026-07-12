@@ -510,6 +510,12 @@ function loadGame() {
         // (corrige saves antigos onde injuryRounds não era inicializado)
         allTeams.forEach(team => {
             if (team.squad) {
+                const seenIds = new Set();
+                team.squad = team.squad.filter(p => {
+                    if (!p || !p.id || !p.name || seenIds.has(p.id)) return false;
+                    seenIds.add(p.id);
+                    return true;
+                });
                 team.squad.forEach(p => {
                     if (p.injuryRounds === undefined || p.injuryRounds === null) p.injuryRounds = 0;
                     if (p.suspensionRounds === undefined || p.suspensionRounds === null) p.suspensionRounds = 0;
@@ -1570,6 +1576,9 @@ function playRound() {
                 p.isStarter = false;
             }
         });
+        
+        // Auto-escala o time do usuário para repor titulares ausentes (lesionados/suspensos) com reservas saudáveis
+        autoSelectStarters(myTeam);
     }
 
     // 2. Validação da escalação do usuário antes da rodada
@@ -2716,6 +2725,37 @@ function renderSquad() {
 }
 
 function selectPlayerToSwap(playerId) {
+    const player = myTeam.squad.find(p => p.id === playerId);
+    if (!player) return;
+
+    const startersCount = myTeam.squad.filter(p => p.isStarter).length;
+
+    // Se o time tem menos de 11 titulares e o jogador clicado é um reserva saudável, promove diretamente
+    if (startersCount < 11 && !player.isStarter) {
+        if (player.injuryRounds > 0) {
+            alert("Você não pode escalar um jogador lesionado!");
+            return;
+        }
+        if (player.suspensionRounds > 0) {
+            alert("Você não pode escalar um jogador suspenso!");
+            return;
+        }
+        player.isStarter = true;
+        playerToSwapId = null;
+        updateTeamStrength();
+        renderSquad();
+        return;
+    }
+
+    // Se o time tem mais de 11 titulares e o jogador clicado é titular, rebaixa diretamente
+    if (startersCount > 11 && player.isStarter) {
+        player.isStarter = false;
+        playerToSwapId = null;
+        updateTeamStrength();
+        renderSquad();
+        return;
+    }
+
     if (playerToSwapId === null) {
         // Primeiro clique: seleciona o jogador
         playerToSwapId = playerId;
@@ -2741,13 +2781,15 @@ function selectPlayerToSwap(playerId) {
             return;
         }
 
-        if (p1 && p2 && p1.isStarter !== p2.isStarter) {
-            // Troca os status
-            const temp = p1.isStarter;
-            p1.isStarter = p2.isStarter;
-            p2.isStarter = temp;
-        } else {
-            alert("Você só pode trocar um titular por um reserva.");
+        if (p1 && p2) {
+            if (p1.isStarter !== p2.isStarter) {
+                // Troca os status
+                const temp = p1.isStarter;
+                p1.isStarter = p2.isStarter;
+                p2.isStarter = temp;
+            } else {
+                alert("Você só pode trocar um titular por um reserva.");
+            }
         }
         playerToSwapId = null; // Reseta após tentar trocar
         updateTeamStrength(); // Atualiza a força ao trocar

@@ -1,28 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800;900&display=swap');
 
 :root {
-    /* Premium Palette */
-    --primary-color: #00E676; /* Vibrant Emerald */
-    --primary-dark: #00C853;
-    --primary-glow: rgba(0, 230, 118, 0.4);
+    /* Premium Palette - Dark Mode Futurista */
+    --primary-color: hsl(150, 100%, 45%); /* Neon Green Emerald */
+    --primary-dark: hsl(150, 100%, 35%);
+    --primary-glow: hsla(150, 100%, 45%, 0.35);
     
-    --bg-base: #0B0E14; /* Deep dark blue/black */
-    --surface-color: rgba(20, 25, 35, 0.6); /* Glass effect */
-    --surface-hover: rgba(30, 35, 45, 0.8);
+    --bg-base: hsl(220, 25%, 7%); /* Slate Dark */
+    --surface-color: hsla(220, 20%, 13%, 0.7); /* Deep slate semi-transparent */
+    --surface-hover: hsla(220, 20%, 18%, 0.85);
     
-    --text-main: #F8F9FA;
-    --text-muted: #ADB5BD;
+    --text-main: hsl(210, 20%, 98%);
+    --text-muted: hsl(218, 12%, 70%);
     
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-highlight: rgba(255, 255, 255, 0.15);
+    --border-color: hsla(210, 20%, 100%, 0.08);
+    --border-highlight: hsla(210, 20%, 100%, 0.15);
     
-    --accent-color: #FFC107; /* Gold accent */
-    --danger-color: #FF3D00;
-    --info-color: #2979FF;
+    --accent-color: hsl(45, 100%, 50%); /* Gold */
+    --danger-color: hsl(10, 100%, 55%); /* Bright Red */
+    --info-color: hsl(215, 100%, 55%); /* Blue */
     
-    --glass-blur: blur(16px);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --glass-blur: blur(20px);
+    --glass-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Competition Themes */
@@ -362,10 +362,17 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 .dashboard-card {
     background: var(--surface-color);
     backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 30px;
     box-shadow: var(--glass-shadow);
+    transition: var(--transition-smooth);
+}
+
+.dashboard-card:hover {
+    border-color: var(--border-highlight);
+    box-shadow: 0 12px 50px -12px rgba(0, 0, 0, 0.8), 0 0 1px 1px var(--border-highlight) inset;
 }
 
 .dashboard-card h3 {
@@ -531,8 +538,10 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 }
 
 .player-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface-hover);
     border-color: var(--border-highlight);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .player-item.selected {
