@@ -1,0 +1,566 @@
+<!-- 
+    ========================================
+    EXEMPLO DE INTEGRAÇÃO COM INTERFACE HTML
+    Para exibir o Mundial de Clubes
+    ========================================
+    
+    Adicione este código ao seu index.html para ter uma UI completa
+    para o Mundial de Clubes
+-->
+
+<!-- ============= MODAL/SEÇÃO DO MUNDIAL ============= -->
+
+<section id="world-cup-section" class="screen" style="display: none;">
+    <header class="hero-header">
+        <h1>🏆 <span>MUNDIAL DE CLUBES</span> 🏆</h1>
+        <p>Taça Intercontinental FIFA - 6 Confederações em Jogo</p>
+        <div style="margin-top: 15px;">
+            <button class="btn btn-primary" onclick="startWorldCupTournament()" 
+                    style="margin-right: 10px;">
+                <i class="fas fa-play"></i> Iniciar Mundial
+            </button>
+            <button class="btn btn-secondary" onclick="showQualifiedTeams()" 
+                    style="margin-right: 10px;">
+                <i class="fas fa-list"></i> Ver Qualificados
+            </button>
+            <button class="btn btn-secondary" onclick="goBackMenu()">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+        </div>
+    </header>
+
+    <div style="display: flex; gap: 20px; padding: 20px; max-width: 1200px; margin: auto;">
+        
+        <!-- COLUNA 1: INFORMAÇÕES DO MUNDIAL -->
+        <div style="flex: 1;">
+            <div class="dashboard-card">
+                <h3>📊 Qualificados Continentais</h3>
+                <div id="qualified-teams" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <!-- Será preenchido por JavaScript -->
+                </div>
+            </div>
+
+            <div class="dashboard-card" style="margin-top: 15px;">
+                <h3>📅 Calendário do Torneio</h3>
+                <div id="tournament-calendar" style="margin-top: 10px;">
+                    <!-- Será preenchido por JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA 2: BRACKET E RESULTADOS -->
+        <div style="flex: 1;">
+            <div class="dashboard-card">
+                <h3>🏗️ Chaveamento</h3>
+                
+                <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px;">Fase 1 - Playoff Africano/Asiático</h4>
+                    <div id="phase1-result" style="text-align: center;">
+                        <p style="color: var(--text-muted);">Aguardando simulação...</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px;">Fase 2 - Quartas de Final</h4>
+                    <div id="phase2-result" style="text-align: center;">
+                        <p style="color: var(--text-muted);">Aguardando simulação...</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 10px;">🏆 Grande Final</h3>
+                    <div id="final-result" style="text-align: center;">
+                        <p style="color: var(--text-muted);">Aguardando simulação...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEÇÃO DE ESTATÍSTICAS -->
+    <div style="padding: 20px; max-width: 1200px; margin: auto;">
+        <div class="dashboard-card">
+            <h3>📈 Estatísticas do Torneio</h3>
+            <div id="tournament-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+                <!-- Será preenchido por JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- AREA DE HISTÓRICO -->
+    <div style="padding: 20px; max-width: 1200px; margin: auto;">
+        <div class="dashboard-card">
+            <h3>📚 Histórico de Mundiais</h3>
+            <div id="worldcup-history" style="margin-top: 10px;">
+                <!-- Será preenchido por JavaScript -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============= CSS ADICIONAL ============= -->
+
+<style>
+    .world-cup-team-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .world-cup-team-card:hover {
+        background: rgba(255, 215, 0, 0.1);
+        border-color: rgba(255, 215, 0, 0.6);
+        transform: translateY(-2px);
+    }
+
+    .world-cup-team-card img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        margin: 10px auto;
+    }
+
+    .world-cup-team-card h5 {
+        margin: 8px 0;
+        font-size: 0.9rem;
+    }
+
+    .world-cup-team-card .strength-bar {
+        background: rgba(255, 255, 255, 0.1);
+        height: 4px;
+        border-radius: 2px;
+        overflow: hidden;
+        margin: 8px 0;
+    }
+
+    .world-cup-team-card .strength-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #FFD700, #FFA500);
+        animation: fillStrength 0.6s ease-out;
+    }
+
+    @keyframes fillStrength {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+
+    .calendar-event {
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid #FFD700;
+        padding: 10px;
+        margin: 8px 0;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .calendar-event .date {
+        font-weight: 600;
+        color: #FFD700;
+        min-width: 100px;
+    }
+
+    .calendar-event .description {
+        flex: 1;
+        margin-left: 15px;
+    }
+
+    .stat-box {
+        background: rgba(255, 215, 0, 0.05);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .stat-box .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #FFD700;
+        margin: 10px 0;
+    }
+
+    .stat-box .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .match-result {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    .match-result .team-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin: 5px 0;
+    }
+
+    .match-result .score {
+        font-size: 1.4rem;
+        color: #FFD700;
+        margin: 10px 0;
+        font-weight: bold;
+    }
+
+    .match-result .vs-text {
+        color: var(--text-muted);
+        margin: 5px 0;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(255, 215, 0, 0.3);
+        border-radius: 50%;
+        border-top-color: #FFD700;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .champion-card {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+        border: 2px solid #FFD700;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        margin: 20px 0;
+    }
+
+    .champion-card img {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        margin: 20px auto;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+    }
+
+    .champion-card .champion-name {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #FFD700;
+        margin: 15px 0;
+    }
+
+    .champion-card .champion-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .champion-card .info-item {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    .champion-card .info-item .label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+
+    .champion-card .info-item .value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #FFD700;
+        margin-top: 5px;
+    }
+</style>
+
+<!-- ============= JAVASCRIPT ============= -->
+
+<script>
+// Variável global para armazenar relatório do Mundial
+let currentWorldCupReport = null;
+
+/**
+ * Mostra a seção do Mundial
+ */
+function showWorldCupSection() {
+    // Esconde outras seções
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('world-cup-section').style.display = 'block';
+    
+    // Carrega dados iniciais
+    loadWorldCupData();
+}
+
+/**
+ * Carrega dados iniciais do Mundial
+ */
+function loadWorldCupData() {
+    // Verifica qualificados rapidamente
+    const qualified = getQualifiedTeams(teamsData);
+    displayQualifiedTeams(qualified);
+    
+    // Carrega calendário
+    const calendar = getWorldCupCalendar(teamsData);
+    displayCalendar(calendar);
+    
+    // Carrega histórico
+    displayHistorico();
+}
+
+/**
+ * Exibe times qualificados
+ */
+function displayQualifiedTeams(qualified) {
+    const container = document.getElementById('qualified-teams');
+    container.innerHTML = '';
+    
+    Object.entries(qualified).forEach(([confederation, teamName]) => {
+        const team = teamsData.find(t => t.name === teamName);
+        
+        if (team) {
+            const html = `
+                <div class="world-cup-team-card">
+                    <img src="${team.shield}" alt="${team.name}" style="max-width: 50px;">
+                    <h5>${confederation}</h5>
+                    <p style="font-weight: 600; margin: 8px 0;">${team.name}</p>
+                    <div class="strength-bar">
+                        <div class="strength-fill" style="width: ${(team.strength / 95) * 100}%"></div>
+                    </div>
+                    <small>Força: ${team.strength}</small>
+                </div>
+            `;
+            container.innerHTML += html;
+        }
+    });
+}
+
+/**
+ * Exibe calendário
+ */
+function displayCalendar(calendar) {
+    const container = document.getElementById('tournament-calendar');
+    container.innerHTML = '';
+    
+    calendar.forEach(event => {
+        const html = `
+            <div class="calendar-event">
+                <span class="date">${event.date}</span>
+                <span class="description">${event.event}</span>
+            </div>
+        `;
+        container.innerHTML += html;
+    });
+}
+
+/**
+ * Inicia o torneio (simula tudo)
+ */
+async function startWorldCupTournament() {
+    const section = document.getElementById('world-cup-section');
+    
+    // Mostra loading
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'world-cup-loading';
+    loadingDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10000;';
+    loadingDiv.innerHTML = '<div class="loading-spinner"></div><p style="text-align: center; margin-top: 20px; color: #FFD700;">Simulando Mundial...</p>';
+    document.body.appendChild(loadingDiv);
+    
+    try {
+        // Executa o Mundial
+        currentWorldCupReport = await executeWorldCup(teamsData);
+        
+        // Remove loading
+        loadingDiv.remove();
+        
+        // Exibe resultados
+        displayWorldCupResults(currentWorldCupReport);
+        
+        // Salva resultado
+        saveWorldCupResult(currentWorldCupReport.year, currentWorldCupReport);
+        
+        // Atualiza histórico
+        displayHistorico();
+        
+    } catch (error) {
+        loadingDiv.remove();
+        alert('Erro ao simular Mundial: ' + error.message);
+    }
+}
+
+/**
+ * Exibe resultados do Mundial
+ */
+function displayWorldCupResults(report) {
+    if (!report || report.status !== 'completed') {
+        return;
+    }
+    
+    // FASE 1
+    const phase1 = report.bracket.fase1[0];
+    const phase1Html = phase1 && phase1.winner ? `
+        <div class="match-result">
+            <div class="team-name">${phase1.home.name}</div>
+            <div class="vs-text">vs</div>
+            <div class="team-name">${phase1.away.name}</div>
+            <div class="score">Vencedor: ${phase1.winner.name}</div>
+        </div>
+    ` : '<p style="color: var(--text-muted);">Aguardando...</p>';
+    document.getElementById('phase1-result').innerHTML = phase1Html;
+    
+    // FASE 2
+    let phase2Html = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">';
+    report.bracket.quartas.forEach((match, i) => {
+        phase2Html += `
+            <div class="match-result">
+                <small style="color: var(--text-muted);">${match.name}</small>
+                <div class="team-name">${match.home.name}</div>
+                <div class="vs-text">vs</div>
+                <div class="team-name">${match.away.name}</div>
+                ${match.winner ? `<div class="score">Vencedor: ${match.winner.name}</div>` : ''}
+            </div>
+        `;
+    });
+    phase2Html += '</div>';
+    document.getElementById('phase2-result').innerHTML = phase2Html;
+    
+    // FINAL
+    const final = report.bracket.final;
+    const finalHtml = final && final.winner ? `
+        <div class="champion-card">
+            <img src="${final.winner.shield}" alt="${final.winner.name}">
+            <div class="champion-name">${final.winner.name}</div>
+            <div style="color: var(--text-muted); font-size: 0.9rem; margin: 10px 0;">
+                🏆 CAMPEÃO MUNDIAL 2024 🏆
+            </div>
+            <div class="champion-info">
+                <div class="info-item">
+                    <div class="label">Confederação</div>
+                    <div class="value">${getConfederationName(final.winner)}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Força</div>
+                    <div class="value">${final.winner.strength}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Estádio</div>
+                    <div class="value">${final.winner.stadium}</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Vice</div>
+                    <div class="value">${final.home.id === final.winner.id ? final.away.name : final.home.name}</div>
+                </div>
+            </div>
+        </div>
+    ` : '<p style="color: var(--text-muted);">Aguardando...</p>';
+    document.getElementById('final-result').innerHTML = finalHtml;
+    
+    // ESTATÍSTICAS
+    displayStatistics(report);
+}
+
+/**
+ * Exibe estatísticas
+ */
+function displayStatistics(report) {
+    const stats = generateWorldCupStats(report);
+    const container = document.getElementById('tournament-stats');
+    
+    container.innerHTML = `
+        <div class="stat-box">
+            <div class="stat-label">Campeão</div>
+            <div class="stat-value">${stats.winner.name}</div>
+            <small>${stats.winner.confederation}</small>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Força Média</div>
+            <div class="stat-value">${stats.average_strength}</div>
+            <small>dos 6 participantes</small>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Mais Forte</div>
+            <div class="stat-value">${stats.strongest_participant}</div>
+            <small>vs ${stats.weakest_participant} (mais fraco)</small>
+        </div>
+    `;
+}
+
+/**
+ * Exibe histórico de Mundiais
+ */
+function displayHistorico() {
+    const history = listAllWorldCups();
+    const container = document.getElementById('worldcup-history');
+    
+    if (history.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted);">Nenhum Mundial registrado ainda.</p>';
+        return;
+    }
+    
+    let html = '<table style="width: 100%; text-align: left; border-collapse: collapse;">';
+    html += '<tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><th style="padding: 10px;">Ano</th><th style="padding: 10px;">Campeão</th><th style="padding: 10px;">Data</th></tr>';
+    
+    history.forEach(cup => {
+        const date = new Date(cup.timestamp).toLocaleDateString('pt-BR');
+        html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+            <td style="padding: 10px;">${cup.year}</td>
+            <td style="padding: 10px; color: #FFD700; font-weight: 600;">${cup.champion}</td>
+            <td style="padding: 10px; color: var(--text-muted);">${date}</td>
+        </tr>`;
+    });
+    
+    html += '</table>';
+    container.innerHTML = html;
+}
+
+/**
+ * Mostra times qualificados rapidamente
+ */
+function showQualifiedTeams() {
+    const qualified = getQualifiedTeams(teamsData);
+    
+    let message = '🌍 TIMES QUALIFICADOS PARA O MUNDIAL:\n\n';
+    Object.entries(qualified).forEach(([conf, team]) => {
+        message += `${conf}: ${team}\n`;
+    });
+    
+    alert(message);
+}
+
+/**
+ * Retorna o nome da confederação
+ */
+function getConfederationName(team) {
+    const confMap = {
+        'england': 'UEFA',
+        'spain': 'UEFA',
+        'italy': 'UEFA',
+        'france': 'UEFA',
+        'portugal': 'UEFA',
+        'germany': 'UEFA',
+        'south_america': 'CONMEBOL',
+        'mexico': 'CONCACAF',
+        'north_america': 'CONCACAF',
+        'africa': 'CAF',
+        'asia': 'AFC',
+        'oceania': 'OFC'
+    };
+    
+    return confMap[team.league] || 'Desconhecida';
+}
+
+/**
+ * Volta ao menu principal
+ */
+function goBackMenu() {
+    showScreen('screen-selection');
+}
+</script>

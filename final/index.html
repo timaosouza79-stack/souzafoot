@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Souza Foot - Manager</title>
+    <!-- Configurações PWA e Mobile -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0f18">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Souza Foot">
+    <meta name="application-name" content="Souza Foot">
+    <meta name="msapplication-TileColor" content="#0a0f18">
+    <meta name="description" content="Souza Foot - Seu gerenciador de futebol online">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="apple-touch-startup-image" href="icon.svg">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Tela de Login -->
+        <section id="screen-login" class="screen active">
+            <header class="hero-header">
+                <h1>Bem-vindo ao <span>Souza Foot</span></h1>
+                <p>Digite seu nome de usuário para gerenciar seu time</p>
+            </header>
+            <div class="login-container">
+                <div class="dashboard-card">
+                    <h3 id="login-title">Entrar</h3>
+                    <div class="form-group">
+                        <input type="text" id="login-username" class="form-control" placeholder="Usuário">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;" id="btn-login-action"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                        Não tem conta? <a href="#" onclick="toggleLoginMode()" id="toggle-link" style="color: var(--primary-color);">Criar conta</a>
+                    </p>
+
+                    <div id="user-list-container" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; font-weight: 600;">Usuários Salvos:</p>
+                        <div id="saved-users-list" class="squad-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tela de Seleção de Time -->
+        <section id="screen-selection" class="screen">
+            <header class="hero-header">
+                <h1>Bem-vindo ao <span>Souza Foot</span></h1>
+                <p>Escolha o seu time para iniciar o campeonato</p>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="logout()" style="background: rgba(255,255,255,0.1);"><i class="fas fa-exchange-alt"></i> Trocar de Usuário</button>
+                </div>
+            </header>
+
+            <div class="league-filter" style="text-align: center; margin-bottom: 30px;">
+                <label for="league-select" style="margin-right: 10px; font-weight: 600;">Selecionar Liga:</label>
+                <select id="league-select" class="form-control" style="width: auto; display: inline-block;" onchange="renderTeams(this.value)">
+                    <option value="brazil_a" selected>Série A - Brasil</option>
+                    <option value="brazil_b">Série B - Brasil</option>
+                    <option value="england">Premier League - Inglaterra</option>
+                    <option value="spain">La Liga - Espanha</option>
+                    <option value="germany">Bundesliga - Alemanha</option>
+                    <option value="italy">Série A - Itália</option>
+                    <option value="france">Ligue 1 - França</option>
+                    <option value="portugal">Liga Portugal - Portugal</option>
+                </select>
+            </div>
+            
+            <div class="teams-grid" id="teams-grid">
+                <!-- Times serão renderizados aqui pelo JS -->
+            </div>
+        </section>
+
+        <!-- Tela Principal do Manager -->
+        <section id="screen-main" class="screen">
+            <header class="manager-header">
+                <div class="team-info">
+                    <img src="" id="my-team-shield" alt="Escudo" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(document.getElementById('my-team-name')?.innerText||'Team')+'&background=random'">
+                    <div>
+                        <h2 id="my-team-name">Nome do Time</h2>
+                        <p>Força: <span id="my-team-strength">0</span></p>
+                        <p style="color: #4CAF50; font-weight: bold;">Saldo: R$ <span id="my-team-balance">0</span></p>
+                    </div>
+                </div>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-squad'); renderSquad();"><i class="fas fa-tshirt"></i> Escalar Time</button>
+                    <button class="btn btn-secondary" onclick="playRound()"><i class="fas fa-play"></i> Jogar Rodada <span id="btn-round-num">(1/38)</span></button>
+                    <button id="btn-sound-toggle" class="btn btn-secondary" onclick="toggleSound()"><i class="fas fa-volume-up"></i> Som: ON</button>
+                    <button id="btn-market" class="btn btn-secondary" onclick="showScreen('screen-market'); renderMarket();"><i class="fas fa-shopping-cart"></i> Mercado</button>
+                    <button class="btn btn-secondary" style="border-color: #ffd700;" onclick="viewCupBracket()"><i class="fas fa-trophy" style="color: #ffd700;"></i> Ver Copa</button>
+                    <button id="btn-view-libertadores" class="btn btn-secondary" style="border-color: #3f51b5; display: none;" onclick="viewLibertadoresBracket()"><i class="fas fa-globe-americas" style="color: #3f51b5;"></i> Ver Libertadores</button>
+                    <button class="btn btn-secondary" onclick="showScreen('screen-calendar'); renderCalendar();"><i class="far fa-calendar-alt"></i> Calendário</button>
+                    <button class="btn btn-secondary" onclick="showScreen('screen-standings'); renderStandings();"><i class="fas fa-list-ol"></i> Ver Classificação</button>
+                    <button class="btn btn-secondary" onclick="showScreen('screen-stats'); populateStatsCompetitions();"><i class="fas fa-chart-bar"></i> Estatísticas</button>
+                    <button class="btn btn-secondary" onclick="manualSave()" style="border-color: #4CAF50;"><i class="fas fa-save" style="color: #4CAF50;"></i> Salvar Jogo</button>
+                    <button class="btn btn-secondary" onclick="confirmReset()" style="border-color: #f44336;"><i class="fas fa-trash-alt" style="color: #f44336;"></i> Reiniciar Jogo</button>
+                    <button class="btn btn-secondary" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair da Conta</button>
+                </div>
+            </header>
+
+            <main class="manager-content">
+                <div class="dashboard-card">
+                    <h3>Próximo Jogo</h3>
+                    <div id="match-stadium-container" style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px;">
+                        <img id="match-stadium-img" src="" style="width: 100%; height: 100px; object-fit: cover; border-radius: 12px; border: 1px solid var(--border-color); display: none;">
+                        <div id="match-stadium-info" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Estádio</div>
+                    </div>
+                    <div class="match-preview" style="display: flex; justify-content: space-around; align-items: center; padding: 15px;">
+                        <div class="match-team" style="display: flex; flex-direction: column; align-items: center; width: 40%;">
+                            <img id="match-home-shield" src="" alt="Escudo Mandante" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(document.getElementById('match-home-name')?.innerText||'Home')+'&background=random'">
+                            <span id="match-home-name">Time Casa</span>
+                        </div>
+                        <div class="match-vs" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-color);">VS</div>
+                        <div class="match-team" style="display: flex; flex-direction: column; align-items: center; width: 40%;">
+                            <img id="match-away-shield" src="" alt="Escudo Visitante" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(document.getElementById('match-away-name')?.innerText||'Away')+'&background=random'">
+                            <span id="match-away-name">Time Fora</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-board">
+                    <h3>Resultados da Rodada</h3>
+                    <ul class="results-list" id="results-list">
+                        <li>Ainda não há resultados. Jogue a primeira rodada!</li>
+                    </ul>
+                </div>
+            </main>
+        </section>
+
+        <!-- Tela de Escalação -->
+        <section id="screen-squad" class="screen">
+            <header class="manager-header">
+                <div class="team-info">
+                    <div>
+                        <h2>Escalação do <span id="squad-team-name">Time</span></h2>
+                        <p>Força Geral: <strong id="squad-team-strength">0</strong></p>
+                    </div>
+                </div>
+                <div class="manager-actions">
+                    <button class="btn btn-secondary" onclick="showScreen('screen-main'); updateTeamStrength();"><i class="fas fa-arrow-left"></i> Voltar ao Painel</button>
+                </div>
+            </header>
+
+            <div class="squad-tabs">
+                <button class="tab-btn active" id="tab-players-btn" onclick="switchSquadTab('players')">Jogadores</button>
+                <button class="tab-btn" id="tab-tactics-btn" onclick="switchSquadTab('tactics')">Táticas & Funções</button>
+            </div>
+
+            <div id="squad-tab-players" class="tab-content active">
+                <main class="squad-content">
+                    <div class="squad-board">
+                        <h3>Titulares (11)</h3>
+                        <div class="squad-list" id="list-starters">
+                            <!-- Titulares renderizados aqui -->
+                        </div>
+                    </div>
+
+                    <div class="squad-board">
+                        <h3>Reservas</h3>
+                        <div class="squad-list" id="list-reserves">
+                            <!-- Reservas renderizados aqui -->
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <div id="squad-tab-tactics" class="tab-content">
+                <main class="tactics-container">
+                    <div class="tactics-card">
+                        <h3>Esquema e Estilo de Jogo</h3>
+                        <div class="form-group">
+                            <label for="tactics-formation">Formação Tática</label>
+                            <select id="tactics-formation" class="form-control" onchange="updateTactics()">
+                                <option value="4-3-3">4-3-3 (Padrão)</option>
+                                <option value="4-4-2">4-4-2 (Equilibrado)</option>
+                                <option value="4-2-3-1">4-2-3-1 (Preenchimento)</option>
+                                <option value="3-5-2">3-5-2 (Alas Ofensivos)</option>
+                                <option value="5-3-2">5-3-2 (Super Defensivo)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tactics-mentality">Mentalidade Tática</label>
+                            <select id="tactics-mentality" class="form-control" onchange="updateTactics()">
+                                <option value="Muito Defensivo">Muito Defensivo (Retranca Total)</option>
+                                <option value="Defensivo">Defensivo (Cuidado)</option>
+                                <option value="Equilibrado" selected>Equilibrado (Segurança)</option>
+                                <option value="Ofensivo">Ofensivo (Ataque Contínuo)</option>
+                                <option value="Muito Ofensivo">Muito Ofensivo (Pressão Absoluta)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tactics-laterais">Comportamento dos Laterais</label>
+                            <select id="tactics-laterais" class="form-control" onchange="updateTactics()">
+                                <option value="Defensivos" selected>Laterais Ficam (Foco Defensivo)</option>
+                                <option value="Apoiando">Laterais Sobem (Apoio Ofensivo)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="tactics-card">
+                        <h3>Funções da Equipe</h3>
+                        <div class="form-group">
+                            <label for="tactics-captain">Capitão do Time</label>
+                            <select id="tactics-captain" class="form-control" onchange="updateTactics()">
+                                <!-- Gerado dinamicamente com os titulares -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tactics-freekicks">Cobrador de Faltas</label>
+                            <select id="tactics-freekicks" class="form-control" onchange="updateTactics()">
+                                <!-- Gerado dinamicamente com os titulares -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tactics-corners">Cobrador de Escanteios</label>
+                            <select id="tactics-corners" class="form-control" onchange="updateTactics()">
+                                <!-- Gerado dinamicamente com os titulares -->
+                            </select>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+
+        <!-- Tela de Classificação -->
+        <section id="screen-standings" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <h2>Classificação - Brasileirão Série A</h2>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            
+            <main style="padding: 20px;">
+                <div class="table-container">
+                    <table class="standings-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="text-align: left;">Time</th>
+                                <th>P</th>
+                                <th>J</th>
+                                <th>V</th>
+                                <th>E</th>
+                                <th>D</th>
+                                <th>GP</th>
+                                <th>GC</th>
+                                <th>SG</th>
+                            </tr>
+                        </thead>
+                        <tbody id="standings-body">
+                            <!-- Linhas geradas via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+        </section>
+
+        <!-- Tela de Estatísticas removida -->
+
+        <!-- Tela de Calendário -->
+        <!-- Tela de Estatísticas (Artilharia e Assistências) -->
+        <section id="screen-stats" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <h2>⚽ Estatísticas — Todos os Campeonatos</h2>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            
+            <main class="manager-content" style="gap: 20px;">
+                <div class="dashboard-card">
+                    <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+                        <label for="stats-competition-select" style="font-weight:600;">Competição:</label>
+                        <select id="stats-competition-select" class="form-control" onchange="renderStats(this.value)" style="width:240px;">
+                            <!-- opções populadas dinamicamente -->
+                        </select>
+                    </div>
+
+                    <h3>⚽ Artilheiros</h3>
+                    <div class="table-container">
+                        <table class="standings-table">
+                            <thead><tr><th>#</th><th style="text-align: left;">Jogador</th><th>Time</th><th style="cursor:pointer;" onclick="sortStats('goals')">Gols ▾</th></tr></thead>
+                            <tbody id="top-scorers-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>👟 Assistências</h3>
+                    <div class="table-container">
+                        <table class="standings-table">
+                            <thead><tr><th>#</th><th style="text-align: left;">Jogador</th><th>Time</th><th style="cursor:pointer;" onclick="sortStats('assists')">Assis. ▾</th></tr></thead>
+                            <tbody id="top-assists-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </section>
+        <section id="screen-calendar" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <h2>Calendário da Temporada - <span id="calendar-team-name">Time</span></h2>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            
+            <main style="padding: 20px;">
+                <div class="dashboard-card">
+                    <ul class="results-list" id="calendar-list" style="max-height: 70vh; overflow-y: auto;">
+                        <!-- Jogos renderizados aqui -->
+                    </ul>
+                </div>
+            </main>
+        </section>
+        
+        <!-- Tela da Copa do Brasil -->
+        <section id="screen-cup" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <h2 id="cup-phase-title">Copa do Brasil - Chaveamento</h2>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" id="btn-play-cup" onclick="playRound()"><i class="fas fa-play"></i> Jogar Fase</button>
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            <main class="dashboard-card" style="margin: 20px;">
+                <div id="cup-matches-list" class="results-list"></div>
+            </main>
+        </section>
+
+        <!-- Tela da Libertadores -->
+        <section id="screen-libertadores" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <h2 id="lib-phase-title">Copa Libertadores - Chaveamento</h2>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            <main class="dashboard-card" style="margin: 20px;">
+                <div id="lib-matches-list" class="results-list"></div>
+            </main>
+        </section>
+
+        <!-- Tela de Mercado de Transferências -->
+        <section id="screen-market" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <div>
+                    <h2>Mercado de Transferências</h2>
+                    <p>Saldo Disponível: <strong style="color: #4CAF50;">R$ <span id="market-balance">0</span></strong></p>
+                </div>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            <div class="market-search-bar" style="margin: 0 20px 15px 20px;">
+                <input type="text" id="market-search-input" class="form-control" placeholder="🔍 Buscar jogador por nome em todos os clubes..." oninput="renderMarket()">
+            </div>
+            <main class="dashboard-card" style="margin: 20px;">
+                <div id="market-list" class="squad-list"></div>
+            </main>
+        </section>
+
+        <!-- Tela de Jogo Ao Vivo -->
+        <section id="screen-match-live" class="screen">
+            <header class="manager-header" style="justify-content: center; flex-direction: column; gap: 10px; padding: 15px 30px;">
+                <h2 style="font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-color); margin-bottom: 0;">Futebol Foot - Em Tempo Real</h2>
+                <div style="display: flex; align-items: center; flex-direction: column; gap: 8px;">
+                    <img id="live-stadium-img" src="" style="width: 180px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: none;">
+                    <div id="live-match-stadium" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 600;">Estádio</div>
+                </div>
+                <div style="font-size: 1.1rem; font-weight: 600; color: var(--text-muted);" id="live-round-title">Rodada 1 / 38</div>
+            </header>
+
+            <main class="live-match-container">
+                <!-- Painel Esquerdo: Jogo do Jogador -->
+                <div class="live-main-panel">
+                    <!-- Placar Grande -->
+                    <div class="live-scoreboard-card">
+                        <div class="live-team left">
+                            <img id="live-home-shield" src="" alt="Escudo" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name=Home&background=random'">
+                            <span id="live-home-name">Time Casa</span>
+                        </div>
+                        <div class="live-score-details">
+                            <div class="live-time-display"><span id="live-match-minute">0</span>'</div>
+                            <div class="live-score-numbers"><span id="live-home-score">0</span> - <span id="live-away-score">0</span></div>
+                        </div>
+                        <div class="live-team right">
+                            <img id="live-away-shield" src="" alt="Escudo" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name=Away&background=random'">
+                            <span id="live-away-name">Time Fora</span>
+                        </div>
+                    </div>
+
+                    <!-- Barra de Progresso do Jogo -->
+                    <div class="live-progress-container">
+                        <div class="live-progress-bar" id="live-progress-bar" style="width: 0%;"></div>
+                    </div>
+
+                    <!-- Comentários e Lances do Jogo -->
+                    <div class="live-commentary-box">
+                        <h3>Comentários da Partida</h3>
+                        <div class="live-commentary-list" id="live-commentary-list">
+                            <!-- Comentários inseridos dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel Direito: Outros Jogos -->
+                <div class="live-side-panel">
+                    <div class="live-others-card">
+                        <h3>Outros Jogos da Rodada</h3>
+                        <ul class="live-others-list" id="live-others-list">
+                            <!-- Outros placares sendo atualizados -->
+                        </ul>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Controles de Velocidade e Ações -->
+            <footer class="live-controls-footer">
+                <div class="speed-controls">
+                    <span style="font-weight: 600; color: var(--text-muted);">Velocidade:</span>
+                    <button class="btn btn-speed active" id="btn-speed-slow" onclick="setSimSpeed('slow')">Devagar</button>
+                    <button class="btn btn-speed" id="btn-speed-normal" onclick="setSimSpeed('normal')">Normal</button>
+                    <button class="btn btn-speed" id="btn-speed-fast" onclick="setSimSpeed('fast')">Rápido</button>
+                    <button class="btn btn-speed" id="btn-speed-ultra" onclick="setSimSpeed('ultra')">Ultra</button>
+                </div>
+                <div class="action-controls">
+                    <button class="btn btn-secondary" onclick="openLiveTactics()"><i class="fas fa-sliders-h"></i> Táticas & Substituições</button>
+                    <button class="btn btn-secondary" onclick="skipMatch()"><i class="fas fa-fast-forward"></i> Pular Jogo</button>
+                    <button class="btn btn-primary" id="btn-live-continue" style="display: none;"><i class="fas fa-check"></i> Continuar</button>
+                </div>
+            </footer>
+        </section>
+
+        <!-- Modal de Táticas e Substituições Ao Vivo -->
+        <div id="live-tactics-modal" class="live-modal" style="display: none;">
+            <div class="live-modal-content">
+                <header class="live-modal-header">
+                    <h2 style="margin: 0; font-size: 1.4rem;">Substituições & Táticas em Tempo Real</h2>
+                    <span class="live-modal-close" onclick="closeLiveTactics()">&times;</span>
+                </header>
+                
+                <main class="live-modal-body">
+                    <!-- Esquerda: Lista de Jogadores para Substituição -->
+                    <div class="live-modal-squad" style="display: flex; flex-direction: column;">
+                        <div class="modal-section-title">Elenco e Substituições</div>
+                        
+                        <div style="display: flex; gap: 20px; height: 350px; overflow: hidden;">
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 5px;">
+                                <h4 style="color: var(--primary-color); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; margin-bottom: 5px; font-size: 0.95rem;">Titulares</h4>
+                                <div id="live-modal-starters" class="live-modal-list"></div>
+                            </div>
+                            
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 5px;">
+                                <h4 style="color: var(--accent-color); border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; margin-bottom: 5px; font-size: 0.95rem;">Reservas</h4>
+                                <div id="live-modal-reserves" class="live-modal-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Direita: Opções Táticas -->
+                    <div class="live-modal-tactics">
+                        <div class="modal-section-title">Instruções Táticas</div>
+                        
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="live-tactics-formation">Formação Tática</label>
+                            <select id="live-tactics-formation" class="form-control" onchange="updateLiveTacticsSettings()">
+                                <option value="4-3-3">4-3-3 (Padrão)</option>
+                                <option value="4-4-2">4-4-2 (Equilibrado)</option>
+                                <option value="4-2-3-1">4-2-3-1 (Preenchimento)</option>
+                                <option value="3-5-2">3-5-2 (Alas Ofensivos)</option>
+                                <option value="5-3-2">5-3-2 (Super Defensivo)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="live-tactics-mentality">Mentalidade Tática</label>
+                            <select id="live-tactics-mentality" class="form-control" onchange="updateLiveTacticsSettings()">
+                                <option value="Muito Defensivo">Muito Defensivo (Retranca Total)</option>
+                                <option value="Defensivo">Defensivo (Cuidado)</option>
+                                <option value="Equilibrado">Equilibrado (Segurança)</option>
+                                <option value="Ofensivo">Ofensivo (Ataque Contínuo)</option>
+                                <option value="Muito Ofensivo">Muito Ofensivo (Pressão Absoluta)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="live-tactics-laterais">Comportamento dos Laterais</label>
+                            <select id="live-tactics-laterais" class="form-control" onchange="updateLiveTacticsSettings()">
+                                <option value="Defensivos">Laterais Ficam (Foco Defensivo)</option>
+                                <option value="Apoiando">Laterais Sobem (Apoio Ofensivo)</option>
+                            </select>
+                        </div>
+                    </div>
+                </main>
+                
+                <footer class="live-modal-footer" style="margin-top: 10px;">
+                    <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="closeLiveTactics()">Confirmar Alterações & Voltar ao Jogo</button>
+                </footer>
+            </div>
+        </div>
+
+        <!-- Tela de Campeão -->
+        <section id="screen-champion" class="screen">
+            <div class="champion-container">
+                <div class="trophy-icon">🏆</div>
+                <h1>TEMOS UM CAMPEÃO!</h1>
+                <h2 id="champion-name">NOME DO TIME</h2>
+                <img id="champion-shield" src="" alt="Escudo Campeão" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name='+encodeURIComponent(document.getElementById('champion-name')?.innerText||'Champion')+'&background=random'">
+                <p id="champion-msg">Você conquistou o título do Brasileirão Série A!</p>
+                <div id="relegation-summary" style="margin: 20px 0; color: var(--text-muted); font-size: 0.9rem;"></div>
+                <button class="btn btn-primary" style="margin-top: 20px; padding: 15px 40px;" onclick="startNextSeason()">Iniciar Próxima Temporada</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- ===== BARRA DE NAVEGAÇÃO MOBILE ===== -->
+    <nav class="mobile-nav-bar" id="mobile-nav-bar" style="display:none;">
+        <div class="mobile-nav-inner">
+            <!-- Painel Principal -->
+            <button class="mobile-nav-btn active" id="mnav-home" onclick="mobileNav('home')">
+                <i class="fas fa-home"></i>
+                Início
+            </button>
+            <!-- Escalar -->
+            <button class="mobile-nav-btn" id="mnav-squad" onclick="mobileNav('squad')">
+                <i class="fas fa-tshirt"></i>
+                Escalar
+            </button>
+            <!-- Jogar Rodada (destaque) -->
+            <button class="mobile-nav-btn nav-play-btn" id="mnav-play" onclick="playRound()">
+                <i class="fas fa-play"></i>
+                Jogar
+            </button>
+            <!-- Mercado -->
+            <button class="mobile-nav-btn" id="mnav-market" onclick="mobileNav('market')">
+                <i class="fas fa-shopping-cart"></i>
+                Mercado
+            </button>
+            <!-- Menu -->
+            <button class="mobile-nav-btn" id="mnav-more" onclick="mobileNav('more')">
+                <i class="fas fa-ellipsis-h"></i>
+                Mais
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== MENU MODAL MOBILE ("Mais" opções) ===== -->
+    <div id="mobile-more-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(10px); z-index:2000; padding: 20px; padding-bottom: calc(80px + env(safe-area-inset-bottom,0px)); overflow-y:auto;">
+        <div style="max-width:400px; margin: 40px auto 0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                <h2 style="font-family:'Outfit',sans-serif; font-size:1.4rem; color:#fff;">⚽ Menu</h2>
+                <button onclick="closeMobileMore()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:40px; height:40px; border-radius:50%; font-size:1.2rem; cursor:pointer;">✕</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px;" onclick="closeMobileMore(); showScreen('screen-standings'); renderStandings();">
+                    <i class="fas fa-list-ol" style="font-size:1.2rem;"></i> Classificação
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px;" onclick="closeMobileMore(); showScreen('screen-calendar'); renderCalendar();">
+                    <i class="far fa-calendar-alt" style="font-size:1.2rem;"></i> Calendário
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px;" onclick="closeMobileMore(); showScreen('screen-stats'); populateStatsCompetitions();">
+                    <i class="fas fa-chart-bar" style="font-size:1.2rem;"></i> Estatísticas
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#ffd700;" onclick="closeMobileMore(); viewCupBracket();">
+                    <i class="fas fa-trophy" style="font-size:1.2rem; color:#ffd700;"></i> Ver Copa
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#4CAF50;" onclick="closeMobileMore(); manualSave();">
+                    <i class="fas fa-save" style="font-size:1.2rem; color:#4CAF50;"></i> Salvar Jogo
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px;" onclick="closeMobileMore(); toggleSound();">
+                    <i class="fas fa-volume-up" style="font-size:1.2rem;"></i> Som
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#f44336;" onclick="closeMobileMore(); confirmReset();">
+                    <i class="fas fa-trash-alt" style="font-size:1.2rem; color:#f44336;"></i> Reiniciar
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px;" onclick="closeMobileMore(); logout();">
+                    <i class="fas fa-sign-out-alt" style="font-size:1.2rem;"></i> Sair
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="squads.js"></script>
+    <script src="script.js"></script>
+    <script src="mundial.js"></script>
+    <script src="continental_tournaments.js"></script>
+    <script src="mundial_integration.js"></script>
+    <script>
+        // Popula o seletor de competições dinamicamente após os scripts carregarem
+        function populateStatsCompetitions() {
+            const sel = document.getElementById('stats-competition-select');
+            if (!sel) return;
+            sel.innerHTML = '';
+
+            // Mapa de todas as ligas disponíveis no jogo
+            const LEAGUE_LABELS = {
+                'brazil_a':    '🇧🇷 Série A - Brasil',
+                'brazil_b':    '🇧🇷 Série B - Brasil',
+                'england':     '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Inglaterra',
+                'spain':       '🇪🇸 La Liga - Espanha',
+                'germany':     '🇩🇪 Bundesliga - Alemanha',
+                'italy':       '🇮🇹 Série A - Itália',
+                'france':      '🇫🇷 Ligue 1 - França',
+                'portugal':    '🇵🇹 Liga Portugal',
+                'south_america': '🌎 Sul-América (Lib.)',
+                'cup':         '🏆 Copa Nacional',
+                'libertadores':'🌍 Libertadores / Continental'
+            };
+
+            // Coleta ligas que têm times no jogo
+            const presentLeagues = new Set((window.allTeams || []).map(t => t.league).filter(Boolean));
+
+            // Adiciona opções em ordem
+            const order = ['brazil_a','brazil_b','england','spain','germany','italy','france','portugal','south_america','cup','libertadores'];
+            order.forEach(key => {
+                // Para ligas de times, só mostra se existir ao menos 1 time
+                if (key === 'cup' || key === 'libertadores') {
+                    // Sempre inclui Copa e Libertadores
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.innerText = LEAGUE_LABELS[key];
+                    sel.appendChild(opt);
+                } else if (presentLeagues.has(key)) {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.innerText = LEAGUE_LABELS[key];
+                    // Seleciona por padrão a liga do usuário
+                    if (window.myTeam && window.myTeam.league === key) opt.selected = true;
+                    sel.appendChild(opt);
+                }
+            });
+
+            // Renderiza as stats da opção actualmente seleccionada
+            renderStats(sel.value);
+        }
+
+        window.addEventListener('load', function() {
+            populateStatsCompetitions();
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado com sucesso!', reg))
+                    .catch(err => console.log('Falha ao registrar o Service Worker:', err));
+            }
+        });
+    </script>
+
+    <!-- ===== SCRIPTS DA NAV BAR MOBILE ===== -->
+    <script>
+        // ---- Controla a navegação mobile ----
+        function mobileNav(tab) {
+            const navBar = document.getElementById('mobile-nav-bar');
+            if (!navBar) return;
+
+            if (tab === 'more') {
+                openMobileMore();
+                return;
+            }
+
+            // Reseta todos os botões
+            document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+
+            if (tab === 'home') {
+                document.getElementById('mnav-home').classList.add('active');
+                showScreen('screen-main');
+                if (typeof updateDashboardUI === 'function') updateDashboardUI();
+            } else if (tab === 'squad') {
+                document.getElementById('mnav-squad').classList.add('active');
+                showScreen('screen-squad');
+                if (typeof renderSquad === 'function') renderSquad();
+            } else if (tab === 'market') {
+                document.getElementById('mnav-market').classList.add('active');
+                showScreen('screen-market');
+                if (typeof renderMarket === 'function') renderMarket();
+            }
+        }
+
+        function openMobileMore() {
+            const modal = document.getElementById('mobile-more-modal');
+            if (modal) {
+                modal.style.display = 'block';
+                modal.style.animation = 'scaleUp 0.3s ease forwards';
+            }
+        }
+
+        function closeMobileMore() {
+            const modal = document.getElementById('mobile-more-modal');
+            if (modal) modal.style.display = 'none';
+            // Reseta seleção dos botões para "home"
+            document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+            const homeBtn = document.getElementById('mnav-home');
+            if (homeBtn) homeBtn.classList.add('active');
+        }
+
+        // ---- Mostra/oculta a nav bar conforme a tela ativa ----
+        // Hook no showScreen original para controlar a nav bar
+        document.addEventListener('DOMContentLoaded', function() {
+            const originalShowScreen = window.showScreen;
+            if (typeof originalShowScreen === 'function') {
+                window.showScreen = function(screenId) {
+                    originalShowScreen(screenId);
+                    updateMobileNavVisibility(screenId);
+                };
+            }
+        });
+
+        // Também tenta após o load (caso showScreen seja definido depois)
+        window.addEventListener('load', function() {
+            const originalShowScreen = window.showScreen;
+            if (typeof originalShowScreen === 'function') {
+                window.showScreen = function(screenId) {
+                    originalShowScreen(screenId);
+                    updateMobileNavVisibility(screenId);
+                };
+            }
+        });
+
+        function updateMobileNavVisibility(screenId) {
+            const navBar = document.getElementById('mobile-nav-bar');
+            if (!navBar) return;
+
+            // Só mostra a nav bar quando o jogador já está no jogo (não no login/seleção)
+            const showOnScreens = ['screen-main', 'screen-squad', 'screen-standings',
+                                   'screen-stats', 'screen-calendar', 'screen-cup',
+                                   'screen-libertadores', 'screen-market', 'screen-champion'];
+
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile && showOnScreens.includes(screenId)) {
+                navBar.style.display = 'flex';
+            } else {
+                navBar.style.display = 'none';
+            }
+
+            // Atualiza botão ativo
+            document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+            if (screenId === 'screen-main') document.getElementById('mnav-home')?.classList.add('active');
+            else if (screenId === 'screen-squad') document.getElementById('mnav-squad')?.classList.add('active');
+            else if (screenId === 'screen-market') document.getElementById('mnav-market')?.classList.add('active');
+        }
+
+        // ---- Responsividade ao redimensionar ----
+        window.addEventListener('resize', function() {
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen) updateMobileNavVisibility(activeScreen.id);
+        });
+    </script>
+</body>
+</html>

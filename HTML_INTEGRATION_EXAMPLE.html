@@ -1,0 +1,349 @@
+<!-- 
+    ========================================
+    EXEMPLO DE INTEGRAÇÃO NO INDEX.HTML
+    Como adicionar o Mundial ao seu jogo
+    ========================================
+    
+    Este é um MODELO de como integrar os scripts do Mundial
+    no seu index.html existente.
+    
+    COPIE E ADAPTE conforme necessário.
+-->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu Jogo + Mundial de Clubes</title>
+    <!-- SEUs estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- SUAS TELAS EXISTENTES -->
+        <!-- (Mantenha todas as suas telas: login, seleção, etc) -->
+        
+        <!-- ============= NOVA SEÇÃO: MUNDIAL DE CLUBES ============= -->
+        
+        <section id="screen-world-cup" class="screen">
+            <header class="hero-header">
+                <h1>🏆 <span>MUNDIAL DE CLUBES</span> 🏆</h1>
+                <p>Taça Intercontinental FIFA</p>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="startWorldCupSimulation()" 
+                            style="margin-right: 10px;">
+                        <i class="fas fa-play"></i> Iniciar Simulação
+                    </button>
+                    <button class="btn btn-secondary" onclick="showWorldCupInfo()">
+                        <i class="fas fa-info-circle"></i> Informações
+                    </button>
+                </div>
+            </header>
+
+            <div style="max-width: 1000px; margin: auto; padding: 20px;">
+                
+                <!-- Qualificados -->
+                <div class="dashboard-card">
+                    <h3>🌍 Campeões Continentais Qualificados</h3>
+                    <div id="worldcup-qualified" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px;">
+                        <div class="loading-placeholder">Carregando...</div>
+                    </div>
+                </div>
+
+                <!-- Resultado -->
+                <div id="worldcup-result" class="dashboard-card" style="margin-top: 20px; display: none;">
+                    <h3>🏆 Campeão Mundial 2024</h3>
+                    <div id="champion-display" style="text-align: center; margin-top: 20px;">
+                        <!-- Será preenchido pelo JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Botões -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="backToMenu()">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ============= FIM DA SEÇÃO MUNDIAL ============= -->
+
+    </div>
+
+    <!-- ============= SCRIPTS (IMPORTANTE: ORDEM CERTA) ============= -->
+    
+    <!-- Seus scripts existentes -->
+    <script src="squads.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- ✨ NOVOS SCRIPTS DO MUNDIAL (adicione em ORDEM) -->
+    <script src="mundial.js"></script>
+    <script src="continental_tournaments.js"></script>
+    <script src="mundial_integration.js"></script>
+    
+    <!-- ============= JAVASCRIPT ESPECÍFICO DO MUNDIAL ============= -->
+    <script>
+        /**
+         * Inicia a simulação do Mundial
+         */
+        async function startWorldCupSimulation() {
+            // Mostra loading
+            const resultDiv = document.getElementById('worldcup-result');
+            const championDisplay = document.getElementById('champion-display');
+            
+            resultDiv.style.display = 'none';
+            championDisplay.innerHTML = '<div class="loading-spinner"></div><p>Simulando...</p>';
+            
+            try {
+                // CHAMA A FUNÇÃO PRINCIPAL DO MUNDIAL
+                const report = await executeWorldCup(teamsData);
+                
+                // Se chegou aqui, funcionou!
+                displayWorldCupResult(report);
+                
+                // Salva o resultado
+                saveWorldCupResult(2024, report);
+                
+            } catch (error) {
+                championDisplay.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
+            }
+        }
+
+        /**
+         * Exibe o resultado do Mundial
+         */
+        function displayWorldCupResult(report) {
+            if (!report.worldChampion) {
+                alert('Erro: Nenhum campeão foi definido');
+                return;
+            }
+
+            const resultDiv = document.getElementById('worldcup-result');
+            const championDisplay = document.getElementById('champion-display');
+            
+            const html = `
+                <div style="background: rgba(255, 215, 0, 0.1); border: 2px solid #FFD700; 
+                            border-radius: 12px; padding: 30px; text-align: center;">
+                    <img src="${report.worldChampion.shield}" alt="${report.worldChampion.name}" 
+                         style="width: 150px; height: 150px; object-fit: contain; margin: 20px 0;">
+                    
+                    <h2 style="color: #FFD700; margin: 15px 0;">
+                        ${report.worldChampion.name}
+                    </h2>
+                    
+                    <p style="font-size: 1.2rem; margin: 10px 0;">
+                        <strong>🏆 CAMPEÃO MUNDIAL 2024 🏆</strong>
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+                        <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 6px;">
+                            <small style="color: var(--text-muted);">FORÇA</small>
+                            <p style="font-size: 1.4rem; color: #FFD700;">${report.worldChampion.strength}</p>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 6px;">
+                            <small style="color: var(--text-muted);">ESTÁDIO</small>
+                            <p style="font-size: 1.1rem; color: #FFD700;">${report.worldChampion.stadium}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 15px;">📅 Calendário do Torneio</h3>
+                    ${report.schedule.map(e => `
+                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; margin: 8px 0; border-left: 3px solid #FFD700;">
+                            <strong>${e.date}</strong> - ${e.event}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div style="margin-top: 20px; background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 8px;">
+                    <h3 style="margin-bottom: 15px;">🌍 Campeões Continentais</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                        ${Object.entries(report.champions).map(([conf, team]) => `
+                            <div style="text-align: center; background: rgba(0, 0, 0, 0.3); padding: 10px; border-radius: 6px;">
+                                <small style="color: var(--text-muted);">${conf}</small>
+                                <p style="font-weight: 600; margin: 5px 0; font-size: 0.9rem;">${team.name}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            championDisplay.innerHTML = html;
+            resultDiv.style.display = 'block';
+        }
+
+        /**
+         * Carrega e exibe informações do Mundial
+         */
+        function showWorldCupInfo() {
+            const qualifiedDiv = document.getElementById('worldcup-qualified');
+            
+            // Busca qualificados rapidamente
+            try {
+                const qualified = getQualifiedTeams(teamsData);
+                
+                let html = '';
+                Object.entries(qualified).forEach(([conf, teamName]) => {
+                    const team = teamsData.find(t => t.name === teamName);
+                    if (team) {
+                        html += `
+                            <div style="background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 8px; text-align: center;">
+                                <img src="${team.shield}" alt="${team.name}" 
+                                     style="width: 60px; height: 60px; object-fit: contain; margin: 10px 0;">
+                                <p style="font-weight: 600; font-size: 0.9rem;">${team.name}</p>
+                                <small style="color: var(--text-muted);">${conf}</small>
+                                <p style="margin-top: 5px; color: #FFD700;">Força: ${team.strength}</p>
+                            </div>
+                        `;
+                    }
+                });
+                
+                qualifiedDiv.innerHTML = html;
+                
+            } catch (error) {
+                qualifiedDiv.innerHTML = `<p style="color: red;">Erro ao carregar: ${error.message}</p>`;
+            }
+        }
+
+        /**
+         * Volta ao menu
+         */
+        function backToMenu() {
+            // Adapte conforme sua lógica de navegação
+            showScreen('screen-selection'); // Se você usa showScreen()
+            // OU
+            // document.getElementById('screen-world-cup').style.display = 'none';
+        }
+
+        /**
+         * Ao carregar a página, carrega informações do Mundial
+         */
+        window.addEventListener('load', function() {
+            // Carrega qualificados quando abre a seção
+            const selector = document.getElementById('screen-world-cup');
+            if (selector) {
+                const observer = new MutationObserver(function() {
+                    if (selector.style.display !== 'none') {
+                        showWorldCupInfo();
+                    }
+                });
+                observer.observe(selector, { attributes: true, attributeFilter: ['style', 'class'] });
+            }
+        });
+
+        /**
+         * Função para testar se tudo funciona
+         */
+        function testWorldCup() {
+            console.log('🧪 Testando sistema do Mundial...');
+            
+            try {
+                // Teste 1: Verificar qualificados
+                const qualified = getQualifiedTeams(teamsData);
+                console.log('✅ Qualificados:', qualified);
+                
+                // Teste 2: Verificar calendário
+                const calendar = getWorldCupCalendar(teamsData);
+                console.log('✅ Calendário:', calendar);
+                
+                // Teste 3: Verificar força
+                const ranking = compareQualifiedStrength(qualified);
+                console.log('✅ Ranking:', ranking);
+                
+                console.log('✅ TUDO FUNCIONANDO!');
+                return true;
+                
+            } catch (error) {
+                console.error('❌ ERRO:', error);
+                return false;
+            }
+        }
+    </script>
+
+    <!-- ============= CSS PARA O MUNDIAL (opcional) ============= -->
+    <style>
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #FFD700;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-placeholder {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+    </style>
+
+</body>
+</html>
+
+<!-- 
+
+    ========================================
+    INSTRUÇÕES DE INTEGRAÇÃO
+    ========================================
+
+    1. COPIE O CÓDIGO ACIMA
+
+    2. NO SEU index.html EXISTENTE:
+       a) Localize onde estão seus scripts:
+          <script src="script.js"></script>
+       
+       b) Logo após, adicione:
+          <script src="mundial.js"></script>
+          <script src="continental_tournaments.js"></script>
+          <script src="mundial_integration.js"></script>
+       
+       c) A ORDEM É IMPORTANTE!
+
+    3. ADICIONE UMA SEÇÃO NOVA no seu app-container:
+       - Copie a seção id="screen-world-cup"
+       - Coloque entre suas outras sections
+
+    4. ADICIONE UM BOTÃO para acessar o Mundial:
+       <button onclick="document.getElementById('screen-world-cup').style.display='block'">
+         🏆 Mundial
+       </button>
+
+    5. TESTE:
+       - Abra o console (F12)
+       - Digite: testWorldCup()
+       - Se retornar ✅, está tudo certo!
+
+    6. PERSONALIZE:
+       - Adapte os estilos conforme sua UI
+       - Mude as cores, fonts, layout
+       - Integre com seu menu principal
+
+    ========================================
+    CHECKLIST RÁPIDO
+    ========================================
+
+    ☐ Adicionei os 3 arquivos .js
+    ☐ Importei os scripts no HTML (ordem correta)
+    ☐ Adicionei a seção do Mundial
+    ☐ Testei com testWorldCup()
+    ☐ Criei um botão de acesso
+    ☐ Testei ao clicar no botão
+    ☐ Customizei estilos (opcional)
+    ☐ Funcionando! 🎉
+
+    ========================================
+
+-->

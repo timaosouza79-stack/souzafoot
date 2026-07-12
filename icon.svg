@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Definições de Gradação e Filtros de Glow -->
+  <defs>
+    <radialGradient id="bg-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1b3d1f"/>
+      <stop offset="100%" stop-color="#07120a"/>
+    </radialGradient>
+    
+    <linearGradient id="border-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4CAF50"/>
+      <stop offset="50%" stop-color="#81C784"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+
+    <radialGradient id="ball-grad" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#e0e0e0"/>
+      <stop offset="100%" stop-color="#9e9e9e"/>
+    </radialGradient>
+
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Fundo Circular -->
+  <circle cx="256" cy="256" r="240" fill="url(#bg-grad)" stroke="url(#border-grad)" stroke-width="12" filter="url(#glow)"/>
+
+  <!-- Estrelas Decorativas (Estilo Champions/Libertadores) -->
+  <g fill="#4CAF50" opacity="0.6">
+    <path d="M256,40 L260,52 L272,52 L262,60 L266,72 L256,64 L246,72 L250,60 L240,52 L252,52 Z"/>
+    <path d="M120,120 L123,129 L132,129 L124,135 L127,144 L120,138 L113,144 L116,135 L108,129 L117,129 Z" transform="scale(0.8) translate(60, 60)"/>
+    <path d="M392,120 L395,129 L404,129 L396,135 L399,144 L392,138 L385,144 L388,135 L380,129 L389,129 Z" transform="scale(0.8) translate(100, 60)"/>
+  </g>
+
+  <!-- Grupo Principal da Bola de Futebol -->
+  <g transform="translate(256, 270) scale(1.3)">
+    <!-- Base Sombreada da Bola -->
+    <circle cx="0" cy="0" r="100" fill="url(#ball-grad)"/>
+
+    <!-- Gomos da Bola de Futebol (Hexágonos e Pentágonos Negros/Cinzas) -->
+    <!-- Gomo Central -->
+    <polygon points="0,-25 24,-8 15,20 -15,20 -24,-8" fill="#1c2833"/>
+    
+    <!-- Linhas e Gomos Conectores -->
+    <!-- Superior -->
+    <line x1="0" y1="-25" x2="0" y2="-55" stroke="#1c2833" stroke-width="6"/>
+    <polygon points="0,-55 25,-70 50,-55 35,-30 10,-35" fill="none" stroke="#1c2833" stroke-width="4"/>
+    
+    <!-- Superior Direito -->
+    <line x1="24" y1="-8" x2="52" y2="-20" stroke="#1c2833" stroke-width="6"/>
+    
+    <!-- Inferior Direito -->
+    <line x1="15" y1="20" x2="35" y2="45" stroke="#1c2833" stroke-width="6"/>
+    <polygon points="35,45 60,35 70,10 50,-10 30,5" fill="#1c2833" stroke="#1c2833" stroke-width="2"/>
+    
+    <!-- Inferior Esquerdo -->
+    <line x1="-15" y1="20" x2="-35" y2="45" stroke="#1c2833" stroke-width="6"/>
+    
+    <!-- Superior Esquerdo -->
+    <line x1="-24" y1="-8" x2="-52" y2="-20" stroke="#1c2833" stroke-width="6"/>
+    <polygon points="-52,-20 -70,10 -60,35 -30,5 -50,-10" fill="#1c2833" stroke="#1c2833" stroke-width="2"/>
+
+    <!-- Costuras externas adicionais -->
+    <path d="M 0,-55 C -30,-65 -70,-35 -52,-20" fill="none" stroke="#1c2833" stroke-width="5"/>
+    <path d="M 0,-55 C 30,-65 70,-35 52,-20" fill="none" stroke="#1c2833" stroke-width="5"/>
+    <path d="M 52,-20 C 75,0 75,30 60,35" fill="none" stroke="#1c2833" stroke-width="5"/>
+    <path d="M -52,-20 C -75,0 -75,30 -60,35" fill="none" stroke="#1c2833" stroke-width="5"/>
+    <path d="M -35,45 C -10,75 10,75 35,45" fill="none" stroke="#1c2833" stroke-width="5"/>
+    <path d="M -35,45 C -55,45 -70,25 -60,35" fill="none" stroke="#1c2833" stroke-width="5"/>
+    <path d="M 35,45 C 55,45 70,25 60,35" fill="none" stroke="#1c2833" stroke-width="5"/>
+  </g>
+
+  <!-- Brilho/Glow de Destaque Superior -->
+  <path d="M 40,140 A 220,220 0 0,1 472,140 A 235,235 0 0,0 40,140 Z" fill="#ffffff" opacity="0.08"/>
+</svg>
