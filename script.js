@@ -2805,8 +2805,77 @@ function updateTeamStrength() {
     if (strengthEl) strengthEl.innerText = myTeam.strength;
 }
 
-// Variável para a mecânica de substituição
-let playerToSwapId = null;
+// Variáveis para a mecânica de substituição no campo 2D
+let selectedPitchPlayerId = null;
+let selectedReservePlayerId = null;
+
+const pitchCoordinates = {
+    '4-3-3': [
+        { left: 50, top: 88, posText: 'GO', sector: 'gk' },
+        { left: 82, top: 72, posText: 'LD', sector: 'df' },
+        { left: 60, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 40, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 18, top: 72, posText: 'LE', sector: 'df' },
+        { left: 50, top: 56, posText: 'VO', sector: 'mf' },
+        { left: 72, top: 48, posText: 'MC', sector: 'mf' },
+        { left: 28, top: 48, posText: 'MC', sector: 'mf' },
+        { left: 80, top: 24, posText: 'PD', sector: 'fw' },
+        { left: 50, top: 18, posText: 'CA', sector: 'fw' },
+        { left: 20, top: 24, posText: 'PE', sector: 'fw' }
+    ],
+    '4-4-2': [
+        { left: 50, top: 88, posText: 'GO', sector: 'gk' },
+        { left: 82, top: 72, posText: 'LD', sector: 'df' },
+        { left: 60, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 40, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 18, top: 72, posText: 'LE', sector: 'df' },
+        { left: 62, top: 54, posText: 'VO', sector: 'mf' },
+        { left: 38, top: 54, posText: 'VO', sector: 'mf' },
+        { left: 80, top: 46, posText: 'MD', sector: 'mf' },
+        { left: 20, top: 46, posText: 'ME', sector: 'mf' },
+        { left: 60, top: 20, posText: 'AT', sector: 'fw' },
+        { left: 40, top: 20, posText: 'AT', sector: 'fw' }
+    ],
+    '4-2-3-1': [
+        { left: 50, top: 88, posText: 'GO', sector: 'gk' },
+        { left: 82, top: 72, posText: 'LD', sector: 'df' },
+        { left: 60, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 40, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 18, top: 72, posText: 'LE', sector: 'df' },
+        { left: 62, top: 58, posText: 'VO', sector: 'mf' },
+        { left: 38, top: 58, posText: 'VO', sector: 'mf' },
+        { left: 80, top: 38, posText: 'MD', sector: 'mf' },
+        { left: 50, top: 36, posText: 'AM', sector: 'mf' },
+        { left: 20, top: 38, posText: 'ME', sector: 'mf' },
+        { left: 50, top: 16, posText: 'CA', sector: 'fw' }
+    ],
+    '3-5-2': [
+        { left: 50, top: 88, posText: 'GO', sector: 'gk' },
+        { left: 74, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 50, top: 76, posText: 'ZC', sector: 'df' },
+        { left: 26, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 86, top: 52, posText: 'AD', sector: 'df' },
+        { left: 62, top: 56, posText: 'VO', sector: 'mf' },
+        { left: 38, top: 56, posText: 'VO', sector: 'mf' },
+        { left: 50, top: 38, posText: 'AM', sector: 'mf' },
+        { left: 14, top: 52, posText: 'AE', sector: 'df' },
+        { left: 62, top: 20, posText: 'AT', sector: 'fw' },
+        { left: 38, top: 20, posText: 'AT', sector: 'fw' }
+    ],
+    '5-3-2': [
+        { left: 50, top: 88, posText: 'GO', sector: 'gk' },
+        { left: 86, top: 70, posText: 'LD', sector: 'df' },
+        { left: 68, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 50, top: 76, posText: 'ZC', sector: 'df' },
+        { left: 32, top: 74, posText: 'ZC', sector: 'df' },
+        { left: 14, top: 70, posText: 'LE', sector: 'df' },
+        { left: 62, top: 50, posText: 'VO', sector: 'mf' },
+        { left: 38, top: 50, posText: 'VO', sector: 'mf' },
+        { left: 50, top: 38, posText: 'AM', sector: 'mf' },
+        { left: 60, top: 20, posText: 'CA', sector: 'fw' },
+        { left: 40, top: 20, posText: 'CA', sector: 'fw' }
+    ]
+};
 
 function renderSquad() {
     if (!myTeam) return;
@@ -2814,53 +2883,182 @@ function renderSquad() {
     document.getElementById('squad-team-name').innerText = myTeam.name;
     document.getElementById('squad-team-strength').innerText = myTeam.strength;
 
-    const listStarters = document.getElementById('list-starters');
+    const pitchField = document.getElementById('squad-pitch-field');
     const listReserves = document.getElementById('list-reserves');
     
-    listStarters.innerHTML = '';
-    listReserves.innerHTML = '';
+    if (pitchField) pitchField.innerHTML = '';
+    if (listReserves) listReserves.innerHTML = '';
 
     // Ordenar por posição: GOL, ZAG, LAT, MEI, ATA
     const posOrder = { 'GOL': 1, 'ZAG': 2, 'LAT': 3, 'MEI': 4, 'ATA': 5 };
     myTeam.squad.sort((a, b) => posOrder[a.position] - posOrder[b.position]);
 
-    myTeam.squad.forEach(player => {
-        const item = document.createElement('div');
-        const isInjured = player.injuryRounds > 0;
-        const isSuspended = player.suspensionRounds > 0;
-        item.className = `player-item ${playerToSwapId === player.id ? 'selected' : ''}`;
-        if (isInjured || isSuspended) item.style.opacity = "0.6";
-        
-        const injuryLabel = isInjured ? ` <span style="color: #f44336; font-size: 0.8rem;">🤕 (${player.injuryRounds}rd)</span>` : "";
-        const suspLabel = isSuspended ? ` <span style="color: #f44336; font-size: 0.8rem;">🚫 (SUSP)</span>` : "";
-        const yellowLabel = (player.yellowCards > 0 && !isSuspended) ? ` <span style="color: #ffd700; font-size: 0.7rem;">🟨 ${player.yellowCards}</span>` : "";
-        
-        item.innerHTML = `
-            <div class="player-info">
-                <span class="player-pos">${player.position}</span>
-                <span class="player-name">${player.name}${injuryLabel}${suspLabel}${yellowLabel}</span>
-            </div>
-            <div class="player-stats">
-                <span class="stat-str" title="Força">${player.strength}</span>
-                <span class="stat-ene" title="Energia">${player.energy}%</span>
-            </div>
-            <button class="btn btn-secondary btn-swap" onclick="selectPlayerToSwap(${player.id})">
-                ${playerToSwapId === player.id ? 'Cancelar' : 'Trocar'}
-            </button>
-            <button class="btn btn-secondary btn-swap" style="border-color: #f44336; color: #f44336; margin-left: 5px;" onclick="sellPlayer(${player.id})">
-                Vender
-            </button>
-        `;
+    const starters = myTeam.squad.filter(p => p.isStarter);
+    const reserves = myTeam.squad.filter(p => !p.isStarter);
 
-        if (player.isStarter) {
-            listStarters.appendChild(item);
-        } else {
+    // 1. RENDERIZAR O CAMPO 2D (LADO ESQUERDO)
+    if (pitchField) {
+        // Linhas de áreas do campo
+        const areaTop = document.createElement('div');
+        areaTop.className = 'pitch-area-top';
+        const areaBottom = document.createElement('div');
+        areaBottom.className = 'pitch-area-bottom';
+        pitchField.appendChild(areaTop);
+        pitchField.appendChild(areaBottom);
+
+        const formation = myTeam.tactics?.formation || myTeam.formation || '4-3-3';
+        const coords = pitchCoordinates[formation] || pitchCoordinates['4-3-3'];
+
+        // Algoritmo de mapeamento inteligente dos 11 titulares para as coordenadas da formação
+        let pool = [...starters];
+        const mapping = [];
+
+        coords.forEach(slot => {
+            let targetPos = 'MEI';
+            if (slot.sector === 'gk') targetPos = 'GOL';
+            else if (slot.posText === 'ZC') targetPos = 'ZAG';
+            else if (slot.posText === 'LE' || slot.posText === 'LD' || slot.posText === 'AD' || slot.posText === 'AE') targetPos = 'LAT';
+            else if (slot.sector === 'df') targetPos = 'ZAG';
+            else if (slot.sector === 'fw') targetPos = 'ATA';
+
+            const playerIdx = pool.findIndex(p => p.position === targetPos);
+            if (playerIdx !== -1) {
+                mapping.push({ slot, player: pool[playerIdx] });
+                pool.splice(playerIdx, 1);
+            } else {
+                mapping.push({ slot, player: null });
+            }
+        });
+
+        // Preenche com jogadores improvisados que sobraram no pool
+        mapping.forEach(item => {
+            if (item.player === null && pool.length > 0) {
+                item.player = pool[0];
+                pool.splice(0, 1);
+            }
+        });
+
+        // Renderiza cada titular no campo 2D
+        mapping.forEach(item => {
+            if (!item.player) return;
+            const player = item.player;
+            const slot = item.slot;
+
+            const node = document.createElement('div');
+            node.className = `pitch-player-node ${selectedPitchPlayerId === player.id ? 'selected' : ''}`;
+            node.style.left = `${slot.left}%`;
+            node.style.top = `${slot.top}%`;
+            
+            const isInjured = player.injuryRounds > 0;
+            const isSuspended = player.suspensionRounds > 0;
+            if (isInjured || isSuspended) node.style.opacity = "0.6";
+
+            const injuryIcon = isInjured ? " 🤕" : "";
+            const suspIcon = isSuspended ? " 🚫" : "";
+
+            node.onclick = (e) => {
+                e.stopPropagation();
+                selectPitchPlayer(player.id);
+            };
+
+            node.innerHTML = `
+                <div class="pitch-player-badge">
+                    <span class="pitch-pos-box sector-${slot.sector}">${slot.posText}</span>
+                    <span class="pitch-str-box">${player.strength}</span>
+                </div>
+                <div class="pitch-player-name" title="${player.name}">${player.name}${injuryIcon}${suspIcon}</div>
+            `;
+            pitchField.appendChild(node);
+        });
+    }
+
+    // 2. RENDERIZAR O BANCO DE RESERVAS (LADO DIREITO)
+    if (listReserves) {
+        reserves.forEach(player => {
+            const item = document.createElement('div');
+            const isInjured = player.injuryRounds > 0;
+            const isSuspended = player.suspensionRounds > 0;
+            item.className = `squad-reserves-item ${selectedReservePlayerId === player.id ? 'selected' : ''}`;
+            if (isInjured || isSuspended) item.style.opacity = "0.6";
+
+            const injuryIcon = isInjured ? " 🤕" : "";
+            const suspIcon = isSuspended ? " 🚫" : "";
+
+            let posText = player.position;
+            let sector = 'mf';
+            if (player.position === 'GOL') { posText = 'GO'; sector = 'gk'; }
+            else if (player.position === 'ZAG') { posText = 'ZC'; sector = 'df'; }
+            else if (player.position === 'LAT') { posText = 'LT'; sector = 'df'; }
+            else if (player.position === 'MEI') { posText = 'MC'; sector = 'mf'; }
+            else if (player.position === 'ATA') { posText = 'AT'; sector = 'fw'; }
+
+            item.onclick = (e) => {
+                e.stopPropagation();
+                if (isInjured || isSuspended) {
+                    alert("Este jogador não está em condições de jogo!");
+                    return;
+                }
+                selectReservePlayer(player.id);
+            };
+
+            item.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                    <span class="reserve-pos-box sector-${sector}">${posText}</span>
+                    <span class="reserve-player-name">${player.name}${injuryIcon}${suspIcon}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="reserve-player-str">${player.strength}</span>
+                    <button class="btn btn-sell-mini" onclick="event.stopPropagation(); sellPlayer(${player.id})" title="Vender Jogador" style="padding: 2px 6px; font-size: 0.7rem; color: #f44336; border-color: #f44336; background: transparent; border-radius: 4px; border: 1px solid var(--border-color);">Vender</button>
+                </div>
+            `;
             listReserves.appendChild(item);
-        }
-    });
+        });
+    }
 
-    // Sincroniza o painel de táticas para refletir mudanças nos titulares
     renderTacticsPanel();
+}
+
+function selectPitchPlayer(playerId) {
+    if (selectedReservePlayerId !== null) {
+        swapPlayers(playerId, selectedReservePlayerId);
+        selectedPitchPlayerId = null;
+        selectedReservePlayerId = null;
+    } else {
+        selectedPitchPlayerId = (selectedPitchPlayerId === playerId) ? null : playerId;
+    }
+    renderSquad();
+}
+
+function selectReservePlayer(playerId) {
+    if (selectedPitchPlayerId !== null) {
+        swapPlayers(selectedPitchPlayerId, playerId);
+        selectedPitchPlayerId = null;
+        selectedReservePlayerId = null;
+    } else {
+        selectedReservePlayerId = (selectedReservePlayerId === playerId) ? null : playerId;
+    }
+    renderSquad();
+}
+
+function swapPlayers(starterId, reserveId) {
+    const starter = myTeam.squad.find(p => p.id === starterId);
+    const reserve = myTeam.squad.find(p => p.id === reserveId);
+    
+    if (starter && reserve) {
+        starter.isStarter = false;
+        reserve.isStarter = true;
+        
+        // Mantém capitão e cobradores sincronizados
+        if (myTeam.tactics) {
+            if (myTeam.tactics.captain === starterId) myTeam.tactics.captain = reserveId;
+            if (myTeam.tactics.freekicks === starterId) myTeam.tactics.freekicks = reserveId;
+            if (myTeam.tactics.corners === starterId) myTeam.tactics.corners = reserveId;
+        }
+
+        updateTeamStrength();
+        saveGame();
+        updateDashboardUI();
+    }
 }
 
 function selectPlayerToSwap(playerId) {

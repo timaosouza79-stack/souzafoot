@@ -1099,18 +1099,225 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 .tab-content.active { display: block; }
 
 /* Squad/tactics content areas */
-.squad-content {
+.squad-content-split {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.2fr 1fr;
     gap: 20px;
+    align-items: start;
 }
 
-.squad-board {
+.squad-pitch-container {
+    background: rgba(11, 14, 20, 0.6);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.squad-pitch {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-width: 440px;
+    background: radial-gradient(circle, #1e5a3c 0%, #0f3d24 100%);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Linhas do relvado */
+.squad-pitch::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-50%);
+}
+
+.squad-pitch::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 90px; height: 90px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.pitch-area-top {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 55%; height: 14%;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+    border-left: 2px solid rgba(255, 255, 255, 0.35);
+    border-right: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.pitch-area-bottom {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 55%; height: 14%;
+    border-top: 2px solid rgba(255, 255, 255, 0.35);
+    border-left: 2px solid rgba(255, 255, 255, 0.35);
+    border-right: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+/* Jogadores no campo */
+.pitch-player-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    z-index: 5;
+    user-select: none;
+}
+
+.pitch-player-node:hover {
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.pitch-player-node.selected .pitch-player-badge {
+    box-shadow: 0 0 14px var(--accent-color);
+    border-color: var(--accent-color);
+    background: rgba(0, 230, 118, 0.2);
+}
+
+.pitch-player-badge {
+    display: flex;
+    align-items: center;
+    background: rgba(11, 14, 20, 0.9);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 2px 5px;
+    gap: 4px;
+    transition: var(--transition-smooth);
+}
+
+.pitch-pos-box {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #000;
+    padding: 1px 4px;
+    border-radius: 3px;
+    min-width: 22px;
+    text-align: center;
+}
+
+.pitch-pos-box.sector-gk { background: #ffd54f; } /* Goleiro - Amarelo */
+.pitch-pos-box.sector-df { background: #29b6f6; } /* Defesa - Azul */
+.pitch-pos-box.sector-mf { background: #66bb6a; } /* Meio - Verde */
+.pitch-pos-box.sector-fw { background: #ef5350; } /* Ataque - Vermelho */
+
+.pitch-str-box {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.pitch-player-name {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-top: 3px;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+    max-width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+/* Banco de Suplentes */
+.squad-reserves-container {
     background: var(--surface-color);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.squad-reserves-container h3 {
+    font-size: 1.1rem;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 5px;
+}
+
+.squad-reserves-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.squad-reserves-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.squad-reserves-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary-color);
+}
+
+.squad-reserves-item.selected {
+    background: rgba(0, 230, 118, 0.12);
+    border-color: var(--primary-color);
+}
+
+.reserve-pos-box {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #000;
+    padding: 2px 5px;
+    border-radius: 4px;
+    min-width: 25px;
+    text-align: center;
+}
+
+.reserve-pos-box.sector-gk { background: #ffd54f; }
+.reserve-pos-box.sector-df { background: #29b6f6; }
+.reserve-pos-box.sector-mf { background: #66bb6a; }
+.reserve-pos-box.sector-fw { background: #ef5350; }
+
+.reserve-player-name {
+    flex: 1;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-left: 10px;
+    color: #eee;
+}
+
+.reserve-player-str {
+    font-weight: 700;
+    color: var(--primary-color);
+    background: rgba(0, 230, 118, 0.1);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    margin-right: 6px;
 }
 
 .squad-board h3 {
@@ -1349,14 +1556,9 @@ h1, h2, h3, h4, h5, h6, .brand-font {
         font-size: 0.85rem;
     }
 
-    .squad-content {
+    .squad-content-split {
         grid-template-columns: 1fr;
-        gap: 14px;
-    }
-
-    .squad-board {
-        padding: 14px;
-        border-radius: 14px;
+        gap: 16px;
     }
 
     .player-item {

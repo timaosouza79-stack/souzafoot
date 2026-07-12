@@ -160,18 +160,19 @@
             </div>
 
             <div id="squad-tab-players" class="tab-content active">
-                <main class="squad-content">
-                    <div class="squad-board">
-                        <h3>Titulares (11)</h3>
-                        <div class="squad-list" id="list-starters">
-                            <!-- Titulares renderizados aqui -->
+                <main class="squad-content-split">
+                    <!-- Lado Esquerdo: Campo de Futebol 2D -->
+                    <div class="squad-pitch-container">
+                        <div class="squad-pitch" id="squad-pitch-field">
+                            <!-- Renderizado dinamicamente via JS -->
                         </div>
                     </div>
 
-                    <div class="squad-board">
-                        <h3>Reservas</h3>
-                        <div class="squad-list" id="list-reserves">
-                            <!-- Reservas renderizados aqui -->
+                    <!-- Lado Direito: Suplentes / Reservas -->
+                    <div class="squad-reserves-container">
+                        <h3>Banco de Suplentes</h3>
+                        <div class="squad-reserves-list" id="list-reserves">
+                            <!-- Suplentes renderizados aqui -->
                         </div>
                     </div>
                 </main>
