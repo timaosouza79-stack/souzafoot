@@ -673,6 +673,7 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 .standings-table {
     width: 100%;
     border-collapse: collapse;
+    white-space: nowrap;
 }
 
 .standings-table th {
@@ -1659,11 +1660,7 @@ h1, h2, h3, h4, h5, h6, .brand-font {
         font-size: 0.76rem;
     }
 
-    /* Esconde GP, GC no celular */
-    .standings-table th:nth-child(8),
-    .standings-table td:nth-child(8),
-    .standings-table th:nth-child(9),
-    .standings-table td:nth-child(9) { display: none; }
+    /* GP e GC serão visíveis no mobile através de scroll horizontal */
 
     .standings-team-cell { gap: 6px; }
 
@@ -1813,13 +1810,7 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     .hero-header { padding: 2.5rem 1rem; }
     .hero-header h1 { font-size: 1.7rem; }
 
-    /* Esconde SG também */
-    .standings-table th:nth-child(10),
-    .standings-table td:nth-child(10) { display: none; }
-
-    /* Esconde D (derrotas) em telas muito pequenas */
-    .standings-table th:nth-child(7),
-    .standings-table td:nth-child(7) { display: none; }
+    /* SG e D serão visíveis no mobile através de scroll horizontal */
 
     .live-score-numbers {
         font-size: 1.8rem;
