@@ -342,6 +342,7 @@ let isLibertadoresMode = false;
 let libertadoresParticipants = []; // Armazena quem se classificou para a próxima Liberta
 let cupWinnerId = null;
 let cupRunnerUpId = null;
+let cupFinished = false;
 let databaseVersion = "2026-07-12-v1";
 // Som: preferência do usuário
 window.soundEnabled = true;
@@ -495,6 +496,7 @@ function saveGame() {
         allTeams,
         isCupMode,
         cupBracket,
+        cupFinished,
         cupWinnerId,
         cupRunnerUpId,
         libertadoresPhase,
@@ -638,6 +640,7 @@ function loadGame() {
         isLibertadoresMode = state.isLibertadoresMode || false;
         cupWinnerId = state.cupWinnerId || null;
         cupRunnerUpId = state.cupRunnerUpId || null;
+        cupFinished = state.cupFinished || false;
         console.log("loadGame: Exibindo screen-main.");
         ensureShields();
         showScreen('screen-main');
@@ -1681,7 +1684,11 @@ function playRound() {
     // Correção: Se for rodada de mata-mata ou fase de grupos continental, busca os jogos nos chaveamentos/grupos
     let matchesToSimulate = currentData.matches || [];
     if (isCupMode && cupBracket.length > 0) {
-        matchesToSimulate = cupBracket[cupBracket.length - 1];
+        if (!cupFinished) {
+            matchesToSimulate = cupBracket[cupBracket.length - 1];
+        } else {
+            matchesToSimulate = [];
+        }
     } else if (isLibertadoresMode) {
         if (libertadoresPhase === 'knockout' && libertadoresBracket.length > 0) {
             matchesToSimulate = libertadoresBracket[libertadoresBracket.length - 1];
@@ -1714,9 +1721,8 @@ function playRound() {
                 p.isStarter = false;
             }
         });
-        
-        // Auto-escala o time do usuário para repor titulares ausentes (lesionados/suspensos) com reservas saudáveis
-        autoSelectStarters(myTeam);
+        // A escalação mantem-se da rodada anterior, apenas removemos os indisponíveis.
+        // O jogo não faz autoSelectStarters(myTeam) para preservar a escolha do utilizador.
     }
 
     // 2. Validação da escalação do usuário antes da rodada
@@ -1969,6 +1975,7 @@ function initChampionship(selectedLeague = 'brazil_a') {
 
 function initCopaDoBrasil(silent = false) { 
     if (cupBracket.length > 0) return;
+    cupFinished = false;
     let participants = [];
     if (myTeam.league.startsWith('brazil')) {
         participants = allTeams.filter(t => t.league === 'brazil_a' || t.league === 'brazil_b');
@@ -3070,6 +3077,7 @@ function renderSquad() {
                     <span class="pitch-str-box" style="color: ${strColor}">${strDisplay}</span>
                 </div>
                 <div class="pitch-player-name" title="${player.name}${isOutOfPosition ? ' (Fora de Posição: -15%)' : ''}">${player.name}${injuryIcon}${suspIcon}</div>
+                <div class="pitch-player-energy" style="font-size: 0.65rem; color: #2196f3; margin-top: 1px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⚡ ${Math.round(player.energy || 100)}%</div>
             `;
             pitchField.appendChild(node);
         });
@@ -3140,6 +3148,7 @@ function renderSquad() {
                     <span class="reserve-player-name">${player.name}${injuryIcon}${suspIcon}</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="reserve-player-energy" style="color: #2196f3; font-size: 0.75rem; min-width: 40px; font-weight: bold;">⚡ ${Math.round(player.energy || 100)}%</span>
                     <span class="reserve-player-str">${player.strength}</span>
                     <button class="btn btn-sell-mini" onclick="event.stopPropagation(); sellPlayer(${player.id})" title="Vender Jogador" style="padding: 2px 6px; font-size: 0.7rem; color: #f44336; border-color: #f44336; background: transparent; border-radius: 4px; border: 1px solid var(--border-color);">Vender</button>
                 </div>
@@ -3711,6 +3720,14 @@ function attemptPurchase(playerId, fromTeamId, offerPrice) {
     const player = fromTeam.squad.find(p => p.id === playerId);
     const marketPrice = Math.pow(player.strength, 2) * 14000;
 
+    // Regra: Teto Salarial Rigoroso
+    const estimatedSalary = marketPrice * 0.001; 
+    const wageBudget = myTeam.balance * 0.05;
+    if (estimatedSalary > wageBudget) {
+        alert("TRANSFERÊNCIA FRACASSADA!\n\nNão temos orçamento salarial para este salário.");
+        return;
+    }
+
     // Fatores que influenciam a transferência
     const offerFactor = offerPrice / marketPrice;
     const playerImportance = player.strength / fromTeam.strength;
@@ -3719,6 +3736,13 @@ function attemptPurchase(playerId, fromTeamId, offerPrice) {
     const leagueRep = { 'england': 10, 'spain': 10, 'germany': 9, 'italy': 9, 'france': 8, 'portugal': 7, 'brazil_a': 6, 'south_america': 5, 'brazil_b': 4 };
     const myRep = (myTeam.strength) + (leagueRep[myTeam.league] || 5) * 5;
     const theirRep = (fromTeam.strength) + (leagueRep[fromTeam.league] || 5) * 5;
+
+    // Regra: Sistema de Reputação/Overall
+    if (player.strength > 80 && myRep < 120) {
+        alert("TRANSFERÊNCIA FRACASSADA!\n\nO jogador recusa jogar num clube desta dimensão.");
+        return;
+    }
+
     const reputationFactor = myRep / theirRep;
 
     // Chance de sucesso final (base de 40%)
@@ -3767,6 +3791,30 @@ function requestLoan(playerId, fromTeamId, originalPrice) {
 
     const fromTeam = allTeams.find(t => t.id === fromTeamId);
     const player = fromTeam.squad.find(p => p.id === playerId);
+
+    // Regra: Lógica Restrita de Empréstimos
+    if (player.isStarter || player.strength >= 75) {
+        alert(`EMPRÉSTIMO RECUSADO!\n\nO ${fromTeam.name} não aceita emprestar titulares ou jogadores importantes.`);
+        return;
+    }
+
+    // Regra: Teto Salarial Rigoroso
+    const marketPrice = Math.pow(player.strength, 2) * 14000;
+    const estimatedSalary = marketPrice * 0.001; 
+    const wageBudget = myTeam.balance * 0.05;
+    if (estimatedSalary > wageBudget) {
+        alert("EMPRÉSTIMO RECUSADO!\n\nNão temos orçamento salarial para este salário.");
+        return;
+    }
+
+    const leagueRep = { 'england': 10, 'spain': 10, 'germany': 9, 'italy': 9, 'france': 8, 'portugal': 7, 'brazil_a': 6, 'south_america': 5, 'brazil_b': 4 };
+    const myRep = (myTeam.strength) + (leagueRep[myTeam.league] || 5) * 5;
+
+    // Regra: Sistema de Reputação/Overall (Empréstimo)
+    if (player.strength > 80 && myRep < 120) {
+        alert("EMPRÉSTIMO RECUSADO!\n\nO jogador recusa jogar num clube desta dimensão.");
+        return;
+    }
 
     const playerImportance = player.strength / fromTeam.strength;
     let successChance = 0.75;
