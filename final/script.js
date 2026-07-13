@@ -1,3 +1,31 @@
+// --- BASE DE DADOS DE PATROCINADORES ---
+const sponsorBrands = {
+    level1: [
+        { brand: "Guaraná Antarctica", domain: "guaranaantarctica.com.br" },
+        { brand: "Continente", domain: "continente.pt" },
+        { brand: "MEO", domain: "meo.pt" },
+        { brand: "Penalty", domain: "penalty.com.br" },
+        { brand: "Topper", domain: "topper.com.ar" }
+    ],
+    level2: [
+        { brand: "Betano", domain: "betano.com" },
+        { brand: "Mercado Livre", domain: "mercadolivre.com.br" },
+        { brand: "Itaú", domain: "itau.com.br" },
+        { brand: "Nubank", domain: "nubank.com.br" },
+        { brand: "Vivo", domain: "vivo.com.br" }
+    ],
+    level3: [
+        { brand: "Emirates", domain: "emirates.com" },
+        { brand: "Spotify", domain: "spotify.com" },
+        { brand: "Red Bull", domain: "redbull.com" },
+        { brand: "Nike", domain: "nike.com" },
+        { brand: "Samsung", domain: "samsung.com" },
+        { brand: "Mastercard", domain: "mastercard.com" }
+    ]
+};
+const sponsorSlots = ['Master', 'Costas', 'Mangas', 'Calcoes'];
+// ---------------------------------------
+
 // Dados dos 20 times da Série A do Brasileirão
 const teamsData = [
     {"id": "athleticopr", "name": "Athletico-PR", "strength": 79, "shield": "img/athleticopr_v3.png", "league": "brazil_a", "balance": 350000000, "stadium": "Ligga Arena", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Ligga_Arena.jpg/600px-Ligga_Arena.jpg"},
@@ -617,6 +645,13 @@ function loadGame() {
                     if (p.yellowCards === undefined || p.yellowCards === null) p.yellowCards = 0;
                 });
             }
+            
+            // Inicializa dados do Estádio e Finanças para os times (necessário para o novo módulo)
+            if (team.stadiumLevel === undefined || team.stadiumLevel === null) team.stadiumLevel = 1;
+            if (team.stadiumCapacity === undefined || team.stadiumCapacity === null) team.stadiumCapacity = 10000 + (team.rep || 10) * 1000;
+            if (team.ticketPriceSetting === undefined || team.ticketPriceSetting === null) team.ticketPriceSetting = 'Medium';
+            if (team.sponsorships === undefined || team.sponsorships === null) team.sponsorships = { Master: null, Costas: null, Mangas: null, Calcoes: null };
+            if (team.consecutiveLosses === undefined || team.consecutiveLosses === null) team.consecutiveLosses = 0;
         });
         
         myTeam = allTeams.find(t => t.id === state.myTeamId);
@@ -1353,8 +1388,15 @@ function getGoalProbabilities(match) {
     const strengthA = match.homeTeam.strength;
     const strengthB = match.awayTeam.strength;
 
-    const modA = getTeamTacticalModifiers(match.homeTeam);
+    let modA = getTeamTacticalModifiers(match.homeTeam);
     const modB = getTeamTacticalModifiers(match.awayTeam);
+    
+    // --- GESTÃO DE ESTÁDIO: Bónus de Adeptos ---
+    if (match.attendanceRate > 0.85) {
+        modA.attackMod *= 1.05;
+        modA.defenseMod *= 1.05;
+    }
+    // ------------------------------------------
 
     const effectiveStrengthA = strengthA * modA.attackMod * modB.defenseMod;
     const effectiveStrengthB = strengthB * modB.attackMod * modA.defenseMod;
@@ -1780,6 +1822,25 @@ function playRound() {
             if (homeTeam.squad) homeTeam.squad.forEach(p => { if (p.isStarter) p.playedInMatch = true; });
             if (awayTeam.squad) awayTeam.squad.forEach(p => { if (p.isStarter) p.playedInMatch = true; });
             
+            // --- GESTÃO DE ESTÁDIO E FINANÇAS ---
+            const price = homeTeam.ticketPriceSetting || 'Medium';
+            let priceMod = 0.8;
+            let ticketValue = 60;
+            if (price === 'Low') { priceMod = 0.95 + (Math.random() * 0.05); ticketValue = 30; }
+            else if (price === 'Medium') { priceMod = 0.70 + (Math.random() * 0.15); ticketValue = 60; }
+            else if (price === 'High') { priceMod = 0.40 + (Math.random() * 0.20); ticketValue = 100; }
+            
+            const repMod = (homeTeam.rep || 10) / 20;
+            const randomFactor = 0.85 + (Math.random() * 0.3);
+            
+            const capacity = homeTeam.stadiumCapacity || 10000;
+            let attendance = Math.floor(capacity * priceMod * repMod * randomFactor);
+            if (attendance > capacity) attendance = capacity;
+            
+            const attendanceRate = attendance / capacity;
+            const revenue = attendance * ticketValue;
+            // ------------------------------------
+            
             return {
                 id: index,
                 home: match.home,
@@ -1787,6 +1848,9 @@ function playRound() {
                 matchType: match.type || currentData?.type || 'league',
                 homeTeam,
                 awayTeam,
+                attendance,
+                attendanceRate,
+                revenue,
                 currentHomeGoals: 0,
                 currentAwayGoals: 0,
                 goals: []
@@ -1810,8 +1874,8 @@ function playRound() {
         if (userBye) {
             alert(`O ${myTeam.name} folga nesta rodada!`);
             simulatedRoundMatches.forEach(m => {
-                m.currentHomeGoals = calculateGoals(m.homeTeam, m.awayTeam);
-                m.currentAwayGoals = calculateGoals(m.awayTeam, m.homeTeam);
+                m.currentHomeGoals = calculateGoals(m.homeTeam, m.awayTeam, m);
+                m.currentAwayGoals = calculateGoals(m.awayTeam, m.homeTeam, m);
             });
             finishMatchSimulation();
             return;
@@ -2398,6 +2462,58 @@ function finishMatchSimulation() {
     document.getElementById('btn-live-continue').style.display = 'none';
 
     try {
+        // --- GESTÃO DE ESTÁDIO E FINANÇAS: Pagamento de Bilheteira ---
+        simulatedRoundMatches.forEach(m => {
+            if (m.home === myTeam.id && m.revenue) {
+                myTeam.balance += m.revenue;
+                addCommentaryItem(`💰 Receita de Bilheteria: R$ ${m.revenue.toLocaleString('pt-BR')} (${m.attendance.toLocaleString('pt-BR')} torcedores)`, 'info', 90);
+            }
+        });
+        
+        // --- GESTÃO DE ESTÁDIO E FINANÇAS: Patrocínios e Rescisões ---
+        if (userSimMatch && (userSimMatch.home === myTeam.id || userSimMatch.away === myTeam.id)) {
+            // Lógica de vitórias/derrotas consecutivas
+            const userG = userSimMatch.home === myTeam.id ? userSimMatch.currentHomeGoals : userSimMatch.currentAwayGoals;
+            const oppG = userSimMatch.home === myTeam.id ? userSimMatch.currentAwayGoals : userSimMatch.currentHomeGoals;
+            
+            if (userG < oppG) {
+                myTeam.consecutiveLosses = (myTeam.consecutiveLosses || 0) + 1;
+                // Rescisão
+                if (myTeam.consecutiveLosses >= 3) {
+                    sponsorSlots.forEach(slot => {
+                        if (myTeam.sponsorships && myTeam.sponsorships[slot] && Math.random() < 0.3) {
+                            const brand = myTeam.sponsorships[slot].brand;
+                            myTeam.sponsorships[slot] = null;
+                            addCommentaryItem(`🚨 <strong>CRISE!</strong> A marca <strong>${brand}</strong> rescindiu o contrato de patrocínio (${slot}) devido aos maus resultados!`, 'red-card', 90);
+                        }
+                    });
+                }
+            } else {
+                myTeam.consecutiveLosses = 0; // Reset nas vitórias e empates
+            }
+            
+            // Pagamentos
+            let sponIncome = 0;
+            if (myTeam.sponsorships) {
+                sponsorSlots.forEach(slot => {
+                    const contract = myTeam.sponsorships[slot];
+                    if (contract) {
+                        sponIncome += contract.value;
+                        contract.duration--;
+                        if (contract.duration <= 0) {
+                            myTeam.sponsorships[slot] = null;
+                            addCommentaryItem(`📜 O contrato de patrocínio com a <strong>${contract.brand}</strong> (${slot}) chegou ao fim.`, 'info', 90);
+                        }
+                    }
+                });
+            }
+            if (sponIncome > 0) {
+                myTeam.balance += sponIncome;
+                addCommentaryItem(`💰 Receita de Patrocínios: R$ ${sponIncome.toLocaleString('pt-BR')}`, 'info', 90);
+            }
+        }
+        // -----------------------------------------------------------
+        
         if (isCupMode) {
             finishCupRound();
         } else if (isLibertadoresMode) {
@@ -2787,13 +2903,23 @@ function getTeamTacticalModifiers(team) {
 }
 
 // Função de cálculo dos gols
-function calculateGoals(teamA, teamB) {
+function calculateGoals(teamA, teamB, match = null) {
     const strengthA = teamA.strength;
     const strengthB = teamB.strength;
     
     // Obter modificadores táticos
-    const modA = getTeamTacticalModifiers(teamA);
+    let modA = getTeamTacticalModifiers(teamA);
     const modB = getTeamTacticalModifiers(teamB);
+    
+    // --- GESTÃO DE ESTÁDIO: Bónus de Adeptos ---
+    // Em simulateMatch/fast-forward, teamA é home quando a função é chamada na primeira linha
+    // e teamA é away na segunda linha (m.awayTeam, m.homeTeam). Portanto, apenas aplicamos
+    // o bónus se houver a match reference passada e formos explicitamente a homeTeam.
+    if (match && match.attendanceRate > 0.85 && match.homeTeam.id === teamA.id) {
+        modA.attackMod *= 1.05;
+        modA.defenseMod *= 1.05;
+    }
+    // ------------------------------------------
     
     // Força efetiva ponderada
     const effectiveStrengthA = strengthA * modA.attackMod * modB.defenseMod;
@@ -3632,6 +3758,151 @@ function sortStats(key) {
 }
 
 // --- Lógica do Mercado de Transferências ---
+// --- ESTÁDIO E FINANÇAS ---
+function renderStadium() {
+    if (!myTeam) return;
+    
+    document.getElementById('stadium-balance').innerText = myTeam.balance.toLocaleString('pt-BR');
+    document.getElementById('stadium-level-badge').innerText = `Nível ${myTeam.stadiumLevel}`;
+    document.getElementById('stadium-capacity').innerText = myTeam.stadiumCapacity.toLocaleString('pt-BR');
+    
+    // Custo base de upgrade
+    const upgradeCost = myTeam.stadiumLevel * 5000000;
+    document.getElementById('stadium-upgrade-cost').innerText = `R$ ${upgradeCost.toLocaleString('pt-BR')}`;
+    
+    // Reset classes
+    ['Low', 'Medium', 'High'].forEach(type => {
+        const btn = document.getElementById(`ticket-btn-${type}`);
+        if (btn) {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-secondary');
+        }
+    });
+    
+    const activeBtn = document.getElementById(`ticket-btn-${myTeam.ticketPriceSetting}`);
+    if (activeBtn) {
+        activeBtn.classList.remove('btn-secondary');
+        activeBtn.classList.add('btn-primary');
+    }
+    
+    renderSponsorships();
+}
+
+function setTicketPrice(type) {
+    if (!myTeam) return;
+    myTeam.ticketPriceSetting = type;
+    saveGame();
+    renderStadium();
+}
+
+function upgradeStadium() {
+    if (!myTeam) return;
+    
+    const upgradeCost = myTeam.stadiumLevel * 5000000;
+    
+    if (myTeam.balance < upgradeCost) {
+        alert("Você não tem saldo suficiente para expandir o estádio.");
+        return;
+    }
+    
+    if (confirm(`Deseja expandir o estádio para o Nível ${myTeam.stadiumLevel + 1} (+5.000 lugares) por R$ ${upgradeCost.toLocaleString('pt-BR')}?`)) {
+        myTeam.balance -= upgradeCost;
+        myTeam.stadiumLevel += 1;
+        myTeam.stadiumCapacity += 5000;
+        
+        saveGame();
+        renderStadium();
+        alert("Parabéns! O seu estádio foi expandido com sucesso!");
+    }
+}
+
+function renderSponsorships() {
+    if (!myTeam || !myTeam.sponsorships) return;
+    const container = document.getElementById('sponsorships-container');
+    container.innerHTML = '';
+    
+    sponsorSlots.forEach(slot => {
+        const contract = myTeam.sponsorships[slot];
+        let html = '';
+        
+        if (contract) {
+            html = `
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
+                    <h4 style="color: var(--accent-color); margin-bottom: 10px;">${slot}</h4>
+                    <img src="https://logo.clearbit.com/${contract.domain}" onerror="this.src='https://via.placeholder.com/64?text=${contract.brand}';" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; background: white; padding: 5px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">${contract.brand}</div>
+                    <div style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 5px;">R$ ${contract.value.toLocaleString('pt-BR')} / jogo</div>
+                    <div style="color: var(--text-muted); font-size: 0.8rem;">Duração: ${contract.duration} jogos</div>
+                </div>
+            `;
+        } else {
+            html = `
+                <div style="background: rgba(0,0,0,0.2); border: 1px dashed var(--border-color); border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 180px;">
+                    <h4 style="color: var(--text-muted); margin-bottom: 15px;">${slot}</h4>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">Espaço Livre</div>
+                    <button class="btn btn-primary" onclick="generateSponsorshipOffers('${slot}')">Buscar Ofertas</button>
+                </div>
+            `;
+        }
+        container.innerHTML += html;
+    });
+}
+
+function generateSponsorshipOffers(slot) {
+    if (!myTeam) return;
+    
+    let level = 'level1';
+    if (myTeam.rep >= 50 && myTeam.rep < 100) level = 'level2';
+    else if (myTeam.rep >= 100) level = 'level3';
+    
+    const brandsPool = [...sponsorBrands[level]].sort(() => 0.5 - Math.random());
+    const offers = brandsPool.slice(0, 3);
+    
+    let baseValue = 50000;
+    if (level === 'level2') baseValue = 150000;
+    if (level === 'level3') baseValue = 350000;
+    
+    let mult = 1.0;
+    if (slot === 'Master') mult = 2.5;
+    if (slot === 'Costas') mult = 1.5;
+    if (slot === 'Mangas') mult = 1.0;
+    if (slot === 'Calcoes') mult = 0.8;
+    
+    const list = document.getElementById('modal-sponsors-list');
+    list.innerHTML = '';
+    
+    offers.forEach(brand => {
+        const value = Math.floor(baseValue * mult * (0.8 + Math.random() * 0.4));
+        const duration = 10 + Math.floor(Math.random() * 20); // 10 to 29 matches
+        
+        list.innerHTML += `
+            <div class="dashboard-card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05);">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <img src="https://logo.clearbit.com/${brand.domain}" onerror="this.src='https://via.placeholder.com/48?text=${brand.brand}';" style="width: 48px; height: 48px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
+                    <div>
+                        <div style="font-weight: bold; font-size: 1.1rem;">${brand.brand}</div>
+                        <div style="color: #4CAF50; font-size: 0.9rem;">R$ ${value.toLocaleString('pt-BR')} / jogo</div>
+                        <div style="color: var(--text-muted); font-size: 0.8rem;">Contrato: ${duration} jogos</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="acceptSponsorship('${slot}', '${brand.brand}', '${brand.domain}', ${value}, ${duration})">Assinar</button>
+            </div>
+        `;
+    });
+    
+    document.getElementById('modal-sponsors').style.display = 'flex';
+}
+
+function acceptSponsorship(slot, brand, domain, value, duration) {
+    if (!myTeam) return;
+    
+    myTeam.sponsorships[slot] = { brand, domain, value, duration };
+    document.getElementById('modal-sponsors').style.display = 'none';
+    saveGame();
+    renderStadium();
+}
+// ----------------------------
+
 function renderMarket() {
     if (myTeam) {
         document.getElementById('market-balance').innerText = myTeam.balance.toLocaleString('pt-BR');

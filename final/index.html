@@ -100,6 +100,7 @@
                     <button class="btn btn-secondary" onclick="playRound()"><i class="fas fa-play"></i> Jogar Rodada <span id="btn-round-num">(1/38)</span></button>
                     <button id="btn-sound-toggle" class="btn btn-secondary" onclick="toggleSound()"><i class="fas fa-volume-up"></i> Som: ON</button>
                     <button id="btn-market" class="btn btn-secondary" onclick="showScreen('screen-market'); renderMarket();"><i class="fas fa-shopping-cart"></i> Mercado</button>
+                    <button id="btn-stadium" class="btn btn-secondary" onclick="showScreen('screen-stadium'); renderStadium();"><i class="fas fa-building"></i> Estádio / Finanças</button>
                     <button class="btn btn-secondary" style="border-color: #ffd700;" onclick="viewCupBracket()"><i class="fas fa-trophy" style="color: #ffd700;"></i> Ver Copa</button>
                     <button id="btn-view-libertadores" class="btn btn-secondary" style="border-color: #3f51b5; display: none;" onclick="viewLibertadoresBracket()"><i class="fas fa-globe-americas" style="color: #3f51b5;"></i> Ver Libertadores</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-calendar'); renderCalendar();"><i class="far fa-calendar-alt"></i> Calendário</button>
@@ -382,6 +383,54 @@
             </main>
         </section>
 
+        <!-- Tela de Estádio / Finanças -->
+        <section id="screen-stadium" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <div>
+                    <h2>Estádio e Finanças</h2>
+                    <p>Saldo Disponível: <strong style="color: #4CAF50;">R$ <span id="stadium-balance">0</span></strong></p>
+                </div>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            <main class="dashboard-card" style="margin: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                        <div>
+                            <h3 style="margin-bottom: 5px;">Meu Estádio <span id="stadium-level-badge" style="font-size: 0.8rem; background: var(--primary-color); padding: 3px 8px; border-radius: 4px; margin-left: 10px;">Nível 1</span></h3>
+                            <p style="color: var(--text-muted);">Capacidade Máxima: <strong style="color: white;"><span id="stadium-capacity">0</span> lugares</strong></p>
+                        </div>
+                        <div>
+                            <button id="btn-upgrade-stadium" class="btn btn-secondary" style="border-color: #ff9800; color: #ff9800;" onclick="upgradeStadium()">
+                                <i class="fas fa-hammer"></i> Expandir (Custo: <span id="stadium-upgrade-cost">0</span>)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 style="margin-bottom: 10px;">Preço dos Ingressos</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Defina a política de preços para o próximo jogo em casa. Ingressos caros geram mais receita por pessoa, mas reduzem a assistência. Estádio cheio (+85%) aumenta a força da sua equipe em casa (Bônus de Torcida).</p>
+                        
+                        <div style="display: flex; gap: 15px;">
+                            <button id="ticket-btn-Low" class="btn btn-secondary" onclick="setTicketPrice('Low')">Baixo (R$ 30)</button>
+                            <button id="ticket-btn-Medium" class="btn btn-secondary" onclick="setTicketPrice('Medium')">Médio (R$ 60)</button>
+                            <button id="ticket-btn-High" class="btn btn-secondary" onclick="setTicketPrice('High')">Alto (R$ 100)</button>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <h3 style="margin-bottom: 10px;">Patrocínios do Clube</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Assine contratos de patrocínio com marcas reais para ganhar dinheiro a cada jogo. Mas cuidado: 3 derrotas consecutivas podem levar à rescisão do contrato!</p>
+                        
+                        <div id="sponsorships-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <!-- Sponsors renderizados via JS -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+
         <!-- Tela de Jogo Ao Vivo -->
         <section id="screen-match-live" class="screen">
             <header class="manager-header" style="justify-content: center; flex-direction: column; gap: 10px; padding: 15px 30px;">
@@ -601,6 +650,20 @@
                 </button>
             </div>
         </div>
+
+        <!-- Modal de Patrocínios -->
+        <div id="modal-sponsors" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="dashboard-card" style="width: 90%; max-width: 500px; padding: 20px;">
+                <h3 id="modal-sponsors-title" style="margin-bottom: 10px; color: var(--accent-color);">Propostas de Patrocínio</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">Selecione a melhor oferta para o seu clube.</p>
+                <div id="modal-sponsors-list" style="display: flex; flex-direction: column; gap: 10px;">
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="document.getElementById('modal-sponsors').style.display='none'">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="squads.js"></script>
