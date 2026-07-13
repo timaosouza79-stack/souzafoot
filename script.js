@@ -1711,6 +1711,11 @@ function playRound() {
         alert("A temporada acabou!");
         return;
     }
+    
+    // Dispara eventos aleatórios com uma pequena probabilidade (ex: 15% por ronda)
+    if (Math.random() < 0.15) {
+        checkRandomEvents();
+    }
 
     const currentData = matchSchedule[currentRound - 1];
     isCupMode = currentData.type === 'cup';
@@ -1839,6 +1844,15 @@ function playRound() {
             
             const attendanceRate = attendance / capacity;
             const revenue = attendance * ticketValue;
+            
+            // --- NOVA RECEITA DE COMÉRCIO ---
+            let commerceRevenue = 0;
+            if (homeTeam.commerceLevel) {
+                const comm = homeTeam.commerceLevel;
+                commerceRevenue += attendance * (comm.bars * 5);
+                commerceRevenue += attendance * (comm.food * 8);
+                commerceRevenue += attendance * (comm.gourmet * 15);
+            }
             // ------------------------------------
             
             return {
@@ -1851,6 +1865,7 @@ function playRound() {
                 attendance,
                 attendanceRate,
                 revenue,
+                commerceRevenue,
                 currentHomeGoals: 0,
                 currentAwayGoals: 0,
                 goals: []
@@ -2162,6 +2177,15 @@ function checkSeasonEnd() {
     
     document.getElementById('champion-msg').innerHTML = msg;
 
+    // --- NOVA MECÂNICA: HISTÓRICO DE ÉPOCAS ---
+    if (!myTeam.history) myTeam.history = [];
+    const leagueName = myTeam.league === 'brazil_a' ? 'Série A' : 'Série B';
+    let histString = `Época Concluída - ${userPos}º lugar na ${leagueName}`;
+    if (isUserChampion) histString = `🏆 Campeão da ${leagueName}`;
+    if (cupWinnerId === myTeam.id) histString += ` e Campeão da Copa`;
+    myTeam.history.push(histString);
+    // ------------------------------------------
+
     // Prepara o resumo de quem sobe e quem desce
     processPromotionsAndRelegations();
     saveGame(); // Salva o novo estado das ligas
@@ -2235,6 +2259,37 @@ function startNextSeason() {
                 p.yellowCards = 0;
                 p.suspensionRounds = 0;
             });
+            
+            // --- NOVA MECÂNICA: ESCOLAS DE FORMAÇÃO ---
+            if (team.id === myTeam.id) {
+                const acLevel = team.academyLevel || 1;
+                // Entre 1 e 3 jogadores, mas níveis maiores tem mais chance de ser 2-3
+                const maxPlayers = Math.min(3, Math.max(1, Math.floor(acLevel / 2) + 1));
+                const numPlayers = Math.floor(Math.random() * maxPlayers) + 1;
+                
+                for (let i = 0; i < numPlayers; i++) {
+                    const positions = ['ATA', 'MEI', 'VOL', 'LAT', 'ZAG', 'GOL'];
+                    const pos = positions[Math.floor(Math.random() * positions.length)];
+                    const strength = 30 + (acLevel * 5) + Math.floor(Math.random() * 10);
+                    const youngPlayer = {
+                        id: 'youth_' + Date.now() + '_' + i,
+                        name: `Jovem Promessa ${Math.floor(Math.random() * 999)}`,
+                        position: pos,
+                        strength: strength,
+                        age: 16 + Math.floor(Math.random() * 2), // 16 ou 17 anos
+                        price: 50000 + (acLevel * 50000),
+                        salary: 2000 + (acLevel * 500),
+                        energy: 100,
+                        yellowCards: 0,
+                        suspensionRounds: 0,
+                        injuryRounds: 0,
+                        isStarter: false
+                    };
+                    team.squad.push(youngPlayer);
+                }
+                console.log(`Gerados ${numPlayers} jovens promessas para a equipa.`);
+            }
+            // ------------------------------------------
         }
     });
 
@@ -2467,6 +2522,11 @@ function finishMatchSimulation() {
             if (m.home === myTeam.id && m.revenue) {
                 myTeam.balance += m.revenue;
                 addCommentaryItem(`💰 Receita de Bilheteria: R$ ${m.revenue.toLocaleString('pt-BR')} (${m.attendance.toLocaleString('pt-BR')} torcedores)`, 'info', 90);
+                
+                if (m.commerceRevenue && m.commerceRevenue > 0) {
+                    myTeam.balance += m.commerceRevenue;
+                    addCommentaryItem(`🍔 Receita de Comércio: R$ ${m.commerceRevenue.toLocaleString('pt-BR')}`, 'info', 90);
+                }
             }
         });
         
@@ -3784,6 +3844,39 @@ function renderStadium() {
         activeBtn.classList.remove('btn-secondary');
         activeBtn.classList.add('btn-primary');
     }
+
+    // Initialize extras if not present
+    if (myTeam.academyLevel === undefined) myTeam.academyLevel = 1;
+    if (!myTeam.commerceLevel) myTeam.commerceLevel = { bars: 0, food: 0, gourmet: 0 };
+    if (!myTeam.history) myTeam.history = [];
+
+    // Academy UI
+    const badgeAcademy = document.getElementById('academy-level-badge');
+    if (badgeAcademy) badgeAcademy.innerText = `Nível ${myTeam.academyLevel}`;
+    const academyCost = myTeam.academyLevel * 2000000;
+    const academyCostEl = document.getElementById('academy-upgrade-cost');
+    if (academyCostEl) {
+        if (myTeam.academyLevel >= 5) {
+            academyCostEl.innerText = "MÁX";
+            document.getElementById('btn-upgrade-academy').disabled = true;
+        } else {
+            academyCostEl.innerText = `${academyCost.toLocaleString('pt-BR')}`;
+            document.getElementById('btn-upgrade-academy').disabled = false;
+        }
+    }
+
+    // Commerce UI
+    const comm = myTeam.commerceLevel;
+    const badgeBars = document.getElementById('commerce-bars-badge');
+    if (badgeBars) {
+        badgeBars.innerText = `Nv. ${comm.bars}`;
+        document.getElementById('commerce-food-badge').innerText = `Nv. ${comm.food}`;
+        document.getElementById('commerce-gourmet-badge').innerText = `Nv. ${comm.gourmet}`;
+        
+        document.getElementById('cost-bars').innerText = ((comm.bars + 1) * 100000).toLocaleString('pt-BR');
+        document.getElementById('cost-food').innerText = ((comm.food + 1) * 150000).toLocaleString('pt-BR');
+        document.getElementById('cost-gourmet').innerText = ((comm.gourmet + 1) * 300000).toLocaleString('pt-BR');
+    }
     
     renderSponsorships();
 }
@@ -3812,8 +3905,127 @@ function upgradeStadium() {
         
         saveGame();
         renderStadium();
-        alert("Parabéns! O seu estádio foi expandido com sucesso!");
     }
+}
+
+function upgradeAcademy() {
+    if (!myTeam) return;
+    if (myTeam.academyLevel >= 5) return alert("A Escola de Formação já está no nível máximo!");
+    
+    const cost = myTeam.academyLevel * 2000000;
+    if (myTeam.balance < cost) {
+        return alert("Saldo insuficiente para evoluir a Escola de Formação.");
+    }
+    
+    if (confirm(`Evoluir Formação para o Nível ${myTeam.academyLevel + 1} por R$ ${cost.toLocaleString('pt-BR')}?`)) {
+        myTeam.balance -= cost;
+        myTeam.academyLevel += 1;
+        saveGame();
+        renderStadium();
+    }
+}
+
+function upgradeCommerce(type) {
+    if (!myTeam) return;
+    
+    let cost = 0;
+    let name = "";
+    if (type === 'bars') { cost = (myTeam.commerceLevel.bars + 1) * 100000; name = "Bares de Bebidas"; }
+    else if (type === 'food') { cost = (myTeam.commerceLevel.food + 1) * 150000; name = "Roulote de Bifanas"; }
+    else if (type === 'gourmet') { cost = (myTeam.commerceLevel.gourmet + 1) * 300000; name = "Doces Gourmet"; }
+    
+    if (myTeam.balance < cost) {
+        return alert(`Saldo insuficiente para melhorar ${name}.`);
+    }
+    
+    if (confirm(`Melhorar ${name} para o próximo nível por R$ ${cost.toLocaleString('pt-BR')}?`)) {
+        myTeam.balance -= cost;
+        myTeam.commerceLevel[type] += 1;
+        saveGame();
+        renderStadium();
+    }
+}
+
+function checkRandomEvents() {
+    if (!myTeam || !myTeam.squad) return;
+    
+    const events = [
+        {
+            type: 'injury',
+            execute: () => {
+                const starters = myTeam.squad.filter(p => p.isStarter && (p.injuryRounds || 0) === 0);
+                if (starters.length > 0) {
+                    const p = starters[Math.floor(Math.random() * starters.length)];
+                    p.injuryRounds = Math.floor(Math.random() * 3) + 1;
+                    p.energy = Math.max(10, p.energy - 30);
+                    alert(`🚨 EVENTO: Lesão no Treino!\nO jogador ${p.name} lesionou-se durante um treino e ficará indisponível por ${p.injuryRounds} rodada(s).`);
+                }
+            }
+        },
+        {
+            type: 'sponsor',
+            execute: () => {
+                const bonus = Math.floor(Math.random() * 500000) + 100000;
+                myTeam.balance += bonus;
+                alert(`🎉 EVENTO: Bónus de Patrocinador!\nUm patrocinador ficou contente com o clube e ofereceu um prémio de R$ ${bonus.toLocaleString('pt-BR')}.`);
+            }
+        },
+        {
+            type: 'unhappy',
+            execute: () => {
+                const bench = myTeam.squad.filter(p => !p.isStarter);
+                if (bench.length > 0) {
+                    const p = bench[Math.floor(Math.random() * bench.length)];
+                    p.energy = Math.max(10, p.energy - 15);
+                    p.strength = Math.max(1, p.strength - 1);
+                    alert(`😠 EVENTO: Insatisfação!\nO jogador ${p.name} exigiu ser titular e criou mau ambiente no balneário. A sua força e moral diminuíram.`);
+                }
+            }
+        }
+    ];
+    
+    const event = events[Math.floor(Math.random() * events.length)];
+    event.execute();
+    saveGame();
+}
+
+function renderTrophies() {
+    if (!myTeam) return;
+    const container = document.getElementById('trophies-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (!myTeam.history || myTeam.history.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted);">Nenhum histórico de épocas registado ainda.</p>';
+        return;
+    }
+    
+    // Mostramos do mais recente ao mais antigo
+    [...myTeam.history].reverse().forEach(hist => {
+        const div = document.createElement('div');
+        div.style.background = 'rgba(255, 255, 255, 0.05)';
+        div.style.padding = '15px';
+        div.style.borderRadius = '8px';
+        div.style.width = '100%';
+        div.style.textAlign = 'left';
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.gap = '15px';
+        
+        let icon = 'fa-calendar-check';
+        let color = '#ccc';
+        if (hist.toLowerCase().includes('campeão') || hist.toLowerCase().includes('vencedor')) {
+            icon = 'fa-trophy';
+            color = '#ffd700';
+        }
+        
+        div.innerHTML = `
+            <i class="fas ${icon}" style="font-size: 1.5rem; color: ${color};"></i>
+            <span style="font-size: 1rem; color: white;">${hist}</span>
+        `;
+        container.appendChild(div);
+    });
 }
 
 function renderSponsorships() {

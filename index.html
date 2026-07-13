@@ -427,6 +427,51 @@
                             <!-- Sponsors renderizados via JS -->
                         </div>
                     </div>
+
+                    <!-- Nova Seção: Investir na Formação -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">Escolas de Formação <span id="academy-level-badge" style="font-size: 0.8rem; background: var(--primary-color); padding: 3px 8px; border-radius: 4px; margin-left: 10px;">Nível 1</span></h3>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Invista na base para revelar jovens promessas (16-17 anos) no fim da temporada.</p>
+                            </div>
+                            <div>
+                                <button id="btn-upgrade-academy" class="btn btn-secondary" style="border-color: #2196F3; color: #2196F3;" onclick="upgradeAcademy()">
+                                    <i class="fas fa-graduation-cap"></i> Evoluir (Custo: <span id="academy-upgrade-cost">0</span>)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nova Seção: Comércio no Estádio -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <h3 style="margin-bottom: 10px;">Comércio no Estádio</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Melhore as infraestruturas para gerar mais receitas em dias de jogos em casa.</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-beer" style="color: #FFC107;"></i> Bares de Bebidas <span id="commerce-bars-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Gera lucro extra por cada adepto.</p>
+                                </div>
+                                <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('bars')">Melhorar (R$ <span id="cost-bars">100.000</span>)</button>
+                            </div>
+                            <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-hamburger" style="color: #FF5722;"></i> Roulote de Bifanas <span id="commerce-food-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Atrai público e aumenta receitas.</p>
+                                </div>
+                                <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('food')">Melhorar (R$ <span id="cost-food">150.000</span>)</button>
+                            </div>
+                            <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-ice-cream" style="color: #E91E63;"></i> Doces Gourmet <span id="commerce-gourmet-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Alta rentabilidade para público premium.</p>
+                                </div>
+                                <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('gourmet')">Melhorar (R$ <span id="cost-gourmet">300.000</span>)</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </section>
@@ -583,6 +628,25 @@
                 <button class="btn btn-primary" style="margin-top: 20px; padding: 15px 40px;" onclick="startNextSeason()">Iniciar Próxima Temporada</button>
             </div>
         </section>
+
+        <!-- Tela de Sala de Troféus -->
+        <section id="screen-trophies" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <div>
+                    <h2>Sala de Troféus</h2>
+                    <p>O histórico de glórias do clube.</p>
+                </div>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            <main class="dashboard-card" style="margin: 20px; text-align: center;">
+                <h3 style="margin-bottom: 20px; color: var(--accent-color);">Histórico de Épocas</h3>
+                <div id="trophies-container" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+                    <!-- Histórico renderizado via JS -->
+                </div>
+            </main>
+        </section>
     </div>
 
     <!-- ===== BARRA DE NAVEGAÇÃO MOBILE ===== -->
@@ -638,6 +702,9 @@
                 </button>
                 <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#ffd700;" onclick="closeMobileMore(); viewCupBracket();">
                     <i class="fas fa-trophy" style="font-size:1.2rem; color:#ffd700;"></i> Ver Copa
+                </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#FF9800;" onclick="closeMobileMore(); showScreen('screen-trophies'); renderTrophies();">
+                    <i class="fas fa-medal" style="font-size:1.2rem; color:#FF9800;"></i> Sala de Troféus
                 </button>
                 <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#4CAF50;" onclick="closeMobileMore(); manualSave();">
                     <i class="fas fa-save" style="font-size:1.2rem; color:#4CAF50;"></i> Salvar Jogo
