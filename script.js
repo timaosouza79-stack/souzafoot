@@ -23,6 +23,25 @@ const sponsorBrands = {
         { brand: "Mastercard", domain: "mastercard.com" }
     ]
 };
+
+const domainMap = {
+    'Guaraná Antarctica': 'guaranaantarctica.com.br',
+    'Topper': 'topper.com.br',
+    'Continente': 'continente.pt',
+    'MEO': 'meo.pt',
+    'Penalty': 'penalty.com.br',
+    'Betano': 'betano.pt',
+    'Mercado Livre': 'mercadolivre.com.br',
+    'Itaú': 'itau.com.br',
+    'Nubank': 'nubank.com.br',
+    'Vivo': 'vivo.com.br',
+    'Emirates': 'emirates.com',
+    'Spotify': 'spotify.com',
+    'Red Bull': 'redbull.com',
+    'Nike': 'nike.com',
+    'Samsung': 'samsung.com',
+    'Mastercard': 'mastercard.com'
+};
 const sponsorSlots = ['Master', 'Costas', 'Mangas', 'Calcoes'];
 // ---------------------------------------
 
@@ -4148,7 +4167,7 @@ function renderSponsorships() {
             html = `
                 <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
                     <h4 style="color: var(--accent-color); margin-bottom: 10px;">${slot}</h4>
-                    <img src="https://logo.clearbit.com/${contract.domain}" onerror="this.src='https://via.placeholder.com/64?text=${contract.brand}';" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; background: white; padding: 5px;">
+                    <img src="https://logo.clearbit.com/${domainMap[contract.brand] || contract.domain}" onerror="this.style.display='none'" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; background: white; padding: 5px;">
                     <div style="font-weight: bold; margin-bottom: 5px;">${contract.brand}</div>
                     <div style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 5px;">R$ ${contract.value.toLocaleString('pt-BR')} / jogo</div>
                     <div style="color: var(--text-muted); font-size: 0.8rem;">Duração: ${contract.duration} jogos</div>
@@ -4179,7 +4198,7 @@ function renderSponsorships() {
             let proposalsHtml = myTeam.sponsorships.propostas.map(p => `
                 <div style="background: rgba(255,255,255,0.05); border-radius: 4px; padding: 10px; margin-bottom: 10px; text-align: left;">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                        <img src="https://logo.clearbit.com/${p.domain}" onerror="this.src='https://via.placeholder.com/32?text=${p.brand}';" style="width: 32px; height: 32px; background: white; border-radius: 4px; padding: 2px;">
+                        <img src="https://logo.clearbit.com/${domainMap[p.brand] || p.domain}" onerror="this.style.display='none'" style="width: 32px; height: 32px; background: white; border-radius: 4px; padding: 2px;">
                         <div>
                             <div style="font-weight: bold; font-size: 0.9rem;">${p.brand}</div>
                             <div style="color: #4CAF50; font-size: 0.8rem;">R$ ${p.value.toLocaleString('pt-BR')}</div>
@@ -4239,7 +4258,7 @@ function generateSponsorshipOffers(slot) {
         list.innerHTML += `
             <div class="dashboard-card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05);">
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <img src="https://logo.clearbit.com/${brand.domain}" onerror="this.src='https://via.placeholder.com/48?text=${brand.brand}';" style="width: 48px; height: 48px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
+                    <img src="https://logo.clearbit.com/${domainMap[brand.brand] || brand.domain}" onerror="this.style.display='none'" style="width: 48px; height: 48px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
                     <div>
                         <div style="font-weight: bold; font-size: 1.1rem;">${brand.brand}</div>
                         <div style="color: #4CAF50; font-size: 0.9rem;">R$ ${value.toLocaleString('pt-BR')} / jogo</div>
