@@ -1092,9 +1092,14 @@ function renderTeams(league = 'brazil_a') {
 }
 
 // Seleciona o time e vai para a tela principal
-function selectTeam(teamId, league = 'brazil_a') {
+function selectTeam(teamId) {
     unlockAudio(); // Garante o áudio caso o login tenha sido pulado ou resetado
     myTeam = allTeams.find(t => t.id === teamId);
+    
+    const baseLeague = myTeam.league.replace('_b', '').replace('_a', '');
+    
+    // NOVA MECÂNICA: Otimização de Memória e Geração de Ligas B
+    optimizeMemoryAndGenerateLeagues(baseLeague);
     
     // Initialize the championship only with teams from the same league
     initChampionship(myTeam.league);
@@ -1118,6 +1123,65 @@ function selectTeam(teamId, league = 'brazil_a') {
 }
 
 // Event listener for league selection
+function optimizeMemoryAndGenerateLeagues(baseLeague) {
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(baseLeague);
+    
+    // 1. Otimização de Memória: Manter apenas times do país + times continentais necessários
+    const neededTeams = allTeams.filter(t => {
+        const tBase = t.league.replace('_b', '').replace('_a', '');
+        if (tBase === baseLeague) return true; // Mesmo país
+        
+        if (isEurope) {
+            // Mantém os times europeus de elite para as competições continentais
+            return ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(tBase);
+        } else {
+            // Mantém times da América do Sul
+            return tBase === 'brazil' || tBase === 'south_america';
+        }
+    });
+    
+    allTeams = neededTeams; // RAM liberada!
+
+    // 2. Garantir que o país atual tenha uma 2ª Divisão (Liga B)
+    const leagueA_name = (baseLeague === 'brazil') ? 'brazil_a' : baseLeague;
+    const leagueB_name = (baseLeague === 'brazil') ? 'brazil_b' : baseLeague + '_b';
+    
+    const existingBTeams = allTeams.filter(t => t.league === leagueB_name);
+    
+    // Se não houver times suficientes na 2ª divisão, gera-os dinamicamente
+    if (existingBTeams.length < 20) {
+        let leagueNameDisplay = baseLeague.charAt(0).toUpperCase() + baseLeague.slice(1);
+        if (leagueNameDisplay === 'England') leagueNameDisplay = 'Inglaterra';
+        if (leagueNameDisplay === 'Spain') leagueNameDisplay = 'Espanha';
+        if (leagueNameDisplay === 'Italy') leagueNameDisplay = 'Itália';
+        if (leagueNameDisplay === 'France') leagueNameDisplay = 'França';
+        if (leagueNameDisplay === 'Germany') leagueNameDisplay = 'Alemanha';
+        if (leagueNameDisplay === 'Portugal') leagueNameDisplay = 'Portugal';
+
+        const teamsToCreate = 20 - existingBTeams.length;
+        for (let i = 1; i <= teamsToCreate; i++) {
+            const genericId = `${baseLeague}_gen_${i}`;
+            const genericName = `${leagueNameDisplay} B ${i}`;
+            const genericStrength = 65 + Math.floor(Math.random() * 8); // Entre 65 e 72
+            
+            const newTeam = {
+                id: genericId,
+                name: genericName,
+                strength: genericStrength,
+                shield: `https://ui-avatars.com/api/?name=${encodeURIComponent(genericName)}&background=random`,
+                league: leagueB_name,
+                balance: 5000000,
+                stadium: `Estádio ${genericName}`,
+                squad: [] // Jogadores serão gerados caso necessário na partida
+            };
+            allTeams.push(newTeam);
+        }
+        
+        // Também precisamos adicionar as traduções das ligas criadas caso não existam
+        names[leagueB_name] = { league: `LIGA ${leagueNameDisplay.toUpperCase()} B`, cup: 'COPA NACIONAL', continental: isEurope ? 'CHAMPIONS LEAGUE' : 'LIBERTADORES' };
+    }
+}
+
 document.getElementById('league-select').addEventListener('change', function() {
     renderTeams(this.value);
 });
@@ -2304,34 +2368,53 @@ function viewCupBracket() {
 
 // Verifica o fim da temporada e mostra a tela de campeão/resumo
 function checkSeasonEnd() {
-    // Calcula quem vai para a Libertadores e Sul-Americana da próxima temporada
+    // Calcula quem vai para as copas (Libertadores/Champions e Sul-Americana/Europa League) da próxima temporada
     const nextLibParticipants = [];
     const nextSulParticipants = [];
     
-    // 1. Brasileiros
-    // Libertadores (7 vagas: Campeão da Copa + G6 do Brasileiro)
+    const baseLeague = myTeam.league.replace('_b', '').replace('_a', '');
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(baseLeague);
+    
+    // 1. Qualificação da Liga Local
     if (cupWinnerId) nextLibParticipants.push(cupWinnerId);
-    let brLibCount = nextLibParticipants.length;
-    let brSulCount = 0;
+    let localLibCount = nextLibParticipants.length;
+    let localSulCount = 0;
+    
+    // Regras: Europa (1º-4º Champions, 5º-6º Europa League), Sul-América (1º-6º Liberta, 7º-12º Sul-Americana)
+    const maxLib = isEurope ? 4 : 7; // Para Europa: 4 vagas via liga (+ Copa se não sobrepor). Na prática, vamos limitar a 4 no total ou 4 via liga
+    const maxSul = isEurope ? 2 : 6;
     
     standings.forEach(t => {
-        if (brLibCount < 7 && !nextLibParticipants.includes(t.id)) {
+        if (localLibCount < maxLib && !nextLibParticipants.includes(t.id)) {
             nextLibParticipants.push(t.id);
-            brLibCount++;
-        } else if (brSulCount < 6 && !nextLibParticipants.includes(t.id)) {
-            // Sul-Americana (6 vagas: 7º ao 12º)
+            localLibCount++;
+        } else if (localSulCount < maxSul && !nextLibParticipants.includes(t.id)) {
             nextSulParticipants.push(t.id);
-            brSulCount++;
+            localSulCount++;
         }
     });
 
-    // 2. Sul-Americanos (25 vagas Liberta, 26 vagas Sul-Americana para fechar 32 em cada)
-    const saTeams = allTeams.filter(t => t.league === 'south_america');
-    const saQualifiersLib = saTeams.sort((a, b) => b.strength - a.strength).slice(0, 25);
-    saQualifiersLib.forEach(t => nextLibParticipants.push(t.id));
+    // 2. Preenchimento de vagas com outros times do continente (para fechar 32 vagas em cada)
+    let continentalPool = [];
+    if (isEurope) {
+        // Pega todos os times europeus de elite (excluindo os do país atual que já se classificaram)
+        continentalPool = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(t.league) && t.league !== myTeam.league);
+    } else {
+        // Pega times do Brasil e América do Sul
+        continentalPool = allTeams.filter(t => (t.league === 'south_america' || t.league === 'brazil_a') && t.league !== myTeam.league);
+    }
     
-    const saQualifiersSul = saTeams.sort((a, b) => b.strength - a.strength).slice(25, 51);
-    saQualifiersSul.forEach(t => nextSulParticipants.push(t.id));
+    continentalPool = continentalPool.sort((a, b) => b.strength - a.strength);
+    
+    // Preenche a Competição de Nível 1 (Champions/Libertadores)
+    const neededLib = 32 - nextLibParticipants.length;
+    const fillersLib = continentalPool.slice(0, neededLib);
+    fillersLib.forEach(t => nextLibParticipants.push(t.id));
+    
+    // Preenche a Competição de Nível 2 (Europa League/Sul-Americana)
+    const neededSul = 32 - nextSulParticipants.length;
+    const fillersSul = continentalPool.slice(neededLib, neededLib + neededSul);
+    fillersSul.forEach(t => nextSulParticipants.push(t.id));
 
     libertadoresParticipants = nextLibParticipants;
     sulAmericanaParticipants = nextSulParticipants;
@@ -2385,15 +2468,19 @@ function checkSeasonEnd() {
     showScreen('screen-champion');
 }
 
-// Lógica de troca de times entre as ligas A e B do Brasil
+// Lógica UNIVERSAL de troca de times entre as ligas A e B do mesmo país
 function processPromotionsAndRelegations() {
     let summaryText = "";
     
+    const baseLeague = myTeam.league.replace('_b', '').replace('_a', '');
+    const leagueA_name = (baseLeague === 'brazil') ? 'brazil_a' : baseLeague;
+    const leagueB_name = (baseLeague === 'brazil') ? 'brazil_b' : baseLeague + '_b';
+    
     // Identifica as ligas antes das alterações para evitar que times rebaixados subam no mesmo turno
-    const leagueA = allTeams.filter(t => t.league === 'brazil_a');
-    const leagueB = allTeams.filter(t => t.league === 'brazil_b');
+    const leagueA = allTeams.filter(t => t.league === leagueA_name);
+    const leagueB = allTeams.filter(t => t.league === leagueB_name);
 
-    if (myTeam.league === 'brazil_a') {
+    if (myTeam.league === leagueA_name) {
         // Rebaixar os 4 últimos da Série A (baseado na tabela de classificação recém-encerrada)
         const relegated = standings.slice(-4);
         const relegatedIds = relegated.map(t => t.id);
@@ -2403,14 +2490,14 @@ function processPromotionsAndRelegations() {
         const promotedIds = promoted.map(t => t.id);
 
         allTeams.forEach(t => {
-            if (relegatedIds.includes(t.id)) t.league = 'brazil_b';
-            if (promotedIds.includes(t.id)) t.league = 'brazil_a';
+            if (relegatedIds.includes(t.id)) t.league = leagueB_name;
+            if (promotedIds.includes(t.id)) t.league = leagueA_name;
         });
 
-        summaryText = `⬇️ Rebaixados para a Série B: ${relegated.map(t => t.name).join(', ')}.<br>` +
-                      `⬆️ Promovidos para a Série A: ${promoted.map(t => t.name).join(', ')}.`;
+        summaryText = `⬇️ Rebaixados para a 2ª Divisão: ${relegated.map(t => t.name).join(', ')}.<br>` +
+                      `⬆️ Promovidos para a 1ª Divisão: ${promoted.map(t => t.name).join(', ')}.`;
     } 
-    else if (myTeam.league === 'brazil_b') {
+    else if (myTeam.league === leagueB_name) {
         // Promover os 4 primeiros da Série B (baseado na tabela de classificação)
         const promoted = standings.slice(0, 4);
         const promotedIds = promoted.map(t => t.id);
@@ -2420,12 +2507,12 @@ function processPromotionsAndRelegations() {
         const relegatedIds = relegated.map(t => t.id);
 
         allTeams.forEach(t => {
-            if (promotedIds.includes(t.id)) t.league = 'brazil_a';
-            if (relegatedIds.includes(t.id)) t.league = 'brazil_b';
+            if (promotedIds.includes(t.id)) t.league = leagueA_name;
+            if (relegatedIds.includes(t.id)) t.league = leagueB_name;
         });
 
-        summaryText = `⬆️ Promovidos para a Série A: ${promoted.map(t => t.name).join(', ')}.<br>` +
-                      `⬇️ Rebaixados para a Série B: ${relegated.map(t => t.name).join(', ')}.`;
+        summaryText = `⬆️ Promovidos para a 1ª Divisão: ${promoted.map(t => t.name).join(', ')}.<br>` +
+                      `⬇️ Rebaixados para a 2ª Divisão: ${relegated.map(t => t.name).join(', ')}.`;
     }
 
     document.getElementById('relegation-summary').innerHTML = summaryText;
