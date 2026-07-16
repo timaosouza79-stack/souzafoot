@@ -584,9 +584,9 @@ function ensureSafeState(team, forceReset = false) {
         stadiumLevel: 1, 
         stadiumCapacity: 10000 + (team.rep || 10) * 1000, 
         ticketPriceSetting: 'Medium',
-        commerceLevel: { bares: 0, bifanas: 0, doces: 0 },
+        commerceLevel: { bars: 0, food: 0, gourmet: 0 },
         sponsorships: { Master: null, Costas: null, Mangas: null, Calcoes: null, propostas: [] },
-        formacaoLevel: 0,
+        academyLevel: 1,
         consecutiveLosses: 0
     };
 
@@ -595,7 +595,7 @@ function ensureSafeState(team, forceReset = false) {
     if (forceReset || isNaN(team.stadiumCapacity) || team.stadiumCapacity == null) team.stadiumCapacity = defaultState.stadiumCapacity;
     if (forceReset || !team.ticketPriceSetting) team.ticketPriceSetting = defaultState.ticketPriceSetting;
     
-    if (forceReset || !team.commerceLevel || isNaN(team.commerceLevel.bares) || isNaN(team.commerceLevel.bifanas) || isNaN(team.commerceLevel.doces)) {
+    if (forceReset || !team.commerceLevel || isNaN(team.commerceLevel.bars) || isNaN(team.commerceLevel.food) || isNaN(team.commerceLevel.gourmet)) {
         team.commerceLevel = defaultState.commerceLevel;
     }
     
@@ -609,7 +609,7 @@ function ensureSafeState(team, forceReset = false) {
         if (team.sponsorships.Calcoes === undefined) team.sponsorships.Calcoes = null;
     }
     
-    if (forceReset || isNaN(team.formacaoLevel) || team.formacaoLevel == null) team.formacaoLevel = defaultState.formacaoLevel;
+    if (forceReset || isNaN(team.academyLevel) || team.academyLevel == null) team.academyLevel = defaultState.academyLevel;
     if (forceReset || isNaN(team.consecutiveLosses) || team.consecutiveLosses == null) team.consecutiveLosses = defaultState.consecutiveLosses;
 }
 
@@ -3989,16 +3989,20 @@ function renderStadium() {
     }
 
     // Commerce UI
-    const comm = myTeam.commerceLevel;
+    const comm = myTeam.commerceLevel || {};
+    const barsLvl = Number(comm.bars) || 0;
+    const foodLvl = Number(comm.food) || 0;
+    const gourmetLvl = Number(comm.gourmet) || 0;
+    
     const badgeBars = document.getElementById('commerce-bars-badge');
     if (badgeBars) {
-        badgeBars.innerText = `Nv. ${comm.bars}`;
-        document.getElementById('commerce-food-badge').innerText = `Nv. ${comm.food}`;
-        document.getElementById('commerce-gourmet-badge').innerText = `Nv. ${comm.gourmet}`;
+        badgeBars.innerText = `Nv. ${barsLvl}`;
+        document.getElementById('commerce-food-badge').innerText = `Nv. ${foodLvl}`;
+        document.getElementById('commerce-gourmet-badge').innerText = `Nv. ${gourmetLvl}`;
         
-        document.getElementById('cost-bars').innerText = ((comm.bars + 1) * 100000).toLocaleString('pt-BR');
-        document.getElementById('cost-food').innerText = ((comm.food + 1) * 150000).toLocaleString('pt-BR');
-        document.getElementById('cost-gourmet').innerText = ((comm.gourmet + 1) * 300000).toLocaleString('pt-BR');
+        document.getElementById('cost-bars').innerText = ((barsLvl + 1) * 100000).toLocaleString('pt-BR');
+        document.getElementById('cost-food').innerText = ((foodLvl + 1) * 150000).toLocaleString('pt-BR');
+        document.getElementById('cost-gourmet').innerText = ((gourmetLvl + 1) * 300000).toLocaleString('pt-BR');
     }
     
     renderSponsorships();
@@ -4051,11 +4055,14 @@ function upgradeAcademy() {
 function upgradeCommerce(type) {
     if (!myTeam) return;
     
+    if (!myTeam.commerceLevel) myTeam.commerceLevel = { bars: 0, food: 0, gourmet: 0 };
+    let currentLevel = Number(myTeam.commerceLevel[type]) || 0;
+    
     let cost = 0;
     let name = "";
-    if (type === 'bars') { cost = (myTeam.commerceLevel.bars + 1) * 100000; name = "Bares de Bebidas"; }
-    else if (type === 'food') { cost = (myTeam.commerceLevel.food + 1) * 150000; name = "Roulote de Bifanas"; }
-    else if (type === 'gourmet') { cost = (myTeam.commerceLevel.gourmet + 1) * 300000; name = "Doces Gourmet"; }
+    if (type === 'bars') { cost = (currentLevel + 1) * 100000; name = "Bares de Bebidas"; }
+    else if (type === 'food') { cost = (currentLevel + 1) * 150000; name = "Roulote de Bifanas"; }
+    else if (type === 'gourmet') { cost = (currentLevel + 1) * 300000; name = "Doces Gourmet"; }
     
     if (myTeam.balance < cost) {
         return alert(`Saldo insuficiente para melhorar ${name}.`);
@@ -4063,7 +4070,7 @@ function upgradeCommerce(type) {
     
     if (confirm(`Melhorar ${name} para o próximo nível por R$ ${cost.toLocaleString('pt-BR')}?`)) {
         myTeam.balance -= cost;
-        myTeam.commerceLevel[type] += 1;
+        myTeam.commerceLevel[type] = currentLevel + 1;
         saveGame();
         renderStadium();
     }
@@ -4167,7 +4174,7 @@ function renderSponsorships() {
             html = `
                 <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
                     <h4 style="color: var(--accent-color); margin-bottom: 10px;">${slot}</h4>
-                    <img src="https://logo.clearbit.com/${domainMap[contract.brand] || contract.domain}" onerror="this.style.display='none'" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; background: white; padding: 5px;">
+                    <img src="https://s2.googleusercontent.com/s2/favicons?domain=${domainMap[contract.brand] || contract.domain}&sz=128" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 10px; border-radius: 5px; background: white; padding: 2px;">
                     <div style="font-weight: bold; margin-bottom: 5px;">${contract.brand}</div>
                     <div style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 5px;">R$ ${contract.value.toLocaleString('pt-BR')} / jogo</div>
                     <div style="color: var(--text-muted); font-size: 0.8rem;">Duração: ${contract.duration} jogos</div>
@@ -4198,7 +4205,7 @@ function renderSponsorships() {
             let proposalsHtml = myTeam.sponsorships.propostas.map(p => `
                 <div style="background: rgba(255,255,255,0.05); border-radius: 4px; padding: 10px; margin-bottom: 10px; text-align: left;">
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                        <img src="https://logo.clearbit.com/${domainMap[p.brand] || p.domain}" onerror="this.style.display='none'" style="width: 32px; height: 32px; background: white; border-radius: 4px; padding: 2px;">
+                        <img src="https://s2.googleusercontent.com/s2/favicons?domain=${domainMap[p.brand] || p.domain}&sz=128" alt="Logo" style="width: 40px; height: 40px; background: white; border-radius: 5px; padding: 2px;">
                         <div>
                             <div style="font-weight: bold; font-size: 0.9rem;">${p.brand}</div>
                             <div style="color: #4CAF50; font-size: 0.8rem;">R$ ${p.value.toLocaleString('pt-BR')}</div>
@@ -4258,7 +4265,7 @@ function generateSponsorshipOffers(slot) {
         list.innerHTML += `
             <div class="dashboard-card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05);">
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <img src="https://logo.clearbit.com/${domainMap[brand.brand] || brand.domain}" onerror="this.style.display='none'" style="width: 48px; height: 48px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
+                    <img src="https://s2.googleusercontent.com/s2/favicons?domain=${domainMap[brand.brand] || brand.domain}&sz=128" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 5px; padding: 2px;">
                     <div>
                         <div style="font-weight: bold; font-size: 1.1rem;">${brand.brand}</div>
                         <div style="color: #4CAF50; font-size: 0.9rem;">R$ ${value.toLocaleString('pt-BR')} / jogo</div>
