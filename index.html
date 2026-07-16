@@ -428,30 +428,15 @@
                         </div>
                     </div>
 
-                    <!-- Nova Seção: Investir na Formação -->
+                    <!-- Nova Seção: Comércio e Bares -->
                     <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <h3 style="margin-bottom: 5px;">Escolas de Formação <span id="academy-level-badge" style="font-size: 0.8rem; background: var(--primary-color); padding: 3px 8px; border-radius: 4px; margin-left: 10px;">Nível 1</span></h3>
-                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Invista na base para revelar jovens promessas (16-17 anos) no fim da temporada.</p>
-                            </div>
-                            <div>
-                                <button id="btn-upgrade-academy" class="btn btn-secondary" style="border-color: #2196F3; color: #2196F3;" onclick="upgradeAcademy()">
-                                    <i class="fas fa-graduation-cap"></i> Evoluir (Custo: <span id="academy-upgrade-cost">0</span>)
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Nova Seção: Comércio no Estádio -->
-                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                        <h3 style="margin-bottom: 10px;">Comércio no Estádio</h3>
+                        <h3 style="margin-bottom: 10px;">Comércio e Bares</h3>
                         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Melhore as infraestruturas para gerar mais receitas em dias de jogos em casa.</p>
                         
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
                             <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
-                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-beer" style="color: #FFC107;"></i> Bares de Bebidas <span id="commerce-bars-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-beer" style="color: #FFC107;"></i> Bar de Bebidas <span id="commerce-bars-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
                                     <p style="font-size: 0.8rem; color: var(--text-muted);">Gera lucro extra por cada adepto.</p>
                                 </div>
                                 <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('bars')">Melhorar (R$ <span id="cost-bars">100.000</span>)</button>
@@ -465,10 +450,25 @@
                             </div>
                             <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
                                 <div>
-                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-ice-cream" style="color: #E91E63;"></i> Doces Gourmet <span id="commerce-gourmet-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-ice-cream" style="color: #E91E63;"></i> Banca de Doces Gourmet <span id="commerce-gourmet-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
                                     <p style="font-size: 0.8rem; color: var(--text-muted);">Alta rentabilidade para público premium.</p>
                                 </div>
                                 <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('gourmet')">Melhorar (R$ <span id="cost-gourmet">300.000</span>)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nova Seção: Investir na Formação -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">Escola de Formação <span id="academy-level-badge" style="font-size: 0.8rem; background: var(--primary-color); padding: 3px 8px; border-radius: 4px; margin-left: 10px;">Nível 1</span></h3>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Invista na base para revelar jovens promessas (16-17 anos) no fim da temporada.</p>
+                            </div>
+                            <div>
+                                <button id="btn-upgrade-academy" class="btn btn-secondary" style="border-color: #2196F3; color: #2196F3; padding: 10px 20px;" onclick="upgradeAcademy()">
+                                    <i class="fas fa-graduation-cap"></i> Investir na Base (Custo: <span id="academy-upgrade-cost">0</span>)
+                                </button>
                             </div>
                         </div>
                     </div>
