@@ -611,6 +611,13 @@ function ensureSafeState(team, forceReset = false) {
     
     if (forceReset || isNaN(team.academyLevel) || team.academyLevel == null) team.academyLevel = defaultState.academyLevel;
     if (forceReset || isNaN(team.consecutiveLosses) || team.consecutiveLosses == null) team.consecutiveLosses = defaultState.consecutiveLosses;
+
+    if (team.squad) {
+        team.squad.forEach(p => {
+            if (forceReset || isNaN(p.energy) || p.energy == null) p.energy = 100;
+            if (forceReset || isNaN(p.morale) || p.morale == null) p.morale = 100;
+        });
+    }
 }
 
 function emergencyReset() {
@@ -1893,8 +1900,8 @@ function playRound() {
             if (awayTeam.id !== myTeam.id) autoSelectStarters(awayTeam);
 
             // Marca os titulares de cada time como participantes da partida
-            if (homeTeam.squad) homeTeam.squad.forEach(p => { if (p.isStarter) p.playedInMatch = true; });
-            if (awayTeam.squad) awayTeam.squad.forEach(p => { if (p.isStarter) p.playedInMatch = true; });
+            if (homeTeam.squad) homeTeam.squad.forEach(p => { if (p.isStarter) { p.playedInMatch = true; p.startedMatch = true; } });
+            if (awayTeam.squad) awayTeam.squad.forEach(p => { if (p.isStarter) { p.playedInMatch = true; p.startedMatch = true; } });
             
             // --- GESTÃO DE ESTÁDIO E FINANÇAS ---
             const price = homeTeam.ticketPriceSetting || 'Medium';
@@ -2770,19 +2777,30 @@ function finishMatchSimulation() {
                 // Verifica se o jogador participou da partida usando a flag temporária
                 if (p.playedInMatch) {
                     p.matchesPlayed = (p.matchesPlayed || 0) + 1;
-                    // Jogadores que jogam cansam mais (perdem entre 5 e 12 de energia)
-                    p.energy = Math.max(0, p.energy - (Math.floor(Math.random() * 8) + 5));
+                    
+                    if (p.startedMatch) {
+                        p.energy = Math.max(0, (p.energy || 100) - (Math.floor(Math.random() * 11) + 15)); // Perde 15 a 25
+                    } else {
+                        p.energy = Math.max(0, (p.energy || 100) - (Math.floor(Math.random() * 5) + 8)); // Perde 8 a 12
+                    }
+                    p.morale = Math.min(100, (p.morale || 100) + 5);
+                    
                     // Chance de lesão baseada na energia
-                    if (Math.random() < (p.energy < 40 ? 0.03 : 0.005)) {
+                    if (Math.random() < ((p.energy || 100) < 40 ? 0.15 : 0.005)) {
                         p.injuryRounds = Math.floor(Math.random() * 3) + 1;
                         p.isStarter = false;
+                        if (team.id === myTeam.id) {
+                            addCommentaryItem(`🚑 <strong>Lesão:</strong> <strong>${p.name}</strong> lesionou-se e vai parar por ${p.injuryRounds} jogo(s).`, 'red-card', 90);
+                        }
                     }
                 } else if (!p.injuryRounds || p.injuryRounds === 0) {
-                    // Quem não joga (permanece no banco de reservas toda a partida) recupera 100% da energia
-                    p.energy = 100;
+                    // Quem não joga recupera energia e perde moral
+                    p.energy = Math.min(100, (p.energy || 100) + 25);
+                    p.morale = Math.max(0, (p.morale || 100) - 5);
                 }
                 // Limpa as flags temporárias de todos os jogadores para a próxima rodada
                 delete p.playedInMatch;
+                delete p.startedMatch;
                 delete p.matchYellowCards;
             });
         });
@@ -3249,9 +3267,16 @@ function calcEffectiveStrength(player, slotPosText) {
     const compatible = positionCompatibility[player.position] || [];
     const isOutOfPosition = !compatible.includes(slotPosText);
     
-    const effectiveStrength = isOutOfPosition 
+    let effectiveStrength = isOutOfPosition 
         ? Math.floor(player.strength * OUT_OF_POSITION_PENALTY) 
         : player.strength;
+        
+    if ((player.energy || 100) < 60) {
+        effectiveStrength = Math.floor(effectiveStrength * 0.8);
+    }
+    if ((player.morale || 100) < 40) {
+        effectiveStrength = Math.floor(effectiveStrength * 0.9);
+    }
     
     return { effectiveStrength, isOutOfPosition };
 }
@@ -3459,7 +3484,10 @@ function renderSquad() {
                     <span class="pitch-str-box" style="color: ${strColor}">${strDisplay}</span>
                 </div>
                 <div class="pitch-player-name" title="${player.name}${isOutOfPosition ? ' (Fora de Posição: -15%)' : ''}">${player.name}${injuryIcon}${suspIcon}</div>
-                <div class="pitch-player-energy" style="font-size: 0.65rem; color: #2196f3; margin-top: 1px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⚡ ${Math.round(player.energy || 100)}%</div>
+                <div style="display: flex; gap: 5px; justify-content: center; margin-top: 1px;">
+                    <div class="pitch-player-energy" style="font-size: 0.7rem; color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⚡ ${Math.round(player.energy || 100)}%</div>
+                    <div style="font-size: 0.7rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${(player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢')}</div>
+                </div>
             `;
             pitchField.appendChild(node);
         });
@@ -3530,7 +3558,8 @@ function renderSquad() {
                     <span class="reserve-player-name">${player.name}${injuryIcon}${suspIcon}</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="reserve-player-energy" style="color: #2196f3; font-size: 0.75rem; min-width: 40px; font-weight: bold;">⚡ ${Math.round(player.energy || 100)}%</span>
+                    <span class="reserve-player-energy" style="color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-size: 0.75rem; min-width: 40px; font-weight: bold;">⚡ ${Math.round(player.energy || 100)}%</span>
+                    <span style="font-size: 0.8rem; margin-right: 5px;">${(player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢')}</span>
                     <span class="reserve-player-str">${player.strength}</span>
                     <button class="btn btn-sell-mini" onclick="event.stopPropagation(); sellPlayer(${player.id})" title="Vender Jogador" style="padding: 2px 6px; font-size: 0.7rem; color: #f44336; border-color: #f44336; background: transparent; border-radius: 4px; border: 1px solid var(--border-color);">Vender</button>
                 </div>
