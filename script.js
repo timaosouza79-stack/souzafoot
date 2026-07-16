@@ -559,6 +559,51 @@ function confirmReset() {
     }
 }
 
+function ensureSafeState(team, forceReset = false) {
+    const defaultState = {
+        balance: 80000000,
+        stadiumLevel: 1, 
+        stadiumCapacity: 10000 + (team.rep || 10) * 1000, 
+        ticketPriceSetting: 'Medium',
+        commerceLevel: { bares: 0, bifanas: 0, doces: 0 },
+        sponsorships: { Master: null, Costas: null, Mangas: null, Calcoes: null, propostas: [] },
+        formacaoLevel: 0,
+        consecutiveLosses: 0
+    };
+
+    if (forceReset || isNaN(team.balance) || team.balance == null) team.balance = defaultState.balance;
+    if (forceReset || isNaN(team.stadiumLevel) || team.stadiumLevel == null) team.stadiumLevel = defaultState.stadiumLevel;
+    if (forceReset || isNaN(team.stadiumCapacity) || team.stadiumCapacity == null) team.stadiumCapacity = defaultState.stadiumCapacity;
+    if (forceReset || !team.ticketPriceSetting) team.ticketPriceSetting = defaultState.ticketPriceSetting;
+    
+    if (forceReset || !team.commerceLevel || isNaN(team.commerceLevel.bares) || isNaN(team.commerceLevel.bifanas) || isNaN(team.commerceLevel.doces)) {
+        team.commerceLevel = defaultState.commerceLevel;
+    }
+    
+    if (forceReset || !team.sponsorships) {
+        team.sponsorships = defaultState.sponsorships;
+    } else {
+        if (!team.sponsorships.propostas) team.sponsorships.propostas = [];
+        if (team.sponsorships.Master === undefined) team.sponsorships.Master = null;
+        if (team.sponsorships.Costas === undefined) team.sponsorships.Costas = null;
+        if (team.sponsorships.Mangas === undefined) team.sponsorships.Mangas = null;
+        if (team.sponsorships.Calcoes === undefined) team.sponsorships.Calcoes = null;
+    }
+    
+    if (forceReset || isNaN(team.formacaoLevel) || team.formacaoLevel == null) team.formacaoLevel = defaultState.formacaoLevel;
+    if (forceReset || isNaN(team.consecutiveLosses) || team.consecutiveLosses == null) team.consecutiveLosses = defaultState.consecutiveLosses;
+}
+
+function emergencyReset() {
+    if (confirm("Tem a certeza absoluta? Vai perder os dados das finanças, patrocínios e voltar aos valores base. Os resultados do campeonato manter-se-ão.")) {
+        if (myTeam) {
+            ensureSafeState(myTeam, true);
+            saveGame();
+            location.reload();
+        }
+    }
+}
+
 function loadGame() {
     if (!currentUser || !users[currentUser]) return;
     console.log("loadGame: Iniciando para usuário:", currentUser);
@@ -651,12 +696,7 @@ function loadGame() {
                 });
             }
             
-            // Inicializa dados do Estádio e Finanças para os times (necessário para o novo módulo)
-            if (team.stadiumLevel === undefined || team.stadiumLevel === null) team.stadiumLevel = 1;
-            if (team.stadiumCapacity === undefined || team.stadiumCapacity === null) team.stadiumCapacity = 10000 + (team.rep || 10) * 1000;
-            if (team.ticketPriceSetting === undefined || team.ticketPriceSetting === null) team.ticketPriceSetting = 'Medium';
-            if (team.sponsorships === undefined || team.sponsorships === null) team.sponsorships = { Master: null, Costas: null, Mangas: null, Calcoes: null };
-            if (team.consecutiveLosses === undefined || team.consecutiveLosses === null) team.consecutiveLosses = 0;
+            ensureSafeState(team);
         });
         
         myTeam = allTeams.find(t => t.id === state.myTeamId);
@@ -772,6 +812,7 @@ function loadGame() {
 
             // The previous 'else' block for generic squads is now integrated into the check above
             // This ensures all teams, regardless of league or realSquads entry, have a complete squad.
+            ensureSafeState(team);
         });
         console.log("loadGame: Exibindo screen-selection.");
         ensureShields();
@@ -4096,6 +4137,9 @@ function renderSponsorships() {
     const container = document.getElementById('sponsorships-container');
     container.innerHTML = '';
     
+    // Ensure propostas array exists
+    if (!myTeam.sponsorships.propostas) myTeam.sponsorships.propostas = [];
+    
     sponsorSlots.forEach(slot => {
         const contract = myTeam.sponsorships[slot];
         let html = '';
@@ -4108,6 +4152,48 @@ function renderSponsorships() {
                     <div style="font-weight: bold; margin-bottom: 5px;">${contract.brand}</div>
                     <div style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 5px;">R$ ${contract.value.toLocaleString('pt-BR')} / jogo</div>
                     <div style="color: var(--text-muted); font-size: 0.8rem;">Duração: ${contract.duration} jogos</div>
+                </div>
+            `;
+        } else if (slot === 'Master') {
+            // Force 3 Master proposals if empty
+            if (myTeam.sponsorships.propostas.length === 0) {
+                let level = 'level1';
+                if (myTeam.rep >= 50 && myTeam.rep < 100) level = 'level2';
+                else if (myTeam.rep >= 100) level = 'level3';
+                
+                const brandsPool = [...sponsorBrands[level]].sort(() => 0.5 - Math.random());
+                const offers = brandsPool.slice(0, 3);
+                
+                let baseValue = 50000;
+                if (level === 'level2') baseValue = 150000;
+                if (level === 'level3') baseValue = 350000;
+                
+                myTeam.sponsorships.propostas = offers.map(brand => {
+                    const value = Math.floor(baseValue * 2.5 * (0.8 + Math.random() * 0.4));
+                    const duration = 10 + Math.floor(Math.random() * 20);
+                    return { brand: brand.brand, domain: brand.domain, value, duration };
+                });
+                saveGame();
+            }
+            
+            let proposalsHtml = myTeam.sponsorships.propostas.map(p => `
+                <div style="background: rgba(255,255,255,0.05); border-radius: 4px; padding: 10px; margin-bottom: 10px; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                        <img src="https://logo.clearbit.com/${p.domain}" onerror="this.src='https://via.placeholder.com/32?text=${p.brand}';" style="width: 32px; height: 32px; background: white; border-radius: 4px; padding: 2px;">
+                        <div>
+                            <div style="font-weight: bold; font-size: 0.9rem;">${p.brand}</div>
+                            <div style="color: #4CAF50; font-size: 0.8rem;">R$ ${p.value.toLocaleString('pt-BR')}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; padding: 5px; font-size: 0.8rem;" onclick="acceptSponsorship('Master', '${p.brand}', '${p.domain}', ${p.value}, ${p.duration})">Assinar (${p.duration}j)</button>
+                </div>
+            `).join('');
+            
+            html = `
+                <div style="background: rgba(0,0,0,0.2); border: 1px dashed var(--border-color); border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column;">
+                    <h4 style="color: var(--text-muted); margin-bottom: 15px;">${slot}</h4>
+                    <div style="color: var(--accent-color); margin-bottom: 15px; font-weight: bold;">Temos propostas!</div>
+                    ${proposalsHtml}
                 </div>
             `;
         } else {
@@ -4172,6 +4258,9 @@ function acceptSponsorship(slot, brand, domain, value, duration) {
     if (!myTeam) return;
     
     myTeam.sponsorships[slot] = { brand, domain, value, duration };
+    if (slot === 'Master') {
+        myTeam.sponsorships.propostas = [];
+    }
     document.getElementById('modal-sponsors').style.display = 'none';
     saveGame();
     renderStadium();
