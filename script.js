@@ -603,7 +603,8 @@ function ensureSafeState(team, forceReset = false) {
         commerceLevel: { bars: 0, food: 0, gourmet: 0 },
         sponsorships: { Master: null, Costas: null, Mangas: null, Calcoes: null, propostas: [] },
         academyLevel: 1,
-        consecutiveLosses: 0
+        consecutiveLosses: 0,
+        plantelJuniores: []
     };
 
     if (forceReset || isNaN(team.balance) || team.balance == null) team.balance = defaultState.balance;
@@ -633,8 +634,11 @@ function ensureSafeState(team, forceReset = false) {
         team.squad.forEach(p => {
             if (forceReset || isNaN(p.energy) || p.energy == null) p.energy = 100;
             if (forceReset || isNaN(p.morale) || p.morale == null) p.morale = 100;
+            if (forceReset || isNaN(p.age) || p.age == null) p.age = Math.floor(Math.random() * (35 - 20 + 1)) + 20; // Default age 20-35
         });
     }
+    
+    if (forceReset || !team.plantelJuniores) team.plantelJuniores = defaultState.plantelJuniores;
 }
 
 function emergencyReset() {
@@ -2522,6 +2526,9 @@ function processPromotionsAndRelegations() {
 function startNextSeason() {
     // 1. Avançar o ano
     currentYear++;
+    
+    // Geração de jovens da Escola de Formação (Fornada Anual)
+    generateYouthIntake(myTeam);
 
     // 2. Recuperar as energias e evoluir jogadores
     allTeams.forEach(team => {
@@ -3017,6 +3024,18 @@ function finishMatchSimulation() {
                             addCommentaryItem(`🚑 <strong>Lesão:</strong> <strong>${p.name}</strong> lesionou-se e vai parar por ${p.injuryRounds} jogo(s).`, 'red-card', 90);
                         }
                     }
+                    
+                    // --- NOVA MECÂNICA: EVOLUÇÃO DE JOVENS PÓS-JOGO ---
+                    if (p.age && p.age <= 19) {
+                        // 15% de chance de evoluir 1 ponto de OVR por jogar
+                        if (Math.random() < 0.15) {
+                            p.strength = Math.min(99, p.strength + 1);
+                            if (team.id === myTeam.id) {
+                                addCommentaryItem(`🌟 <strong>Evolução:</strong> O jovem <strong>${p.name}</strong> ganhou experiência em campo e evoluiu para OVR ${p.strength}!`, 'info', 90);
+                            }
+                        }
+                    }
+                    
                 } else if (!p.injuryRounds || p.injuryRounds === 0) {
                     // Quem não joga recupera energia e perde moral
                     p.energy = Math.min(100, (p.energy || 100) + 25);
@@ -4344,7 +4363,7 @@ function renderStadium() {
     const academyCost = myTeam.academyLevel * 2000000;
     const academyCostEl = document.getElementById('academy-upgrade-cost');
     if (academyCostEl) {
-        if (myTeam.academyLevel >= 5) {
+        if (myTeam.academyLevel >= 10) {
             academyCostEl.innerText = "MÁX";
             document.getElementById('btn-upgrade-academy').disabled = true;
         } else {
@@ -4402,7 +4421,7 @@ function upgradeStadium() {
 
 function upgradeAcademy() {
     if (!myTeam) return;
-    if (myTeam.academyLevel >= 5) return alert("A Escola de Formação já está no nível máximo!");
+    if (myTeam.academyLevel >= 10) return alert("A Escola de Formação já está no nível máximo!");
     
     const cost = myTeam.academyLevel * 2000000;
     if (myTeam.balance < cost) {
@@ -5137,4 +5156,126 @@ function renderTacticsSummary() {
         `;
         summaryContainer.appendChild(div);
     });
+}
+
+// --- SISTEMA DE ESCOLA DE FORMAÇÃO (YOUTH ACADEMY) ---
+
+function generateYouthIntake(team) {
+    if (!team) return;
+    if (!team.plantelJuniores) team.plantelJuniores = [];
+    
+    // Gera de 1 a 3 jogadores
+    const amount = Math.floor(Math.random() * 3) + 1;
+    const academyLevel = team.academyLevel || 1;
+    
+    for (let i = 0; i < amount; i++) {
+        let minOvr = 55;
+        let maxOvr = 65;
+        
+        if (academyLevel >= 4 && academyLevel <= 7) {
+            minOvr = 65;
+            maxOvr = 75;
+        } else if (academyLevel >= 8) {
+            minOvr = 75;
+            maxOvr = 82;
+        }
+        
+        const overall = Math.floor(Math.random() * (maxOvr - minOvr + 1)) + minOvr;
+        const age = Math.floor(Math.random() * 3) + 16; // 16 a 18 anos
+        const positions = ['GK', 'DF', 'MD', 'AT'];
+        const position = positions[Math.floor(Math.random() * positions.length)];
+        
+        const firstNames = ["João", "Tiago", "Diogo", "Miguel", "Pedro", "Tomás", "Lucas", "Gabriel", "Enzo", "Mateus"];
+        const lastNames = ["Silva", "Santos", "Costa", "Oliveira", "Pereira", "Fernandes", "Gomes", "Martins", "Ribeiro", "Almeida"];
+        const name = firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)];
+        
+        const newPlayer = {
+            id: Date.now() + i + Math.floor(Math.random() * 1000), // Unique ID
+            name: name,
+            position: position,
+            strength: overall,
+            age: age,
+            energy: 100,
+            morale: 100,
+            matchesPlayed: 0,
+            goals: 0,
+            assists: 0,
+            yellowCards: 0,
+            suspensionRounds: 0,
+            injuryRounds: 0,
+            isYouth: true // Tag para identificar que veio da base
+        };
+        
+        team.plantelJuniores.push(newPlayer);
+    }
+}
+
+function openAcademyModal() {
+    renderAcademyPlayers();
+    document.getElementById('modal-academy').style.display = 'block';
+}
+
+function renderAcademyPlayers() {
+    const list = document.getElementById('academy-players-list');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    if (!myTeam.plantelJuniores || myTeam.plantelJuniores.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color: var(--text-muted);">Não há jovens talentos na base neste momento. Invista na Escola de Formação e aguarde a próxima fornada no fim da época.</p>';
+        return;
+    }
+    
+    myTeam.plantelJuniores.forEach((player, index) => {
+        const item = document.createElement('div');
+        item.className = 'transfer-player-card';
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+        item.style.padding = '10px';
+        item.style.borderBottom = '1px solid var(--border-color)';
+        
+        let positionClass = '';
+        if (player.position === 'GK') positionClass = 'pos-gk';
+        else if (player.position === 'DF') positionClass = 'pos-df';
+        else if (player.position === 'MD') positionClass = 'pos-md';
+        else if (player.position === 'AT') positionClass = 'pos-at';
+
+        item.innerHTML = `
+            <div style="flex: 1;">
+                <h4 style="margin: 0; display:flex; align-items:center; gap:8px;">
+                    ${player.name}
+                    <span class="position-badge ${positionClass}">${player.position}</span>
+                </h4>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">
+                    Idade: ${player.age} anos | OVR: <strong>${player.strength}</strong>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="promoteYouthPlayer(${index})" style="background-color: var(--primary-color);">Promover</button>
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function promoteYouthPlayer(index) {
+    if (!myTeam.plantelJuniores || index < 0 || index >= myTeam.plantelJuniores.length) return;
+    
+    const player = myTeam.plantelJuniores[index];
+    
+    // Remove do plantel de juniores
+    myTeam.plantelJuniores.splice(index, 1);
+    
+    // Adiciona ao squad principal
+    delete player.isYouth; // Já não é júnior na base
+    myTeam.squad.push(player);
+    
+    saveGame();
+    renderAcademyPlayers(); // Atualiza a modal
+    
+    // Se a aba jogadores estiver ativa, re-renderiza o campo e o banco
+    renderSquad();
+    
+    alert(`${player.name} foi promovido para a equipa principal!`);
 }

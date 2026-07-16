@@ -158,6 +158,7 @@
                     </div>
                 </div>
                 <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="openAcademyModal()" style="margin-right: 10px; background-color: #4CAF50; border-color: #4CAF50;"><i class="fas fa-graduation-cap"></i> Ver Escola de Formação</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-main'); updateTeamStrength();"><i class="fas fa-arrow-left"></i> Voltar ao Painel</button>
                 </div>
             </header>
@@ -780,6 +781,22 @@
     </div>
 
     </div>
+
+    <!-- Modal da Escola de Formação (Regens) -->
+    <div id="modal-academy" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-modal" onclick="closeModal('modal-academy')">&times;</span>
+            <h2 style="color: var(--primary-color); margin-top: 0;"><i class="fas fa-graduation-cap"></i> Escola de Formação (Juniores)</h2>
+            <p>Estes são os jovens talentos revelados na base. Promova-os ao plantel principal para os poder escalar e evoluir (menores de 19 anos ganham chance de +1 de OVR a cada jogo).</p>
+            <div id="academy-players-list" style="margin-top: 15px;">
+                <!-- Renderizados via JS -->
+            </div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="closeModal('modal-academy')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="squads.js"></script>
     <script src="continental.js?v=1"></script>
     <script src="script.js?v=2"></script>
