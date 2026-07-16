@@ -372,6 +372,7 @@ let cupWinnerId = null;
 let cupRunnerUpId = null;
 let cupFinished = false;
 let databaseVersion = "2026-07-12-v1";
+let currentYear = 2026;
 // Som: preferência do usuário
 window.soundEnabled = true;
 
@@ -517,6 +518,7 @@ function saveGame() {
     if (!currentUser) return;
     users[currentUser].gameState = {
         databaseVersion,
+        currentYear,
         myTeamId: myTeam ? myTeam.id : null,
         currentRound,
         matchSchedule,
@@ -571,6 +573,7 @@ function loadGame() {
         const targetDbVersion = "2026-07-12-v1";
         
         databaseVersion = targetDbVersion; // Atualiza a variável global
+        currentYear = state.currentYear || 2026; // Carrega o ano ou 2026 como default
         
         myTeam = allTeams.find(t => t.id === state.myTeamId);
         
@@ -643,6 +646,8 @@ function loadGame() {
                     if (p.suspensionRounds === undefined || p.suspensionRounds === null) p.suspensionRounds = 0;
                     if (p.energy === undefined || p.energy === null) p.energy = 100;
                     if (p.yellowCards === undefined || p.yellowCards === null) p.yellowCards = 0;
+                    if (p.age === undefined || p.age === null) p.age = Math.floor(Math.random() * (35 - 18 + 1)) + 18;
+                    if (p.matchesPlayed === undefined || p.matchesPlayed === null) p.matchesPlayed = 0;
                 });
             }
             
@@ -716,7 +721,9 @@ function loadGame() {
                     suspensionRounds: 0,
                     injuryRounds: 0,
                     redCardInMatch: false,
-                    isStarter: index < 11
+                    isStarter: index < 11,
+                    age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                    matchesPlayed: 0
                 }));
                 team.formation = realSquads[team.id].formation;
             }
@@ -736,7 +743,9 @@ function loadGame() {
                         position: pos,
                         strength: Math.round(team.strength - 5 + Math.random() * 10), // Strength around team average
                         energy: 100, goals: 0, assists: 0, yellowCards: 0, suspensionRounds: 0, redCardInMatch: false,
-                        isStarter: existingPlayers.length + i < 11
+                        isStarter: existingPlayers.length + i < 11,
+                        age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                        matchesPlayed: 0
                     });
                 }
                 team.squad = existingPlayers;
@@ -2240,7 +2249,10 @@ function processPromotionsAndRelegations() {
 
 // Reinicia o estado para uma nova temporada mantendo o progresso dos times
 function startNextSeason() {
-    // 1. Recuperar as energias de todos os jogadores
+    // 1. Avançar o ano
+    currentYear++;
+
+    // 2. Recuperar as energias e evoluir jogadores
     allTeams.forEach(team => {
         if (team.squad) {
             const loanedOut = team.squad.filter(p => p.isLoaned);
@@ -2253,12 +2265,61 @@ function startNextSeason() {
                 // mas para simplificar o MVP, eles apenas são resetados.
             });
 
+            let newSquad = [];
             team.squad.forEach(p => {
                 p.energy = 100;
                 p.injuryRounds = 0;
                 p.yellowCards = 0;
                 p.suspensionRounds = 0;
+                
+                // --- NOVA MECÂNICA: ENVELHECIMENTO, EVOLUÇÃO E APOSENTADORIA ---
+                p.age = (p.age || 18) + 1;
+                let matches = p.matchesPlayed || 0;
+                
+                if (p.age <= 23) {
+                    if (matches >= 15) p.strength += Math.floor(Math.random() * 3) + 1; // +1 a +3
+                    else p.strength += Math.floor(Math.random() * 2); // 0 a +1
+                } else if (p.age <= 31) {
+                    if (matches >= 20 || (p.goals + p.assists) >= 5) p.strength += 1;
+                    else p.strength -= 1;
+                } else {
+                    p.strength -= Math.floor(Math.random() * 2) + 1; // -1 a -2
+                }
+                
+                p.strength = Math.max(40, Math.min(99, Math.round(p.strength) || 40));
+                p.matchesPlayed = 0;
+                p.goals = 0;
+                p.assists = 0;
+                
+                let retireChance = 0;
+                if (p.age === 38 || p.age === 39) retireChance = 0.8;
+                else if (p.age >= 40) retireChance = 1.0;
+                
+                if (Math.random() >= retireChance) {
+                    newSquad.push(p);
+                }
             });
+            team.squad = newSquad;
+            
+            // Repor jogadores para times controlados pela CPU (manter mínimo de 18)
+            if (team.id !== myTeam?.id && team.squad.length < 18) {
+                let playerIdCounter = Date.now() + Math.floor(Math.random() * 10000);
+                const needed = 18 - team.squad.length;
+                const genericPositions = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'];
+                for (let i = 0; i < needed; i++) {
+                    const pos = genericPositions[Math.floor(Math.random() * genericPositions.length)];
+                    team.squad.push({
+                        id: playerIdCounter++,
+                        name: `Jogador ${team.squad.length + 1} ${team.name.split(' ')[0]}`,
+                        position: pos,
+                        strength: Math.round(team.strength - 5 + Math.random() * 10),
+                        energy: 100, goals: 0, assists: 0, yellowCards: 0, suspensionRounds: 0, injuryRounds: 0, redCardInMatch: false,
+                        isStarter: false,
+                        age: Math.floor(Math.random() * (30 - 18 + 1)) + 18,
+                        matchesPlayed: 0
+                    });
+                }
+            }
             
             // --- NOVA MECÂNICA: ESCOLAS DE FORMAÇÃO ---
             if (team.id === myTeam.id) {
@@ -2283,7 +2344,8 @@ function startNextSeason() {
                         yellowCards: 0,
                         suspensionRounds: 0,
                         injuryRounds: 0,
-                        isStarter: false
+                        isStarter: false,
+                        matchesPlayed: 0
                     };
                     team.squad.push(youngPlayer);
                 }
@@ -2624,6 +2686,7 @@ function finishMatchSimulation() {
 
                 // Verifica se o jogador participou da partida usando a flag temporária
                 if (p.playedInMatch) {
+                    p.matchesPlayed = (p.matchesPlayed || 0) + 1;
                     // Jogadores que jogam cansam mais (perdem entre 5 e 12 de energia)
                     p.energy = Math.max(0, p.energy - (Math.floor(Math.random() * 8) + 5));
                     // Chance de lesão baseada na energia
