@@ -202,13 +202,19 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="tactics-playstyle">Estilo de Jogo</label>
+                            <select id="tactics-playstyle" class="form-control" onchange="updateTactics()">
+                                <option value="Posse de Bola" selected>Posse de Bola (Tiki-Taka)</option>
+                                <option value="Contra-Ataque">Contra-Ataque (Transições Rápidas)</option>
+                                <option value="Pressão Alta">Pressão Alta (Sufoco)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="tactics-mentality">Mentalidade Tática</label>
                             <select id="tactics-mentality" class="form-control" onchange="updateTactics()">
-                                <option value="Muito Defensivo">Muito Defensivo (Retranca Total)</option>
                                 <option value="Defensivo">Defensivo (Cuidado)</option>
                                 <option value="Equilibrado" selected>Equilibrado (Segurança)</option>
                                 <option value="Ofensivo">Ofensivo (Ataque Contínuo)</option>
-                                <option value="Muito Ofensivo">Muito Ofensivo (Pressão Absoluta)</option>
                             </select>
                         </div>
                         <div class="form-group">

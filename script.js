@@ -2064,9 +2064,22 @@ function playRound() {
             const homeTeam = allTeams.find(t => t.id === match.home) || { name: "Time A", strength: 70, squad: [] };
             const awayTeam = allTeams.find(t => t.id === match.away) || { name: "Time B", strength: 70, squad: [] };
             
-            // Auto-escalar times controlados pelo computador para poupar jogadores e substituir lesionados/suspensos
-            if (homeTeam.id !== myTeam.id) autoSelectStarters(homeTeam);
-            if (awayTeam.id !== myTeam.id) autoSelectStarters(awayTeam);
+            // Auto-escalar e atribuir táticas aos times controlados pelo computador
+            const aiPlaystyles = ['Posse de Bola', 'Contra-Ataque', 'Pressão Alta'];
+            const aiMentalities = ['Defensivo', 'Equilibrado', 'Ofensivo'];
+            
+            if (homeTeam.id !== myTeam.id) {
+                autoSelectStarters(homeTeam);
+                if (!homeTeam.tactics) homeTeam.tactics = {};
+                homeTeam.tactics.playstyle = aiPlaystyles[Math.floor(Math.random() * aiPlaystyles.length)];
+                homeTeam.tactics.mentality = aiMentalities[Math.floor(Math.random() * aiMentalities.length)];
+            }
+            if (awayTeam.id !== myTeam.id) {
+                autoSelectStarters(awayTeam);
+                if (!awayTeam.tactics) awayTeam.tactics = {};
+                awayTeam.tactics.playstyle = aiPlaystyles[Math.floor(Math.random() * aiPlaystyles.length)];
+                awayTeam.tactics.mentality = aiMentalities[Math.floor(Math.random() * aiMentalities.length)];
+            }
 
             // Marca os titulares de cada time como participantes da partida
             if (homeTeam.squad) homeTeam.squad.forEach(p => { if (p.isStarter) { p.playedInMatch = true; p.startedMatch = true; } });
@@ -2869,6 +2882,17 @@ function finishMatchSimulation() {
             prizeRev: 0,
             totalRev: 0
         };
+        
+        // --- ANÁLISE TÁTICA ---
+        const isHome = userSimMatch.home === myTeam.id;
+        const oppId = isHome ? userSimMatch.away : userSimMatch.home;
+        const oppTeam = allTeams.find(t => t.id === oppId);
+        if (oppTeam && oppTeam.tactics) {
+            const oppPlaystyle = oppTeam.tactics.playstyle || 'Equilibrado';
+            const oppMentality = oppTeam.tactics.mentality || 'Equilibrado';
+            addCommentaryItem(`📊 <strong>Análise Tática:</strong> O ${oppTeam.name} tentou sufocar com ${oppPlaystyle} (${oppMentality}).`, 'info', 90);
+        }
+        // ----------------------
     }
 
     try {
@@ -3410,19 +3434,14 @@ function getTeamTacticalModifiers(team) {
 
     if (team.tactics) {
         // 1. Mentalidade
-        if (team.tactics.mentality === 'Muito Ofensivo') {
-            attackMod += 0.30;
-            defenseMod += 0.30; // Mais exposto a sofrer gols
-        } else if (team.tactics.mentality === 'Ofensivo') {
-            attackMod += 0.15;
-            defenseMod += 0.15;
+        if (team.tactics.mentality === 'Ofensivo') {
+            attackMod += 0.20;
+            defenseMod += 0.15; // Mais exposto a sofrer gols
         } else if (team.tactics.mentality === 'Defensivo') {
             attackMod -= 0.15;
-            defenseMod -= 0.15; // Defesa mais sólida
-        } else if (team.tactics.mentality === 'Muito Defensivo') {
-            attackMod -= 0.30;
-            defenseMod -= 0.30;
+            defenseMod -= 0.20; // Defesa mais sólida, sofre menos gols
         }
+        // Equilibrado mantém os multiplicadores em 1.0
 
         // 2. Laterais
         if (team.tactics.laterais === 'Apoiando') {
@@ -3478,8 +3497,32 @@ function calculateGoals(teamA, teamB, match = null) {
     // ------------------------------------------
     
     // Força efetiva ponderada
-    const effectiveStrengthA = strengthA * modA.attackMod * modB.defenseMod;
-    const effectiveStrengthB = strengthB * modB.attackMod * modA.defenseMod;
+    let effectiveStrengthA = strengthA * modA.attackMod * modB.defenseMod;
+    let effectiveStrengthB = strengthB * modB.attackMod * modA.defenseMod;
+    
+    // --- ESTILO DE JOGO (PEDRA-PAPEL-TESOURA) ---
+    if (teamA.tactics && teamB.tactics) {
+        const styleA = teamA.tactics.playstyle || 'Posse de Bola';
+        const styleB = teamB.tactics.playstyle || 'Posse de Bola';
+        
+        if (styleA === 'Posse de Bola' && styleB === 'Contra-Ataque') {
+            effectiveStrengthA *= 1.10;
+        } else if (styleA === 'Contra-Ataque' && styleB === 'Pressão Alta') {
+            effectiveStrengthA *= 1.10;
+        } else if (styleA === 'Pressão Alta' && styleB === 'Posse de Bola') {
+            effectiveStrengthA *= 1.10;
+        }
+        
+        // E o inverso para o B (caso seja ele a ter vantagem sobre o A)
+        if (styleB === 'Posse de Bola' && styleA === 'Contra-Ataque') {
+            effectiveStrengthB *= 1.10;
+        } else if (styleB === 'Contra-Ataque' && styleA === 'Pressão Alta') {
+            effectiveStrengthB *= 1.10;
+        } else if (styleB === 'Pressão Alta' && styleA === 'Posse de Bola') {
+            effectiveStrengthB *= 1.10;
+        }
+    }
+    // --------------------------------------------
     
     // Diferença de força
     const ratio = effectiveStrengthA / effectiveStrengthB;
@@ -4009,6 +4052,9 @@ function renderTacticsPanel() {
     // 1. Preenche os seletores básicos
     document.getElementById('tactics-formation').value = myTeam.tactics.formation;
     document.getElementById('tactics-mentality').value = myTeam.tactics.mentality;
+    if (document.getElementById('tactics-playstyle')) {
+        document.getElementById('tactics-playstyle').value = myTeam.tactics.playstyle || 'Posse de Bola';
+    }
     document.getElementById('tactics-laterais').value = myTeam.tactics.laterais;
 
     // 2. Preenche os seletores de funções (Capitão, Faltas, Escanteios) com os titulares atuais
@@ -4068,6 +4114,9 @@ function updateTactics() {
 
     myTeam.tactics.formation = document.getElementById('tactics-formation').value;
     myTeam.tactics.mentality = document.getElementById('tactics-mentality').value;
+    if (document.getElementById('tactics-playstyle')) {
+        myTeam.tactics.playstyle = document.getElementById('tactics-playstyle').value;
+    }
     myTeam.tactics.laterais = document.getElementById('tactics-laterais').value;
 
     myTeam.tactics.captain = Number(document.getElementById('tactics-captain').value);
