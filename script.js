@@ -611,6 +611,7 @@ function ensureSafeState(team, forceReset = false) {
     
     if (forceReset || isNaN(team.academyLevel) || team.academyLevel == null) team.academyLevel = defaultState.academyLevel;
     if (forceReset || isNaN(team.consecutiveLosses) || team.consecutiveLosses == null) team.consecutiveLosses = defaultState.consecutiveLosses;
+    if (forceReset || isNaN(team.boardConfidence) || team.boardConfidence == null) team.boardConfidence = 80;
 
     if (team.squad) {
         team.squad.forEach(p => {
@@ -1145,6 +1146,30 @@ function updateDashboardUI() {
 
     const balanceFormatted = myTeam.balance.toLocaleString('pt-BR');
     document.getElementById('my-team-balance').innerText = balanceFormatted;
+    
+    const confidenceBar = document.getElementById('my-team-confidence-bar');
+    if (confidenceBar) {
+        const conf = myTeam.boardConfidence || 80;
+        confidenceBar.style.width = `${conf}%`;
+        if (conf >= 70) {
+            confidenceBar.style.background = '#4CAF50';
+            confidenceBar.style.animation = 'none';
+        } else if (conf >= 31) {
+            confidenceBar.style.background = '#FFEB3B';
+            confidenceBar.style.animation = 'none';
+        } else {
+            confidenceBar.style.background = '#f44336';
+            // Adiciona CSS piscar caso não exista na stylesheet principal
+            if (!document.getElementById('blink-css')) {
+                const style = document.createElement('style');
+                style.id = 'blink-css';
+                style.innerHTML = `@keyframes blink-danger { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }`;
+                document.head.appendChild(style);
+            }
+            confidenceBar.style.animation = 'blink-danger 1s infinite';
+        }
+    }
+    
     if (document.getElementById('market-balance')) {
         document.getElementById('market-balance').innerText = balanceFormatted;
     }
@@ -2683,13 +2708,32 @@ function finishMatchSimulation() {
         
         // --- GESTÃO DE ESTÁDIO E FINANÇAS: Patrocínios e Rescisões ---
         if (userSimMatch && (userSimMatch.home === myTeam.id || userSimMatch.away === myTeam.id)) {
-            // Lógica de vitórias/derrotas consecutivas
+            // Lógica de vitórias/derrotas consecutivas e Confiança da Direção
             const userG = userSimMatch.home === myTeam.id ? userSimMatch.currentHomeGoals : userSimMatch.currentAwayGoals;
             const oppG = userSimMatch.home === myTeam.id ? userSimMatch.currentAwayGoals : userSimMatch.currentHomeGoals;
+            const isHomeMatch = userSimMatch.home === myTeam.id;
             
-            if (userG < oppG) {
+            if (isNaN(myTeam.boardConfidence) || myTeam.boardConfidence == null) myTeam.boardConfidence = 80;
+            
+            if (userG > oppG) {
+                myTeam.consecutiveLosses = 0;
+                myTeam.boardConfidence = Math.min(100, myTeam.boardConfidence + 5);
+            } else if (userG === oppG) {
+                myTeam.consecutiveLosses = 0;
+                if (isHomeMatch) {
+                    myTeam.boardConfidence -= 2;
+                } else {
+                    myTeam.boardConfidence = Math.min(100, myTeam.boardConfidence + 1);
+                }
+            } else {
                 myTeam.consecutiveLosses = (myTeam.consecutiveLosses || 0) + 1;
-                // Rescisão
+                if (oppG - userG >= 3) {
+                    myTeam.boardConfidence -= 12; // Goleada
+                } else {
+                    myTeam.boardConfidence -= 8; // Derrota normal
+                }
+                
+                // Rescisão de patrocínios
                 if (myTeam.consecutiveLosses >= 3) {
                     sponsorSlots.forEach(slot => {
                         if (myTeam.sponsorships && myTeam.sponsorships[slot] && Math.random() < 0.3) {
@@ -2699,8 +2743,6 @@ function finishMatchSimulation() {
                         }
                     });
                 }
-            } else {
-                myTeam.consecutiveLosses = 0; // Reset nas vitórias e empates
             }
             
             // Pagamentos
@@ -2829,6 +2871,42 @@ function finishMatchSimulation() {
             updateDynamicBackground(myTeam.id);
             window.scrollTo(0,0);
         }
+        
+        // Verifica Demissão ou Alerta de Confiança
+        setTimeout(() => {
+            if (myTeam && myTeam.boardConfidence <= 0) {
+                const modal = document.getElementById('modal-sacked');
+                if (modal) modal.style.display = 'flex';
+            } else if (myTeam && myTeam.boardConfidence <= 15) {
+                alert("Aviso da Direção: Estás em risco de ser despedido devido aos maus resultados!");
+            }
+        }, 800);
+    }
+}
+
+function handleSacking() {
+    const modal = document.getElementById('modal-sacked');
+    if (modal) modal.style.display = 'none';
+    
+    if (myTeam) {
+        // Zera finanças e infraestrutura
+        ensureSafeState(myTeam, true);
+        myTeam.boardConfidence = 80;
+        
+        // Downgrade do plantel para a equipa base original
+        if (typeof squads !== 'undefined') {
+            const originalTeam = squads.find(t => t.id === myTeam.id);
+            if (originalTeam && originalTeam.squad) {
+                myTeam.squad = JSON.parse(JSON.stringify(originalTeam.squad));
+                myTeam.squad.forEach(p => {
+                    p.energy = 100;
+                    p.morale = 100;
+                });
+            }
+        }
+        
+        saveGame();
+        location.reload();
     }
 }
 

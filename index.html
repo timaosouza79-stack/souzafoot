@@ -93,6 +93,12 @@
                         <h2 id="my-team-name">Nome do Time</h2>
                         <p>Força: <span id="my-team-strength">0</span></p>
                         <p style="color: #4CAF50; font-weight: bold;">Saldo: R$ <span id="my-team-balance">0</span></p>
+                        <div style="margin-top: 5px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+                            <span style="color: var(--text-muted);">Confiança da Direção:</span>
+                            <div style="width: 150px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; display: flex;">
+                                <div id="my-team-confidence-bar" style="height: 100%; width: 80%; background: #4CAF50; transition: all 0.3s ease;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="manager-actions">
@@ -749,6 +755,24 @@
             <div style="text-align: center; margin-top: 25px;">
                 <button class="btn btn-primary" onclick="closeFinancialReport()" style="width: 100%; padding: 12px; font-size: 1.1rem; font-weight: bold;">
                     Continuar <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Demissão (Game Over) -->
+    <div id="modal-sacked" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="dashboard-card" style="width: 90%; max-width: 400px; padding: 30px; border: 1px solid #f44336; border-top: 5px solid #f44336;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <i class="fas fa-user-times" style="font-size: 3rem; color: #f44336; margin-bottom: 15px;"></i>
+                <h3 style="margin: 0; color: white; font-size: 1.5rem;">Fim de Linha!</h3>
+                <p style="color: #f44336; font-weight: bold; margin-top: 10px; font-size: 1.1rem;">Foste Despedido.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 15px; line-height: 1.5;">A direção perdeu totalmente a confiança no teu trabalho devido aos maus resultados recentes.</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="handleSacking()" style="width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; background: #f44336; border-color: #f44336;">
+                    Assumir Novo Clube <i class="fas fa-sign-in-alt"></i>
                 </button>
             </div>
         </div>
