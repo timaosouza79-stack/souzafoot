@@ -2638,19 +2638,41 @@ function finishMatchSimulation() {
     console.log("finishMatchSimulation: Finalizando rodada...");
     document.getElementById('btn-live-continue').style.display = 'none';
 
+    let matchReport = null;
+    let initialBalance = 0;
+    if (userSimMatch && (userSimMatch.home === myTeam.id || userSimMatch.away === myTeam.id)) {
+        initialBalance = myTeam.balance;
+        matchReport = {
+            isHome: userSimMatch.home === myTeam.id,
+            ticketRev: 0,
+            commRev: 0,
+            sponRev: 0,
+            tvRev: userSimMatch.away === myTeam.id ? 800000 : 0,
+            prizeRev: 0,
+            totalRev: 0
+        };
+    }
+
     try {
         // --- GESTÃO DE ESTÁDIO E FINANÇAS: Pagamento de Bilheteira ---
         simulatedRoundMatches.forEach(m => {
             if (m.home === myTeam.id && m.revenue) {
                 myTeam.balance += m.revenue;
+                if (matchReport) matchReport.ticketRev = m.revenue;
                 addCommentaryItem(`💰 Receita de Bilheteria: R$ ${m.revenue.toLocaleString('pt-BR')} (${m.attendance.toLocaleString('pt-BR')} torcedores)`, 'info', 90);
                 
                 if (m.commerceRevenue && m.commerceRevenue > 0) {
                     myTeam.balance += m.commerceRevenue;
+                    if (matchReport) matchReport.commRev = m.commerceRevenue;
                     addCommentaryItem(`🍔 Receita de Comércio: R$ ${m.commerceRevenue.toLocaleString('pt-BR')}`, 'info', 90);
                 }
             }
         });
+        
+        if (matchReport && matchReport.tvRev > 0) {
+            myTeam.balance += matchReport.tvRev;
+            addCommentaryItem(`📺 Direitos de TV: R$ ${matchReport.tvRev.toLocaleString('pt-BR')}`, 'info', 90);
+        }
         
         // --- GESTÃO DE ESTÁDIO E FINANÇAS: Patrocínios e Rescisões ---
         if (userSimMatch && (userSimMatch.home === myTeam.id || userSimMatch.away === myTeam.id)) {
@@ -2691,6 +2713,7 @@ function finishMatchSimulation() {
             }
             if (sponIncome > 0) {
                 myTeam.balance += sponIncome;
+                if (matchReport) matchReport.sponRev = sponIncome;
                 addCommentaryItem(`💰 Receita de Patrocínios: R$ ${sponIncome.toLocaleString('pt-BR')}`, 'info', 90);
             }
         }
@@ -2763,6 +2786,12 @@ function finishMatchSimulation() {
                 delete p.matchYellowCards;
             });
         });
+        
+        if (matchReport) {
+            matchReport.totalRev = myTeam.balance - initialBalance;
+            matchReport.prizeRev = matchReport.totalRev - matchReport.ticketRev - matchReport.commRev - matchReport.sponRev - matchReport.tvRev;
+            window.lastMatchReport = matchReport;
+        }
 
     } catch (error) {
         console.error("Erro ao processar fim da rodada:", error);
@@ -2773,10 +2802,54 @@ function finishMatchSimulation() {
         
         updateDashboardUI();
         saveGame();
-        showScreen('screen-main');
-        updateDynamicBackground(myTeam.id);
-        window.scrollTo(0,0);
+        
+        if (window.lastMatchReport) {
+            showFinancialReport(window.lastMatchReport);
+            window.lastMatchReport = null;
+        } else {
+            showScreen('screen-main');
+            updateDynamicBackground(myTeam.id);
+            window.scrollTo(0,0);
+        }
     }
+}
+
+function showFinancialReport(report) {
+    const modal = document.getElementById('modal-financial-report');
+    const content = document.getElementById('financial-report-content');
+    if (!modal || !content) return;
+    
+    let html = `<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8;">`;
+    if (report.isHome) {
+        html += `<li style="display: flex; justify-content: space-between;"><span>Bilhetes:</span> <span style="color: #4CAF50;">R$ ${report.ticketRev.toLocaleString('pt-BR')}</span></li>`;
+        html += `<li style="display: flex; justify-content: space-between;"><span>Comércio:</span> <span style="color: #4CAF50;">R$ ${report.commRev.toLocaleString('pt-BR')}</span></li>`;
+    } else {
+        html += `<li style="display: flex; justify-content: space-between;"><span>Direitos TV:</span> <span style="color: #4CAF50;">R$ ${report.tvRev.toLocaleString('pt-BR')}</span></li>`;
+    }
+    
+    html += `<li style="display: flex; justify-content: space-between;"><span>Patrocínios:</span> <span style="color: #4CAF50;">R$ ${report.sponRev.toLocaleString('pt-BR')}</span></li>`;
+    
+    if (report.prizeRev > 0) {
+        html += `<li style="display: flex; justify-content: space-between;"><span>Prêmio de Jogo:</span> <span style="color: #4CAF50;">R$ ${report.prizeRev.toLocaleString('pt-BR')}</span></li>`;
+    } else if (report.prizeRev < 0) {
+        html += `<li style="display: flex; justify-content: space-between;"><span>Despesas:</span> <span style="color: #f44336;">R$ ${report.prizeRev.toLocaleString('pt-BR')}</span></li>`;
+    }
+    
+    html += `<li style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between; font-weight: bold;">
+                <span>LUCRO TOTAL:</span> <span style="color: #4CAF50;">R$ ${report.totalRev.toLocaleString('pt-BR')}</span>
+             </li>`;
+    html += `</ul>`;
+    
+    content.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function closeFinancialReport() {
+    const modal = document.getElementById('modal-financial-report');
+    if (modal) modal.style.display = 'none';
+    showScreen('screen-main');
+    updateDynamicBackground(myTeam.id);
+    window.scrollTo(0,0);
 }
 
 function finishCupRound() {

@@ -733,7 +733,26 @@
                     <button class="btn btn-secondary" onclick="document.getElementById('modal-sponsors').style.display='none'">Cancelar</button>
                 </div>
             </div>
+        </div>    <!-- Modal de Relatório Financeiro (Balancete da Partida) -->
+    <div id="modal-financial-report" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1050; align-items: center; justify-content: center;">
+        <div class="dashboard-card" style="width: 90%; max-width: 400px; padding: 20px; border: 1px solid #4CAF50; border-top: 5px solid #4CAF50;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <i class="fas fa-file-invoice-dollar" style="font-size: 2.5rem; color: #4CAF50; margin-bottom: 10px;"></i>
+                <h3 style="margin: 0; color: white;">Balancete da Partida</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Relatório Financeiro do Jogo</p>
+            </div>
+            
+            <div id="financial-report-content" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 1rem;">
+                <!-- Conteúdo gerado dinamicamente -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="btn btn-primary" onclick="closeFinancialReport()" style="width: 100%; padding: 12px; font-size: 1.1rem; font-weight: bold;">
+                    Continuar <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
         </div>
+    </div>
 
     </div>
     <script src="squads.js"></script>
