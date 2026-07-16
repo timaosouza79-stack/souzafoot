@@ -387,6 +387,14 @@ let libertadoresGroupStandings = [];
 let libertadoresBracket = [];
 let isLibertadoresMode = false;
 let libertadoresParticipants = []; // Armazena quem se classificou para a próxima Liberta
+let sulAmericanaBracket = [];
+let isSulAmericanaMode = false;
+let sulAmericanaParticipants = [];
+let sulAmericanaPhase = 'groups';
+let sulAmericanaGroups = [];
+let sulAmericanaGroupStandings = [];
+let intercontinentalBracket = [];
+let isIntercontinentalMode = false;
 let cupWinnerId = null;
 let cupRunnerUpId = null;
 let cupFinished = false;
@@ -553,7 +561,15 @@ function saveGame() {
         libertadoresGroups,
         libertadoresGroupStandings,
         isLibertadoresMode,
-        libertadoresParticipants
+        libertadoresParticipants,
+        sulAmericanaBracket,
+        isSulAmericanaMode,
+        sulAmericanaParticipants,
+        sulAmericanaPhase,
+        sulAmericanaGroups,
+        sulAmericanaGroupStandings,
+        intercontinentalBracket,
+        isIntercontinentalMode
     };
     try {
         localStorage.setItem('brasfoot_users', JSON.stringify(users));
@@ -745,6 +761,14 @@ function loadGame() {
         libertadoresBracket = state.libertadoresBracket || [];
         libertadoresParticipants = state.libertadoresParticipants || [];
         isLibertadoresMode = state.isLibertadoresMode || false;
+        sulAmericanaBracket = state.sulAmericanaBracket || [];
+        isSulAmericanaMode = state.isSulAmericanaMode || false;
+        sulAmericanaParticipants = state.sulAmericanaParticipants || [];
+        sulAmericanaPhase = state.sulAmericanaPhase || 'groups';
+        sulAmericanaGroups = state.sulAmericanaGroups || [];
+        sulAmericanaGroupStandings = state.sulAmericanaGroupStandings || [];
+        intercontinentalBracket = state.intercontinentalBracket || [];
+        isIntercontinentalMode = state.isIntercontinentalMode || false;
         cupWinnerId = state.cupWinnerId || null;
         cupRunnerUpId = state.cupRunnerUpId || null;
         cupFinished = state.cupFinished || false;
@@ -767,6 +791,14 @@ function loadGame() {
         libertadoresGroupStandings = [];
         libertadoresBracket = [];
         libertadoresParticipants = [];
+        sulAmericanaBracket = [];
+        isSulAmericanaMode = false;
+        sulAmericanaParticipants = [];
+        sulAmericanaPhase = 'groups';
+        sulAmericanaGroups = [];
+        sulAmericanaGroupStandings = [];
+        intercontinentalBracket = [];
+        isIntercontinentalMode = false;
         cupWinnerId = null; // Reset cup winner for new season
         cupRunnerUpId = null; // Reset cup runner-up for new season
         databaseVersion = "2026-07-12-v1";
@@ -1129,10 +1161,15 @@ function updateDashboardUI() {
     }
     
     const libBtn = document.getElementById('btn-view-libertadores');
+    const sulBtn = document.getElementById('btn-view-sulamericana');
     if (myTeam.league) {
         if (libBtn) {
             libBtn.style.display = (isSA || isEurope) ? 'inline-block' : 'none';
             libBtn.innerHTML = isEurope ? '<i class="fas fa-globe-europe" style="color: #3f51b5;"></i> Ver Champions' : '<i class="fas fa-globe-americas" style="color: #3f51b5;"></i> Ver Libertadores';
+        }
+        if (sulBtn) {
+            sulBtn.style.display = (isSA || isEurope) ? 'inline-block' : 'none';
+            sulBtn.innerHTML = isEurope ? '<i class="fas fa-fire" style="color: #f44336;"></i> Ver Europa League' : '<i class="fas fa-fire" style="color: #f44336;"></i> Ver Sul-Americana';
         }
 
         const cupBtn = document.querySelector('button[onclick="viewCupBracket()"]');
@@ -1809,7 +1846,7 @@ function autoSelectStarters(team) {
 // Inicia a rodada com a simulação ao vivo interativa
 function playRound() {
     if (currentRound > matchSchedule.length) {
-        alert("A temporada acabou!");
+        checkSeasonEnd();
         return;
     }
     
@@ -1820,13 +1857,28 @@ function playRound() {
 
     const currentData = matchSchedule[currentRound - 1];
     isCupMode = currentData.type === 'cup';
-    isLibertadoresMode = currentData.type === 'libertadores';
+    
+    // Agora o tipo é continental. O usuário joga na Libertadores, Sul-Americana ou nenhum dos dois.
+    // Vamos simular ambos nos mesmos dias.
+    const isContinentalRound = currentData.type === 'continental';
+    isIntercontinentalMode = currentData.type === 'intercontinental';
+    
+    // Descobre em qual o usuário está jogando para atualizar a UI
+    isLibertadoresMode = isContinentalRound && libertadoresParticipants.includes(myTeam.id);
+    isSulAmericanaMode = isContinentalRound && sulAmericanaParticipants.includes(myTeam.id);
+    
+    // Se não estiver em nenhuma mas for rodada continental, força Libertadores por padrão para a UI
+    if (isContinentalRound && !isLibertadoresMode && !isSulAmericanaMode) {
+        isLibertadoresMode = true; 
+    }
 
     // Aplica o tema visual da competição na tela de jogo ao vivo
     const liveScreen = document.getElementById('screen-match-live');
-    liveScreen.classList.remove('match-live-league', 'match-live-cup', 'match-live-libertadores');
+    liveScreen.classList.remove('match-live-league', 'match-live-cup', 'match-live-libertadores', 'match-live-sulamericana', 'match-live-intercontinental');
     if (isCupMode) liveScreen.classList.add('match-live-cup');
     else if (isLibertadoresMode) liveScreen.classList.add('match-live-libertadores');
+    else if (isSulAmericanaMode) liveScreen.classList.add('match-live-sulamericana'); // CSS custom necessário
+    else if (isIntercontinentalMode) liveScreen.classList.add('match-live-intercontinental'); // CSS custom necessário
     else liveScreen.classList.add('match-live-league');
 
     // Correção: Se for rodada de mata-mata ou fase de grupos continental, busca os jogos nos chaveamentos/grupos
@@ -1837,28 +1889,52 @@ function playRound() {
         } else {
             matchesToSimulate = [];
         }
-    } else if (isLibertadoresMode) {
+    } else if (isContinentalRound) {
+        matchesToSimulate = [];
+        
+        // 1. Libertadores
         if (libertadoresPhase === 'knockout' && libertadoresBracket.length > 0) {
-            matchesToSimulate = libertadoresBracket[libertadoresBracket.length - 1];
+            matchesToSimulate.push(...libertadoresBracket[libertadoresBracket.length - 1]);
         } else if (libertadoresPhase === 'groups') {
-            // Gerar jogos da fase de grupos (32 times em 8 grupos de 4)
-            const libRoundIdx = matchSchedule.slice(0, currentRound).filter(r => r.type === 'libertadores').length - 1;
-            matchesToSimulate = [];
+            const libRoundIdx = matchSchedule.slice(0, currentRound).filter(r => r.type === 'continental').length - 1;
             if (libertadoresGroups.length === 0) initLibertadores(true);
             
-            libertadoresGroups.forEach(group => { // Here, the loop variable is `group`
+            libertadoresGroups.forEach(group => {
                 const teams = group.teams;
                 let m1, m2;
-                // Esquema de 6 rodadas para grupo de 4 times (Round Robin)
                 if (libRoundIdx === 0) { m1 = {home: teams[0], away: teams[1]}; m2 = {home: teams[2], away: teams[3]}; }
                 else if (libRoundIdx === 1) { m1 = {home: teams[0], away: teams[2]}; m2 = {home: teams[1], away: teams[3]}; }
                 else if (libRoundIdx === 2) { m1 = {home: teams[0], away: teams[3]}; m2 = {home: teams[1], away: teams[2]}; }
                 else if (libRoundIdx === 3) { m1 = {home: teams[1], away: teams[0]}; m2 = {home: teams[3], away: teams[2]}; }
                 else if (libRoundIdx === 4) { m1 = {home: teams[2], away: teams[0]}; m2 = {home: teams[3], away: teams[1]}; }
                 else if (libRoundIdx === 5) { m1 = {home: teams[3], away: teams[0]}; m2 = {home: teams[2], away: teams[1]}; }
-                
                 if (m1) matchesToSimulate.push(m1, m2);
             });
+        }
+
+        // 2. Sul-Americana
+        if (sulAmericanaPhase === 'knockout' && sulAmericanaBracket.length > 0) {
+            matchesToSimulate.push(...sulAmericanaBracket[sulAmericanaBracket.length - 1]);
+        } else if (sulAmericanaPhase === 'groups') {
+            const sulRoundIdx = matchSchedule.slice(0, currentRound).filter(r => r.type === 'continental').length - 1;
+            if (sulAmericanaGroups.length === 0) initSulAmericana(true);
+            
+            sulAmericanaGroups.forEach(group => {
+                const teams = group.teams;
+                let m1, m2;
+                if (sulRoundIdx === 0) { m1 = {home: teams[0], away: teams[1]}; m2 = {home: teams[2], away: teams[3]}; }
+                else if (sulRoundIdx === 1) { m1 = {home: teams[0], away: teams[2]}; m2 = {home: teams[1], away: teams[3]}; }
+                else if (sulRoundIdx === 2) { m1 = {home: teams[0], away: teams[3]}; m2 = {home: teams[1], away: teams[2]}; }
+                else if (sulRoundIdx === 3) { m1 = {home: teams[1], away: teams[0]}; m2 = {home: teams[3], away: teams[2]}; }
+                else if (sulRoundIdx === 4) { m1 = {home: teams[2], away: teams[0]}; m2 = {home: teams[3], away: teams[1]}; }
+                else if (sulRoundIdx === 5) { m1 = {home: teams[3], away: teams[0]}; m2 = {home: teams[2], away: teams[1]}; }
+                if (m1) matchesToSimulate.push(m1, m2);
+            });
+        }
+    } else if (isIntercontinentalMode) {
+        if (intercontinentalBracket.length === 0) initIntercontinental(true);
+        if (intercontinentalBracket.length > 0) {
+            matchesToSimulate = intercontinentalBracket[0];
         }
     }
 
@@ -2009,6 +2085,7 @@ function playRound() {
     
     if (isCupMode || isLibertadoresMode) {
         const compNames = getCompetitionNames(myTeam.league);
+        const currentType = matchSchedule[currentRound - 1].type;
         if (isCupMode) {
             title = `${compNames.cup} - ${phaseNames[Math.log2(simulatedRoundMatches.length)] || "Copa"}`;
         } else {
@@ -2144,13 +2221,16 @@ function initChampionship(selectedLeague = 'brazil_a') {
         if ((isBrazil || isEurope) && cupIndices.includes(currentRoundCounter)) {
             matchSchedule.push({ type: 'cup', matches: [] });
         } else if ((isBrazil || isEurope) && continentalIndices.includes(currentRoundCounter)) {
-            matchSchedule.push({ type: 'libertadores', matches: [] });
+            matchSchedule.push({ type: 'continental', matches: [] });
         } else {
             matchSchedule.push({ type: 'league', matches: fullLeague[leagueIdx] });
             leagueIdx++;
         }
         currentRoundCounter++;
     }
+    
+    // Adiciona a rodada do Mundial Intercontinental no fim do ano
+    matchSchedule.push({ type: 'intercontinental', matches: [] });
 }
 
 function initCopaDoBrasil(silent = false) { 
@@ -2224,25 +2304,37 @@ function viewCupBracket() {
 
 // Verifica o fim da temporada e mostra a tela de campeão/resumo
 function checkSeasonEnd() {
-    // Calcula quem vai para a Libertadores da próxima temporada
+    // Calcula quem vai para a Libertadores e Sul-Americana da próxima temporada
     const nextLibParticipants = [];
+    const nextSulParticipants = [];
     
-    // 1. Brasileiros (7 vagas: Campeão da Copa + G6 do Brasileiro)
+    // 1. Brasileiros
+    // Libertadores (7 vagas: Campeão da Copa + G6 do Brasileiro)
     if (cupWinnerId) nextLibParticipants.push(cupWinnerId);
-    let brCount = nextLibParticipants.length;
+    let brLibCount = nextLibParticipants.length;
+    let brSulCount = 0;
+    
     standings.forEach(t => {
-        if (brCount < 7 && !nextLibParticipants.includes(t.id)) {
+        if (brLibCount < 7 && !nextLibParticipants.includes(t.id)) {
             nextLibParticipants.push(t.id);
-            brCount++;
+            brLibCount++;
+        } else if (brSulCount < 6 && !nextLibParticipants.includes(t.id)) {
+            // Sul-Americana (6 vagas: 7º ao 12º)
+            nextSulParticipants.push(t.id);
+            brSulCount++;
         }
     });
 
-    // 2. Sul-Americanos (25 vagas)
+    // 2. Sul-Americanos (25 vagas Liberta, 26 vagas Sul-Americana para fechar 32 em cada)
     const saTeams = allTeams.filter(t => t.league === 'south_america');
-    const saQualifiers = saTeams.sort((a, b) => b.strength - a.strength).slice(0, 25);
-    saQualifiers.forEach(t => nextLibParticipants.push(t.id));
+    const saQualifiersLib = saTeams.sort((a, b) => b.strength - a.strength).slice(0, 25);
+    saQualifiersLib.forEach(t => nextLibParticipants.push(t.id));
+    
+    const saQualifiersSul = saTeams.sort((a, b) => b.strength - a.strength).slice(25, 51);
+    saQualifiersSul.forEach(t => nextSulParticipants.push(t.id));
 
     libertadoresParticipants = nextLibParticipants;
+    sulAmericanaParticipants = nextSulParticipants;
 
     const champion = standings[0];
     const isUserChampion = champion.id === myTeam.id;
@@ -2770,8 +2862,11 @@ function finishMatchSimulation() {
         
         if (isCupMode) {
             finishCupRound();
-        } else if (isLibertadoresMode) {
+        } else if (currentType === 'continental') {
             finishLibertadoresRound();
+            if (typeof finishSulAmericanaRound === 'function') finishSulAmericanaRound();
+        } else if (currentType === 'intercontinental') {
+            if (typeof finishIntercontinentalRound === 'function') finishIntercontinentalRound();
         } else {
             // Lógica de Liga (Brasileirão/Nacionais)
             simulatedRoundMatches.forEach(m => {
@@ -2998,9 +3093,12 @@ function finishCupRound() {
 
 function finishLibertadoresRound() {
     console.log("finishLibertadoresRound: Iniciando...");
+    const libMatches = simulatedRoundMatches.filter(m => libertadoresParticipants.includes(m.home));
+    if (libMatches.length === 0) return;
+
     if (libertadoresPhase === 'groups') {
         console.log("finishLibertadoresRound: Processando fase de grupos.");
-        simulatedRoundMatches.forEach(m => {
+        libMatches.forEach(m => {
             const homeId = m.home;
             const awayId = m.away;
             let h = libertadoresGroupStandings.find(s => s.id === homeId);
@@ -3045,7 +3143,7 @@ function finishLibertadoresRound() {
         }
     } else {
         console.log("finishLibertadoresRound: Processando fase de mata-mata.");
-        const currentPhase = simulatedRoundMatches;
+        const currentPhase = libMatches;
         const winners = [];
         currentPhase.forEach(m => {
             let homeGoals = m.currentHomeGoals;
