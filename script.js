@@ -3083,7 +3083,19 @@ function finishMatchSimulation() {
             const relatorio = document.getElementById('relatorio-fim-de-jogo');
             if (relatorio) {
                 relatorio.style.display = 'block';
-                document.getElementById('texto-publico').innerText = `🏟️ Bilheteira: R$ ${matchReport.ticketRev.toLocaleString('pt-BR')}`;
+                
+                let attendance = 0;
+                let capacity = myTeam.stadiumCapacity || 10000;
+                if (userSimMatch) {
+                    attendance = userSimMatch.attendance || 0;
+                    if (userSimMatch.home !== myTeam.id) {
+                        const opp = allTeams.find(t => t.id === userSimMatch.home);
+                        if (opp) capacity = opp.stadiumCapacity || 10000;
+                    }
+                }
+                
+                document.getElementById('texto-publico').innerText = `👥 Público Presente: ${attendance.toLocaleString('pt-BR')} / ${capacity.toLocaleString('pt-BR')}`;
+                document.getElementById('texto-bilheteira').innerText = `🏟️ Bilheteira: R$ ${matchReport.ticketRev.toLocaleString('pt-BR')}`;
                 document.getElementById('texto-comercio').innerText = `🍔 Comércio: R$ ${matchReport.commRev.toLocaleString('pt-BR')}`;
                 document.getElementById('texto-patrocinios').innerText = `🤝 Patrocínios: R$ ${matchReport.sponRev.toLocaleString('pt-BR')}`;
                 document.getElementById('texto-lucro-total').innerText = `💰 LUCRO TOTAL: R$ ${matchReport.totalRev.toLocaleString('pt-BR')}`;
