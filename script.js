@@ -1675,8 +1675,10 @@ function endSimulation() {
     setTimeout(() => playSFX('crowd'), 500);
     addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida. Placar final: ${userSimMatch.homeTeam.name} ${userSimMatch.currentHomeGoals} x ${userSimMatch.currentAwayGoals} ${userSimMatch.awayTeam.name}!`, "info", 90);
 
-    document.getElementById('btn-live-continue').style.display = 'inline-block';
-    document.getElementById('btn-live-continue').onclick = finishMatchSimulation; // Garante que a função correta seja chamada
+    // Finaliza a simulação automaticamente após 2.5 segundos, mostrando o relatório
+    setTimeout(() => {
+        finishMatchSimulation();
+    }, 2500);
 }
 
 // Gera um evento aleatório no jogo do jogador (faltas, escanteios, chutes)
@@ -3171,6 +3173,7 @@ function handleSacking() {
 
 function showFinancialReport(report, attendance, capacity) {
     const modal = document.getElementById('modal-financial-report');
+    const overlay = document.getElementById('modal-financial-overlay');
     if (!modal) return;
     
     // Atualiza os valores detalhados no modal
@@ -3194,11 +3197,14 @@ function showFinancialReport(report, attendance, capacity) {
         document.getElementById('texto-lucro-total').innerText = `💰 LUCRO TOTAL: R$ ${(report.totalRev || 0).toLocaleString('pt-BR')}`;
     }
     
-    modal.style.display = 'flex';
+    if (overlay) overlay.style.display = 'block';
+    modal.style.display = 'block';
 }
 
 function closeFinancialReport() {
     const modal = document.getElementById('modal-financial-report');
+    const overlay = document.getElementById('modal-financial-overlay');
+    if (overlay) overlay.style.display = 'none';
     if (modal) modal.style.display = 'none';
     showScreen('screen-main');
     updateDynamicBackground(myTeam.id);
