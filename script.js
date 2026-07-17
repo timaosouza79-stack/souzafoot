@@ -1619,6 +1619,8 @@ function getGoalProbabilities(match) {
 
 // Avança instantaneamente para os 90 minutos simulando dinamicamente os minutos restantes
 function skipMatch() {
+    if (window.simulationEnded) return;
+    
     // Stop any running simulated loop and run fast-forward logic
     simController.stop();
     simInterval = null;
@@ -1663,11 +1665,13 @@ function skipMatch() {
 
     playSFX('whistle');
     setTimeout(() => playSFX('crowd'), 500);
-    endSimulation();
+    endSimulation(true);
 }
 
 // Finaliza o tempo de jogo
-function endSimulation() {
+function endSimulation(immediate = false) {
+    if (window.simulationEnded) return;
+    window.simulationEnded = true;
     simController.stop();
     simInterval = null;
 
@@ -1675,10 +1679,14 @@ function endSimulation() {
     setTimeout(() => playSFX('crowd'), 500);
     addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida. Placar final: ${userSimMatch.homeTeam.name} ${userSimMatch.currentHomeGoals} x ${userSimMatch.currentAwayGoals} ${userSimMatch.awayTeam.name}!`, "info", 90);
 
-    // Finaliza a simulação automaticamente após 2.5 segundos, mostrando o relatório
-    setTimeout(() => {
+    if (immediate) {
         finishMatchSimulation();
-    }, 2500);
+    } else {
+        // Finaliza a simulação automaticamente após 2.5 segundos, mostrando o relatório
+        setTimeout(() => {
+            finishMatchSimulation();
+        }, 2500);
+    }
 }
 
 // Gera um evento aleatório no jogo do jogador (faltas, escanteios, chutes)
@@ -1915,6 +1923,7 @@ function autoSelectStarters(team) {
 
 // Inicia a rodada com a simulação ao vivo interativa
 function playRound() {
+    window.simulationEnded = false;
     if (currentRound > matchSchedule.length) {
         checkSeasonEnd();
         return;
