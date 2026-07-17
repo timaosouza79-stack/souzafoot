@@ -3036,15 +3036,25 @@ function finishMatchSimulation() {
                 if (p.playedInMatch) {
                     p.matchesPlayed = (p.matchesPlayed || 0) + 1;
                     
-                    if (p.startedMatch) {
-                        p.energy = Math.max(0, (p.energy || 100) - (Math.floor(Math.random() * 11) + 15)); // Perde 15 a 25
-                    } else {
-                        p.energy = Math.max(0, (p.energy || 100) - (Math.floor(Math.random() * 5) + 8)); // Perde 8 a 12
+                    let energyLoss = p.startedMatch ? (Math.floor(Math.random() * 11) + 15) : (Math.floor(Math.random() * 5) + 8);
+                    
+                    // Modificador de Foco de Treino
+                    if (team.id === myTeam.id && team.tactics && team.tactics.trainingFocus) {
+                        if (team.tactics.trainingFocus === 'Intenso') energyLoss += 8;
+                        if (team.tactics.trainingFocus === 'Recuperacao') energyLoss -= 8;
                     }
+                    
+                    p.energy = Math.max(0, (p.energy || 100) - energyLoss);
                     p.morale = Math.min(100, (p.morale || 100) + 5);
                     
-                    // Chance de lesão baseada na energia
-                    if (Math.random() < ((p.energy || 100) < 40 ? 0.15 : 0.005)) {
+                    // Chance de lesão baseada na energia e Foco de Treino
+                    let injuryRisk = (p.energy || 100) < 40 ? 0.15 : 0.005;
+                    if (team.id === myTeam.id && team.tactics && team.tactics.trainingFocus) {
+                        if (team.tactics.trainingFocus === 'Intenso') injuryRisk *= 2.5;
+                        if (team.tactics.trainingFocus === 'Recuperacao') injuryRisk /= 4;
+                    }
+                    
+                    if (Math.random() < injuryRisk) {
                         p.injuryRounds = Math.floor(Math.random() * 3) + 1;
                         p.isStarter = false;
                         if (team.id === myTeam.id) {
@@ -3065,7 +3075,12 @@ function finishMatchSimulation() {
                     
                 } else if (!p.injuryRounds || p.injuryRounds === 0) {
                     // Quem não joga recupera energia e perde moral
-                    p.energy = Math.min(100, (p.energy || 100) + 25);
+                    let energyGain = 25;
+                    if (team.id === myTeam.id && team.tactics && team.tactics.trainingFocus) {
+                        if (team.tactics.trainingFocus === 'Intenso') energyGain -= 10;
+                        if (team.tactics.trainingFocus === 'Recuperacao') energyGain += 15;
+                    }
+                    p.energy = Math.min(100, (p.energy || 100) + energyGain);
                     p.morale = Math.max(0, (p.morale || 100) - 5);
                 }
                 // Limpa as flags temporárias de todos os jogadores para a próxima rodada
@@ -3495,6 +3510,23 @@ function getTeamTacticalModifiers(team) {
             if (cornerPlayer && cornerPlayer.isStarter) {
                 attackMod += (cornerPlayer.strength / 100) * 0.02;
             }
+        }
+        
+        // 5. Foco de Treino Semanal
+        const trainingFocus = team.tactics.trainingFocus || 'Equilibrado';
+        if (trainingFocus === 'Intenso') {
+            attackMod += 0.05;
+            defenseMod -= 0.05; // attackMod > 1 gives more power, defenseMod < 1 gives more solid defense. Wait, let's look at mentality.
+            // Mentality: 'Ofensivo' -> defenseMod += 0.15 (Mais exposto a sofrer gols).
+            // Intenso should just increase both attacking and defending power (so attackMod+, defenseMod-).
+            // Let's use:
+            // attackMod += 0.05;
+            // defenseMod -= 0.05;
+        } else if (trainingFocus === 'Tecnico') {
+            attackMod += 0.08;
+        } else if (trainingFocus === 'Recuperacao') {
+            attackMod -= 0.03;
+            defenseMod += 0.03;
         }
     }
 
@@ -4080,6 +4112,9 @@ function renderTacticsPanel() {
         document.getElementById('tactics-playstyle').value = myTeam.tactics.playstyle || 'Posse de Bola';
     }
     document.getElementById('tactics-laterais').value = myTeam.tactics.laterais;
+    if (document.getElementById('tactics-training')) {
+        document.getElementById('tactics-training').value = myTeam.tactics.trainingFocus || 'Equilibrado';
+    }
 
     // 2. Preenche os seletores de funções (Capitão, Faltas, Escanteios) com os titulares atuais
     const starters = myTeam.squad.filter(p => p.isStarter);
@@ -4142,6 +4177,9 @@ function updateTactics() {
         myTeam.tactics.playstyle = document.getElementById('tactics-playstyle').value;
     }
     myTeam.tactics.laterais = document.getElementById('tactics-laterais').value;
+    if (document.getElementById('tactics-training')) {
+        myTeam.tactics.trainingFocus = document.getElementById('tactics-training').value;
+    }
 
     myTeam.tactics.captain = Number(document.getElementById('tactics-captain').value);
     myTeam.tactics.freekicks = Number(document.getElementById('tactics-freekicks').value);

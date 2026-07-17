@@ -224,6 +224,16 @@
                                 <option value="Apoiando">Laterais Sobem (Apoio Ofensivo)</option>
                             </select>
                         </div>
+                        
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label for="tactics-training">Foco de Treino Semanal</label>
+                            <select id="tactics-training" class="form-control" onchange="updateTactics()">
+                                <option value="Equilibrado">Equilibrado (Normal)</option>
+                                <option value="Recuperacao">Recuperação Física (+Energia, Menor Risco de Lesão)</option>
+                                <option value="Intenso">Físico Intenso (+Força, -Energia, Alto Risco de Lesão)</option>
+                                <option value="Tecnico">Treino Técnico (+Ataque, Energia Normal)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="tactics-card">
