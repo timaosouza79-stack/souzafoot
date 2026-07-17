@@ -2217,6 +2217,9 @@ function playRound() {
     document.getElementById('btn-live-continue').style.display = 'none';
     document.getElementById('btn-live-continue').onclick = finishMatchSimulation;
     
+    const relatorioDiv = document.getElementById('relatorio-fim-de-jogo');
+    if (relatorioDiv) relatorioDiv.style.display = 'none';
+    
     showScreen('screen-match-live');
     simMinute = 0;
     subsUsedInMatch = 0;
@@ -3076,6 +3079,15 @@ function finishMatchSimulation() {
             matchReport.totalRev = myTeam.balance - initialBalance;
             matchReport.prizeRev = matchReport.totalRev - matchReport.ticketRev - matchReport.commRev - matchReport.sponRev - matchReport.tvRev;
             window.lastMatchReport = matchReport;
+            
+            const relatorio = document.getElementById('relatorio-fim-de-jogo');
+            if (relatorio) {
+                relatorio.style.display = 'block';
+                document.getElementById('texto-publico').innerText = `🏟️ Bilheteira: R$ ${matchReport.ticketRev.toLocaleString('pt-BR')}`;
+                document.getElementById('texto-comercio').innerText = `🍔 Comércio: R$ ${matchReport.commRev.toLocaleString('pt-BR')}`;
+                document.getElementById('texto-patrocinios').innerText = `🤝 Patrocínios: R$ ${matchReport.sponRev.toLocaleString('pt-BR')}`;
+                document.getElementById('texto-lucro-total').innerText = `💰 LUCRO TOTAL: R$ ${matchReport.totalRev.toLocaleString('pt-BR')}`;
+            }
         }
 
     } catch (error) {
