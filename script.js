@@ -2981,6 +2981,7 @@ function finishMatchSimulation() {
         }
         // -----------------------------------------------------------
         
+        const currentType = matchSchedule[currentRound - 1].type;
         if (isCupMode) {
             finishCupRound();
         } else if (currentType === 'continental') {
