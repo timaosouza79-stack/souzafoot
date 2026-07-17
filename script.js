@@ -3095,26 +3095,18 @@ function finishMatchSimulation() {
             matchReport.prizeRev = matchReport.totalRev - matchReport.ticketRev - matchReport.commRev - matchReport.sponRev - matchReport.tvRev;
             window.lastMatchReport = matchReport;
             
-            const relatorio = document.getElementById('relatorio-fim-de-jogo');
-            if (relatorio) {
-                relatorio.style.display = 'block';
-                
-                let attendance = 0;
-                let capacity = myTeam.stadiumCapacity || 10000;
-                if (userSimMatch) {
-                    attendance = userSimMatch.attendance || 0;
-                    if (userSimMatch.home !== myTeam.id) {
-                        const opp = allTeams.find(t => t.id === userSimMatch.home);
-                        if (opp) capacity = opp.stadiumCapacity || 10000;
-                    }
+            // Calcula o público para passar ao relatório financeiro
+            let attendance = 0;
+            let capacity = myTeam.stadiumCapacity || 10000;
+            if (userSimMatch) {
+                attendance = userSimMatch.attendance || 0;
+                if (userSimMatch.home !== myTeam.id) {
+                    const opp = allTeams.find(t => t.id === userSimMatch.home);
+                    if (opp) capacity = opp.stadiumCapacity || 10000;
                 }
-                
-                document.getElementById('texto-publico').innerText = `👥 Público Presente: ${attendance.toLocaleString('pt-BR')} / ${capacity.toLocaleString('pt-BR')}`;
-                document.getElementById('texto-bilheteira').innerText = `🏟️ Bilheteira: R$ ${matchReport.ticketRev.toLocaleString('pt-BR')}`;
-                document.getElementById('texto-comercio').innerText = `🍔 Comércio: R$ ${matchReport.commRev.toLocaleString('pt-BR')}`;
-                document.getElementById('texto-patrocinios').innerText = `🤝 Patrocínios: R$ ${matchReport.sponRev.toLocaleString('pt-BR')}`;
-                document.getElementById('texto-lucro-total').innerText = `💰 LUCRO TOTAL: R$ ${matchReport.totalRev.toLocaleString('pt-BR')}`;
             }
+            window.lastMatchAttendance = attendance;
+            window.lastMatchCapacity = capacity;
         }
 
     } catch (error) {
@@ -3128,8 +3120,10 @@ function finishMatchSimulation() {
         saveGame();
         
         if (window.lastMatchReport) {
-            showFinancialReport(window.lastMatchReport);
+            showFinancialReport(window.lastMatchReport, window.lastMatchAttendance, window.lastMatchCapacity);
             window.lastMatchReport = null;
+            window.lastMatchAttendance = null;
+            window.lastMatchCapacity = null;
         } else {
             showScreen('screen-main');
             updateDynamicBackground(myTeam.id);
@@ -3174,33 +3168,31 @@ function handleSacking() {
     }
 }
 
-function showFinancialReport(report) {
+function showFinancialReport(report, attendance, capacity) {
     const modal = document.getElementById('modal-financial-report');
-    const content = document.getElementById('financial-report-content');
-    if (!modal || !content) return;
+    if (!modal) return;
     
-    let html = `<ul style="list-style: none; padding: 0; margin: 0; line-height: 1.8;">`;
-    if (report.isHome) {
-        html += `<li style="display: flex; justify-content: space-between;"><span>Bilhetes:</span> <span style="color: #4CAF50;">R$ ${report.ticketRev.toLocaleString('pt-BR')}</span></li>`;
-        html += `<li style="display: flex; justify-content: space-between;"><span>Comércio:</span> <span style="color: #4CAF50;">R$ ${report.commRev.toLocaleString('pt-BR')}</span></li>`;
-    } else {
-        html += `<li style="display: flex; justify-content: space-between;"><span>Direitos TV:</span> <span style="color: #4CAF50;">R$ ${report.tvRev.toLocaleString('pt-BR')}</span></li>`;
+    // Atualiza os valores detalhados no modal
+    if (document.getElementById('texto-publico')) {
+        document.getElementById('texto-publico').innerText = `👥 Público Presente: ${attendance ? attendance.toLocaleString('pt-BR') : '--'} / ${capacity ? capacity.toLocaleString('pt-BR') : '--'}`;
     }
     
-    html += `<li style="display: flex; justify-content: space-between;"><span>Patrocínios:</span> <span style="color: #4CAF50;">R$ ${report.sponRev.toLocaleString('pt-BR')}</span></li>`;
-    
-    if (report.prizeRev > 0) {
-        html += `<li style="display: flex; justify-content: space-between;"><span>Prêmio de Jogo:</span> <span style="color: #4CAF50;">R$ ${report.prizeRev.toLocaleString('pt-BR')}</span></li>`;
-    } else if (report.prizeRev < 0) {
-        html += `<li style="display: flex; justify-content: space-between;"><span>Despesas:</span> <span style="color: #f44336;">R$ ${report.prizeRev.toLocaleString('pt-BR')}</span></li>`;
+    if (document.getElementById('texto-bilheteira')) {
+        document.getElementById('texto-bilheteira').innerText = `🏟️ Bilheteira: R$ ${(report.ticketRev || 0).toLocaleString('pt-BR')}`;
     }
     
-    html += `<li style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 10px; padding-top: 10px; display: flex; justify-content: space-between; font-weight: bold;">
-                <span>LUCRO TOTAL:</span> <span style="color: #4CAF50;">R$ ${report.totalRev.toLocaleString('pt-BR')}</span>
-             </li>`;
-    html += `</ul>`;
+    if (document.getElementById('texto-comercio')) {
+        document.getElementById('texto-comercio').innerText = `🍔 Comércio: R$ ${(report.commRev || 0).toLocaleString('pt-BR')}`;
+    }
     
-    content.innerHTML = html;
+    if (document.getElementById('texto-patrocinios')) {
+        document.getElementById('texto-patrocinios').innerText = `🤝 Patrocínios: R$ ${(report.sponRev || 0).toLocaleString('pt-BR')}`;
+    }
+    
+    if (document.getElementById('texto-lucro-total')) {
+        document.getElementById('texto-lucro-total').innerText = `💰 LUCRO TOTAL: R$ ${(report.totalRev || 0).toLocaleString('pt-BR')}`;
+    }
+    
     modal.style.display = 'flex';
 }
 
