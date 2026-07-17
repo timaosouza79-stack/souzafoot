@@ -13,14 +13,56 @@ function initSulAmericana(silent = false) {
             pTeams = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(t.league))
                              .sort((a, b) => b.strength - a.strength).slice(32, 64);
         } else {
-            const saQualifiers = allTeams.filter(t => t.league === 'south_america');
-            pTeams = saQualifiers.sort((a, b) => b.strength - a.strength).slice(25, 57);
-            if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !pTeams.find(t => t.id === myTeam.id) && sulAmericanaParticipants.includes(myTeam.id)) {
-                pTeams.push(myTeam);
+            // FIX: Mix obrigatório — vagas sul-americanas estrangeiras + vagas brasileiras
+            // 8 vagas garantidas para times estrangeiros clássicos CONMEBOL
+            const VAGAS_EST_SUL = 8;
+            let estrangeiros = [];
+            if (typeof getEquipasEstrangeirasSulAmericanas === 'function') {
+                estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_EST_SUL);
+            } else {
+                // Fallback: pega os mais fortes da south_america
+                estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id)
+                                       .sort(() => 0.5 - Math.random()).slice(0, VAGAS_EST_SUL);
             }
+
+            const estIds = new Set(estrangeiros.map(t => t.id));
+
+            // Pega os qualificadores brasileiros para a Sul-Americana (posicões 7º-12º do Brasileirão)
+            const brSulIds = ['fortaleza', 'cruzeiro', 'corinthians', 'internacional', 'bahia', 'athleticopr',
+                              'gremio', 'vasco', 'santos', 'sport', 'ceara', 'fluminense', 'bragantino', 'cuiaba'];
+            let brSulQualifiers = allTeams.filter(t => brSulIds.includes(t.id) && !estIds.has(t.id));
+
+            if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brSulQualifiers.find(t => t.id === myTeam.id) && !estIds.has(myTeam.id)) {
+                brSulQualifiers.unshift(myTeam);
+            }
+
+            brSulQualifiers.sort((a, b) => b.strength - a.strength);
+            const vagasBrasil = 32 - estrangeiros.length;
+            const brSelecionados = brSulQualifiers.slice(0, vagasBrasil);
+
+            pTeams = [...estrangeiros, ...brSelecionados];
         } 
     } else {
         pTeams = sulAmericanaParticipants.map(id => allTeams.find(t => t.id === id)).filter(t => t);
+
+        // FIX: Se os participants vieram apenas de times brasileiros, injeta estrangeiros
+        if (!isEurope) {
+            const temEstrangeiro = pTeams.some(t => t.league === 'south_america');
+            if (!temEstrangeiro) {
+                const VAGAS_EST_SUL = 8;
+                let estrangeiros = [];
+                if (typeof getEquipasEstrangeirasSulAmericanas === 'function') {
+                    estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_EST_SUL);
+                } else {
+                    estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id)
+                                           .sort(() => 0.5 - Math.random()).slice(0, VAGAS_EST_SUL);
+                }
+                const estIds = estrangeiros.map(t => t.id);
+                pTeams = pTeams.filter(t => !estIds.includes(t.id));
+                pTeams = pTeams.slice(0, 32 - estrangeiros.length);
+                pTeams = [...estrangeiros, ...pTeams];
+            }
+        }
     }
 
     if (pTeams.length < 32) {

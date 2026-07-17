@@ -908,6 +908,59 @@ function ensureShields() {
     });
 }
 
+// ============================================================
+// BASE FIXA DE CLUBES CLÁSSICOS SUL-AMERICANOS (CONMEBOL)
+// Garante presença de estrangeiros na Libertadores e Sul-Am.
+// ============================================================
+const equipasSulAmericanas = [
+    // Argentina
+    { id: 'riverplate', vagas: 2 },
+    { id: 'bocajuniors', vagas: 2 },
+    { id: 'racing', vagas: 1 },
+    { id: 'sanlorenzo', vagas: 1 },
+    { id: 'talleres', vagas: 1 },
+    { id: 'estudiantes', vagas: 1 },
+    { id: 'rosariocentral', vagas: 1 },
+    // Uruguai
+    { id: 'penarol', vagas: 1 },
+    { id: 'nacional', vagas: 1 },
+    // Chile
+    { id: 'colocolo', vagas: 1 },
+    { id: 'ucatolica', vagas: 1 },
+    // Equador
+    { id: 'ldu', vagas: 1 },
+    { id: 'independientedelvalle', vagas: 1 },
+    { id: 'barcelonasc', vagas: 1 },
+    // Paraguai
+    { id: 'olimpia', vagas: 1 },
+    { id: 'cerroporteno', vagas: 1 },
+    { id: 'libertad', vagas: 1 },
+    // Colômbia
+    { id: 'atleticonacional', vagas: 1 },
+    { id: 'millonarios', vagas: 1 },
+    { id: 'junior', vagas: 1 },
+    // Peru
+    { id: 'alianzalima', vagas: 1 },
+    { id: 'sportingcristal', vagas: 1 },
+    // Bolívia
+    { id: 'bolivar', vagas: 1 },
+    { id: 'thestrongest', vagas: 1 },
+    // Chile
+    { id: 'udechile', vagas: 1 },
+];
+
+/**
+ * Retorna um array de equipas estrangeiras sul-americanas para compor as taças,
+ * garantindo diversidade de países. Embaralha para variedade a cada sorteio.
+ */
+function getEquipasEstrangeirasSulAmericanas(quantidade) {
+    const ids = equipasSulAmericanas.map(e => e.id);
+    const disponiveis = allTeams.filter(t => ids.includes(t.id) && t.id !== myTeam.id);
+    // Embaralha aleatoriamente para variedade
+    disponiveis.sort(() => 0.5 - Math.random());
+    return disponiveis.slice(0, quantidade);
+}
+
 function initLibertadores(silent = false) {
     if (libertadoresGroups.length > 0 || libertadoresBracket.length > 0) return;
 
@@ -918,29 +971,51 @@ function initLibertadores(silent = false) {
     const isBrazil = myTeam.league.startsWith('brazil');
     const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(myTeam.league);
 
-    // Se for a primeira temporada, usamos times reais/fortes de 2026
     if (libertadoresParticipants.length === 0) {
         if (isEurope) {
             pTeams = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(t.league))
                              .sort((a, b) => b.strength - a.strength).slice(0, 32);
         } else {
-        // IDs de times brasileiros que costumam estar na Libertadores
-        const brIds = ['flamengo', 'palmeiras', 'botafogo', 'atleticomg', 'saopaulo', 'fluminense', 'fortaleza', 'cruzeiro', 'corinthians', 'internacional', 'bahia', 'athleticopr', 'gremio', 'vasco'];
-        let brQualifiers = allTeams.filter(t => brIds.includes(t.id));
-        
-        // Garante que o time do jogador participe se ele for de uma liga que dá vaga (Brasil A ou S. Am)
-        if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brQualifiers.find(t => t.id === myTeam.id)) {
-            brQualifiers.push(myTeam);
-        }
-        
-        // Times da América do Sul
-        const saQualifiers = allTeams.filter(t => t.league === 'south_america');
-        
-        // Seleciona os times mais fortes entre brasileiros convidados e sul-americanos
-        pTeams = [...brQualifiers, ...saQualifiers].sort((a, b) => b.strength - a.strength).slice(0, 32);
+            // FIX: Mix obrigatório — vagas brasileiras + vagas de clubes estrangeiros sul-americanos
+            // 8 vagas para times estrangeiros CONMEBOL clássicos
+            const VAGAS_ESTRANGEIROS_LIB = 8;
+            const estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_ESTRANGEIROS_LIB);
+
+            // IDs dos estrangeiros já escolhidos (para não duplicar)
+            const estrangeirosIds = estrangeiros.map(t => t.id);
+
+            // IDs de times brasileiros que costumam estar na Libertadores (6 vagas diretas mínimas)
+            const brIds = ['flamengo', 'palmeiras', 'botafogo', 'atleticomg', 'saopaulo', 'fluminense', 'fortaleza', 'cruzeiro', 'corinthians', 'internacional', 'bahia', 'athleticopr', 'gremio', 'vasco'];
+            let brQualifiers = allTeams.filter(t => brIds.includes(t.id) && !estrangeirosIds.includes(t.id));
+
+            // Garante que o time do jogador participe
+            if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brQualifiers.find(t => t.id === myTeam.id) && !estrangeirosIds.includes(myTeam.id)) {
+                brQualifiers.unshift(myTeam);
+            }
+
+            // Ordena brasileiros por força e pega os melhores para completar 32
+            brQualifiers.sort((a, b) => b.strength - a.strength);
+            const vagasBrasil = 32 - estrangeiros.length;
+            const brSelecionados = brQualifiers.slice(0, vagasBrasil);
+
+            pTeams = [...estrangeiros, ...brSelecionados];
         } 
     } else {
         pTeams = libertadoresParticipants.map(id => allTeams.find(t => t.id === id)).filter(t => t);
+
+        // FIX: Se os participants vieram APENAS de times brasileiros, injeta estrangeiros
+        if (!isEurope) {
+            const temEstrangeiro = pTeams.some(t => t.league === 'south_america');
+            if (!temEstrangeiro) {
+                const VAGAS_ESTRANGEIROS_LIB = 8;
+                const estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_ESTRANGEIROS_LIB);
+                const estIds = estrangeiros.map(t => t.id);
+                // Remove alguns times brasileiros para abrir vagas e injeta estrangeiros
+                pTeams = pTeams.filter(t => !estIds.includes(t.id));
+                pTeams = pTeams.slice(0, 32 - estrangeiros.length);
+                pTeams = [...estrangeiros, ...pTeams];
+            }
+        }
     }
 
     // GARANTIA: Se houver menos de 32 times, preenche com os mais fortes disponíveis no jogo
@@ -2430,22 +2505,58 @@ function checkSeasonEnd() {
     if (isEurope) {
         // Pega todos os times europeus de elite (excluindo os do país atual que já se classificaram)
         continentalPool = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(t.league) && t.league !== myTeam.league);
+        continentalPool = continentalPool.sort((a, b) => b.strength - a.strength);
+
+        // Preenche a Competição de Nível 1 (Champions)
+        const neededLib = 32 - nextLibParticipants.length;
+        continentalPool.slice(0, neededLib).forEach(t => nextLibParticipants.push(t.id));
+
+        // Preenche a Competição de Nível 2 (Europa League)
+        const neededSul = 32 - nextSulParticipants.length;
+        continentalPool.slice(neededLib, neededLib + neededSul).forEach(t => nextSulParticipants.push(t.id));
     } else {
-        // Pega times do Brasil e América do Sul
-        continentalPool = allTeams.filter(t => (t.league === 'south_america' || t.league === 'brazil_a') && t.league !== myTeam.league);
+        // FIX: Para Libertadores e Sul-Americana, garantir MIX de brasileiros + estrangeiros sul-americanos
+        // Pool de times estrangeiros (south_america)
+        const poolEstrangeiros = allTeams.filter(t => t.league === 'south_america').sort(() => 0.5 - Math.random());
+        // Pool de times brasileiros (brazil_a) não classificados ainda
+        const poolBrasil = allTeams.filter(t => t.league === 'brazil_a' && t.league !== myTeam.league).sort((a, b) => b.strength - a.strength);
+
+        // --- Libertadores: mínimo 6 vagas para estrangeiros ---
+        const neededLib = 32 - nextLibParticipants.length;
+        const vagasEstLibMin = Math.min(6, neededLib);
+        const estLibIds = new Set(nextLibParticipants);
+
+        const estLibFill = poolEstrangeiros.filter(t => !estLibIds.has(t.id)).slice(0, vagasEstLibMin);
+        estLibFill.forEach(t => nextLibParticipants.push(t.id));
+
+        const estLibIds2 = new Set(nextLibParticipants);
+        const brLibFill = poolBrasil.filter(t => !estLibIds2.has(t.id)).slice(0, 32 - nextLibParticipants.length);
+        brLibFill.forEach(t => nextLibParticipants.push(t.id));
+
+        // Se ainda faltar, completa com mais estrangeiros
+        if (nextLibParticipants.length < 32) {
+            const usedIds = new Set(nextLibParticipants);
+            poolEstrangeiros.filter(t => !usedIds.has(t.id)).slice(0, 32 - nextLibParticipants.length).forEach(t => nextLibParticipants.push(t.id));
+        }
+
+        // --- Sul-Americana: mínimo 6 vagas para estrangeiros ---
+        const neededSul = 32 - nextSulParticipants.length;
+        const vagasEstSulMin = Math.min(6, neededSul);
+        const estSulIds = new Set(nextSulParticipants);
+
+        const estSulFill = poolEstrangeiros.filter(t => !estSulIds.has(t.id)).slice(0, vagasEstSulMin);
+        estSulFill.forEach(t => nextSulParticipants.push(t.id));
+
+        const estSulIds2 = new Set(nextSulParticipants);
+        const brSulFill = poolBrasil.filter(t => !estSulIds2.has(t.id)).slice(0, 32 - nextSulParticipants.length);
+        brSulFill.forEach(t => nextSulParticipants.push(t.id));
+
+        // Se ainda faltar, completa com mais estrangeiros
+        if (nextSulParticipants.length < 32) {
+            const usedIds = new Set(nextSulParticipants);
+            allTeams.filter(t => t.league === 'south_america' && !usedIds.has(t.id)).slice(0, 32 - nextSulParticipants.length).forEach(t => nextSulParticipants.push(t.id));
+        }
     }
-    
-    continentalPool = continentalPool.sort((a, b) => b.strength - a.strength);
-    
-    // Preenche a Competição de Nível 1 (Champions/Libertadores)
-    const neededLib = 32 - nextLibParticipants.length;
-    const fillersLib = continentalPool.slice(0, neededLib);
-    fillersLib.forEach(t => nextLibParticipants.push(t.id));
-    
-    // Preenche a Competição de Nível 2 (Europa League/Sul-Americana)
-    const neededSul = 32 - nextSulParticipants.length;
-    const fillersSul = continentalPool.slice(neededLib, neededLib + neededSul);
-    fillersSul.forEach(t => nextSulParticipants.push(t.id));
 
     libertadoresParticipants = nextLibParticipants;
     sulAmericanaParticipants = nextSulParticipants;
