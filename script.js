@@ -1696,51 +1696,79 @@ function getGoalProbabilities(match) {
 function skipMatch() {
     if (window.simulationEnded) return;
     
-    // Stop any running simulated loop and run fast-forward logic
+    // Para qualquer loop em execução
     simController.stop();
     simInterval = null;
 
     addCommentaryItem("⚡ O jogo foi avançado rapidamente para os 90 minutos finais!", "info", simMinute);
 
-    while (simMinute < 90) {
-        simMinute++;
-        simulatedRoundMatches.forEach((m, idx) => {
-            const {
-                probA,
-                probB
-            } = getGoalProbabilities(m);
-            
-            // Simular cartões/disciplina no modo rápido
-            simulateDisciplines(m, simMinute);
+    // Simula todos os minutos restantes até ao minuto 90
+    try {
+        while (simMinute < 90) {
+            simMinute++;
+            simulatedRoundMatches.forEach((m, idx) => {
+                try {
+                    const { probA, probB } = getGoalProbabilities(m);
+                    
+                    simulateDisciplines(m, simMinute);
 
-            if (Math.random() < probA) {
-                m.currentHomeGoals++;
-                const scorerName = attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
-                if (m === userSimMatch) {
-                    addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.homeTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
+                    if (Math.random() < probA) {
+                        m.currentHomeGoals++;
+                        // FIX: null-check em homeTeam (partidas continentais podem não ter .homeTeam)
+                        if (m.homeTeam && m === userSimMatch) {
+                            const scorerName = attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
+                            addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.homeTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
+                        } else if (m.homeTeam) {
+                            attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
+                        }
+                    }
+                    if (Math.random() < probB) {
+                        m.currentAwayGoals++;
+                        // FIX: null-check em awayTeam
+                        if (m.awayTeam && m === userSimMatch) {
+                            const scorerName = attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
+                            addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.awayTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
+                        } else if (m.awayTeam) {
+                            attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
+                        }
+                    }
+                    
+                    updateOtherMatchUI(idx, m);
+                } catch (matchErr) {
+                    console.warn('Erro num jogo durante skipMatch (minuto ' + simMinute + '):', matchErr);
                 }
-            }
-            if (Math.random() < probB) {
-                m.currentAwayGoals++;
-                const scorerName = attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
-                if (m === userSimMatch) {
-                    addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.awayTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
-                }
-            }
-            
-            updateOtherMatchUI(idx, m);
-        });
+            });
+        }
+    } catch (loopErr) {
+        console.error('Erro no loop de skipMatch:', loopErr);
     }
 
-    document.getElementById('live-home-score').innerText = userSimMatch.currentHomeGoals;
-    document.getElementById('live-away-score').innerText = userSimMatch.currentAwayGoals;
+    // Actualiza UI do placar com null-check
+    const homeScoreEl = document.getElementById('live-home-score');
+    const awayScoreEl = document.getElementById('live-away-score');
+    if (homeScoreEl && userSimMatch) homeScoreEl.innerText = userSimMatch.currentHomeGoals;
+    if (awayScoreEl && userSimMatch) awayScoreEl.innerText = userSimMatch.currentAwayGoals;
 
-    document.getElementById('live-match-minute').innerText = 90;
-    document.getElementById('live-progress-bar').style.width = '100%';
+    const minEl = document.getElementById('live-match-minute');
+    const barEl = document.getElementById('live-progress-bar');
+    if (minEl) minEl.innerText = 90;
+    if (barEl) barEl.style.width = '100%';
 
     playSFX('whistle');
     setTimeout(() => playSFX('crowd'), 500);
-    endSimulation(true);
+    
+    // FIX: Envolve a chamada final em try/catch para garantir que nunca congela
+    try {
+        endSimulation(true);
+    } catch (e) {
+        console.error('Erro crítico em skipMatch ao chamar endSimulation:', e);
+        window.simulationEnded = true;
+        try { finishMatchSimulation(); } catch (e2) {
+            console.error('Erro também em finishMatchSimulation:', e2);
+            showScreen('screen-main');
+            if (myTeam) updateDynamicBackground(myTeam.id);
+        }
+    }
 }
 
 // Finaliza o tempo de jogo
@@ -1752,7 +1780,13 @@ function endSimulation(immediate = false) {
 
     playSFX('whistle');
     setTimeout(() => playSFX('crowd'), 500);
-    addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida. Placar final: ${userSimMatch.homeTeam.name} ${userSimMatch.currentHomeGoals} x ${userSimMatch.currentAwayGoals} ${userSimMatch.awayTeam.name}!`, "info", 90);
+    
+    // FIX: null-check em userSimMatch e homeTeam para evitar TypeError na mensagem final
+    if (userSimMatch && userSimMatch.homeTeam && userSimMatch.awayTeam) {
+        addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida. Placar final: ${userSimMatch.homeTeam.name} ${userSimMatch.currentHomeGoals} x ${userSimMatch.currentAwayGoals} ${userSimMatch.awayTeam.name}!`, "info", 90);
+    } else {
+        addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida.`, "info", 90);
+    }
 
     if (immediate) {
         finishMatchSimulation();
@@ -2992,7 +3026,11 @@ function updateStandings(teamId, goalsFor, goalsAgainst) {
 // Função que finaliza a rodada, processa resultados e avança o calendário
 function finishMatchSimulation() {
     console.log("finishMatchSimulation: Finalizando rodada...");
-    document.getElementById('btn-live-continue').style.display = 'none';
+    
+    // FIX BUG #1: Protege o acesso ao btn-live-continue com null-check
+    // Se este elemento não existir, a função quebrava silenciosamente ANTES do try/catch
+    const continueBtn = document.getElementById('btn-live-continue');
+    if (continueBtn) continueBtn.style.display = 'none';
 
     let matchReport = null;
     let initialBalance = 0;
@@ -3233,20 +3271,34 @@ function finishMatchSimulation() {
         }
 
     } catch (error) {
-        console.error("Erro ao processar fim da rodada:", error);
+        console.error("ERRO CRÍTICO ao processar fim da rodada:", error);
+        // FIX BUG FALLBACK: Em caso de erro inesperado, garante que o jogo não congela
+        // O finally abaixo vai sempre correr e avançar a rodada de forma segura
     } finally {
         currentRound++;
         isCupMode = false;
         isLibertadoresMode = false;
         
+        // FIX: Garante que o btn-live-continue é sempre escondido no finally
+        const finBtn = document.getElementById('btn-live-continue');
+        if (finBtn) finBtn.style.display = 'none';
+        
         updateDashboardUI();
         saveGame();
         
         if (window.lastMatchReport) {
-            showFinancialReport(window.lastMatchReport, window.lastMatchAttendance, window.lastMatchCapacity);
-            window.lastMatchReport = null;
-            window.lastMatchAttendance = null;
-            window.lastMatchCapacity = null;
+            try {
+                showFinancialReport(window.lastMatchReport, window.lastMatchAttendance, window.lastMatchCapacity);
+            } catch (reportErr) {
+                console.error("Erro ao mostrar relatório financeiro:", reportErr);
+                showScreen('screen-main');
+                updateDynamicBackground(myTeam.id);
+                window.scrollTo(0,0);
+            } finally {
+                window.lastMatchReport = null;
+                window.lastMatchAttendance = null;
+                window.lastMatchCapacity = null;
+            }
         } else {
             showScreen('screen-main');
             updateDynamicBackground(myTeam.id);
@@ -3264,6 +3316,7 @@ function finishMatchSimulation() {
         }, 800);
     }
 }
+
 
 function handleSacking() {
     const modal = document.getElementById('modal-sacked');
@@ -3393,7 +3446,11 @@ function finishLibertadoresRound() {
             let a = libertadoresGroupStandings.find(s => s.id === awayId);
             
             if (!h || !a) return; // Segurança contra times não encontrados
-            console.log(`finishLibertadoresRound: Processando partida de grupo ${m.homeTeam.name} vs ${m.awayTeam.name}`);
+            // FIX BUG #2: m.homeTeam pode ser undefined em partidas continentais (sem enriquecimento)
+            // Usa fallback seguro para o log
+            const htName = (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : m.home;
+            const atName = (m.awayTeam && m.awayTeam.name) ? m.awayTeam.name : m.away;
+            console.log(`finishLibertadoresRound: Processando partida de grupo ${htName} vs ${atName}`);
 
             h.j++; a.j++; h.gp += m.currentHomeGoals; h.gc += m.currentAwayGoals; a.gp += m.currentAwayGoals; a.gc += m.currentHomeGoals;
             h.sg = h.gp - h.gc; a.sg = a.gp - a.gc;
@@ -3439,7 +3496,10 @@ function finishLibertadoresRound() {
             if (homeGoals === awayGoals) {
                 if (Math.random() > 0.5) homeGoals++; else awayGoals++;
             }
-            console.log(`finishLibertadoresRound: Processando partida de mata-mata ${m.homeTeam.name} vs ${m.awayTeam.name}`);
+            // FIX BUG #3: m.homeTeam pode ser undefined em partidas de mata-mata continental
+            const htNameKO = (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : m.home;
+            const atNameKO = (m.awayTeam && m.awayTeam.name) ? m.awayTeam.name : m.away;
+            console.log(`finishLibertadoresRound: Processando partida de mata-mata ${htNameKO} vs ${atNameKO}`);
             const winnerId = homeGoals > awayGoals ? m.home : m.away;
             const winnerObj = allTeams.find(t => t.id === winnerId);
             if (winnerObj) winners.push(winnerObj);
