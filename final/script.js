@@ -2,27 +2,84 @@
 const sponsorBrands = {
     level1: [
         { brand: "Guaraná Antarctica", domain: "guaranaantarctica.com.br" },
-        { brand: "Continente", domain: "continente.pt" },
-        { brand: "MEO", domain: "meo.pt" },
-        { brand: "Penalty", domain: "penalty.com.br" },
-        { brand: "Topper", domain: "topper.com.ar" }
+        { brand: "Continente",         domain: "continente.pt" },
+        { brand: "Pingo Doce",         domain: "pingodoce.pt" },
+        { brand: "MEO",                domain: "meo.pt" },
+        { brand: "Penalty",            domain: "penalty.com.br" },
+        { brand: "Topper",             domain: "topper.com.ar" },
+        { brand: "McDonald's",         domain: "mcdonalds.com" },
+        { brand: "Burger King",        domain: "burgerking.com" }
     ],
     level2: [
-        { brand: "Betano", domain: "betano.com" },
-        { brand: "Mercado Livre", domain: "mercadolivre.com.br" },
-        { brand: "Itaú", domain: "itau.com.br" },
-        { brand: "Nubank", domain: "nubank.com.br" },
-        { brand: "Vivo", domain: "vivo.com.br" }
+        { brand: "Betano",             domain: "betano.com" },
+        { brand: "Mercado Livre",      domain: "mercadolivre.com.br" },
+        { brand: "Itaú",               domain: "itau.com.br" },
+        { brand: "Nubank",             domain: "nubank.com.br" },
+        { brand: "Vivo",               domain: "vivo.com.br" },
+        { brand: "New Balance",        domain: "newbalance.com" },
+        { brand: "Puma",               domain: "puma.com" }
     ],
     level3: [
-        { brand: "Emirates", domain: "emirates.com" },
-        { brand: "Spotify", domain: "spotify.com" },
-        { brand: "Red Bull", domain: "redbull.com" },
-        { brand: "Nike", domain: "nike.com" },
-        { brand: "Samsung", domain: "samsung.com" },
-        { brand: "Mastercard", domain: "mastercard.com" }
+        { brand: "Emirates",           domain: "emirates.com" },
+        { brand: "Spotify",            domain: "spotify.com" },
+        { brand: "Red Bull",           domain: "redbull.com" },
+        { brand: "Nike",               domain: "nike.com" },
+        { brand: "Adidas",             domain: "adidas.com" },
+        { brand: "Samsung",            domain: "samsung.com" },
+        { brand: "Mastercard",         domain: "mastercard.com" }
     ]
 };
+
+const domainMap = {
+    'Coca-Cola':          'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Coca-Cola_logo.svg/256px-Coca-Cola_logo.svg.png',
+    'Guaraná Antarctica': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Guaran%C3%A1_Antarctica_logo.svg/256px-Guaran%C3%A1_Antarctica_logo.svg.png',
+    'Nike':               'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/256px-Logo_NIKE.svg.png',
+    'Adidas':             'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/256px-Adidas_Logo.svg.png',
+    'Puma':               'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Puma_Logo.svg/256px-Puma_Logo.svg.png',
+    'New Balance':        'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/New_Balance_logo.svg/256px-New_Balance_logo.svg.png',
+    "McDonald's":         'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/256px-McDonald%27s_Golden_Arches.svg.png',
+    'Burger King':        'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Burger_King_logo_%281999%29.svg/256px-Burger_King_logo_%281999%29.svg.png',
+    'Pingo Doce':         'https://upload.wikimedia.org/wikipedia/en/d/de/Pingo_Doce_logo.svg',
+    'Continente':         'https://logodownload.org/wp-content/uploads/2019/10/continente-logo.png',
+    'MEO':                'https://upload.wikimedia.org/wikipedia/commons/0/02/Meo_logo.svg',
+    'Penalty':            'https://logodownload.org/wp-content/uploads/2017/05/penalty-logo-1.png',
+    'Topper':             'https://logodownload.org/wp-content/uploads/2017/05/topper-logo.png',
+    'Betano':             'https://logodownload.org/wp-content/uploads/2021/07/betano-logo.png',
+    'Mercado Livre':      'https://logodownload.org/wp-content/uploads/2016/08/Mercado-Livre-logo-1.png',
+    'Itaú':               'https://logodownload.org/wp-content/uploads/2014/05/itau-logo-1.png',
+    'Nubank':             'https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-3.png',
+    'Vivo':               'https://logodownload.org/wp-content/uploads/2014/02/vivo-logo-1.png',
+    'Emirates':           'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Emirates_logo.svg/256px-Emirates_logo.svg.png',
+    'Spotify':            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Spotify_logo_with_text.svg/256px-Spotify_logo_with_text.svg.png',
+    'Red Bull':           'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Red_bull_logo.svg/256px-Red_bull_logo.svg.png',
+    'Samsung':            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Samsung_Logo.svg/256px-Samsung_Logo.svg.png',
+    'Mastercard':         'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/256px-Mastercard-logo.svg.png'
+};
+
+function getSponsorLogoUrl(brandName, fallbackDomain) {
+    if (!brandName) {
+        const domain = fallbackDomain || "google.com";
+        return `https://logo.clearbit.com/${domain}`;
+    }
+    
+    // Normaliza o nome da marca para busca tolerante (ex: "Coca-Cola" e "Coca Cola" viram "cocacola")
+    const normalized = brandName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    let mapped = null;
+    for (const key in domainMap) {
+        if (key.toLowerCase().replace(/[^a-z0-9]/g, '') === normalized) {
+            mapped = domainMap[key];
+            break;
+        }
+    }
+    
+    if (mapped && mapped.startsWith('http')) {
+        return mapped;
+    }
+    
+    const domain = mapped || fallbackDomain || "google.com";
+    return `https://logo.clearbit.com/${domain}`;
+}
 const sponsorSlots = ['Master', 'Costas', 'Mangas', 'Calcoes'];
 // ---------------------------------------
 
@@ -206,7 +263,35 @@ const teamsData = [
     {"id": "thestrongest", "name": "The Strongest", "strength": 71, "shield": "img/thestrongest_v3.png", "league": "south_america", "balance": 7000000, "stadium": "Hernando Siles", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Estadio_Hernando_Siles_La_Paz.jpg/600px-Estadio_Hernando_Siles_La_Paz.jpg"},
     {"id": "rosariocentral", "name": "Rosario Central", "strength": 77, "shield": "img/rosariocentral_v3.png", "league": "south_america", "balance": 18000000, "stadium": "Gigante de Arroyito", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Estadio_Gigante_de_Arroyito.jpg/600px-Estadio_Gigante_de_Arroyito.jpg"},
     {"id": "sanlorenzo", "name": "San Lorenzo", "strength": 78, "shield": "img/sanlorenzo_v3.png", "league": "south_america", "balance": 22000000, "stadium": "Nuevo Gasómetro", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Estadio_Pedro_Bidegain_interior.jpg/600px-Estadio_Pedro_Bidegain_interior.jpg"},
-    {"id": "ucatolica", "name": "Univ. Católica", "strength": 75, "shield": "img/ucatolica_v3.png", "league": "south_america", "balance": 15000000, "stadium": "San Carlos de Apoquindo", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Estadio_San_Carlos_de_Apoquindo.jpg/600px-Estadio_San_Carlos_de_Apoquindo.jpg"}
+    {"id": "ucatolica", "name": "Univ. Católica", "strength": 75, "shield": "img/ucatolica_v3.png", "league": "south_america", "balance": 15000000, "stadium": "San Carlos de Apoquindo", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Estadio_San_Carlos_de_Apoquindo.jpg/600px-Estadio_San_Carlos_de_Apoquindo.jpg"},
+    {"id": "independiente", "name": "Independiente", "strength": 79, "shield": "https://upload.wikimedia.org/wikipedia/commons/d/db/Escudo_del_Club_Atl%C3%A9tico_Independiente.svg", "league": "south_america", "balance": 25000000, "stadium": "Libertadores de América", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Estadio_Libertadores_de_Am%C3%A9rica_-_Ricardo_Enrique_Bochini.jpg/600px-Estadio_Libertadores_de_Am%C3%A9rica_-_Ricardo_Enrique_Bochini.jpg"},
+    {"id": "velez", "name": "Vélez Sarsfield", "strength": 78, "shield": "https://upload.wikimedia.org/wikipedia/commons/9/91/Club_Atl%C3%A9tico_V%C3%A9lez_Sarsfield_logo.svg", "league": "south_america", "balance": 20000000, "stadium": "José Amalfitani", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Estadio_Jos%C3%A9_Amalfitani.jpg/600px-Estadio_Jos%C3%A9_Amalfitani.jpg"},
+    {"id": "emelec", "name": "Emelec", "strength": 76, "shield": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Escudo_de_Emelec.svg", "league": "south_america", "balance": 15000000, "stadium": "George Capwell", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Estadio_George_Capwell_-_Emelec.jpg/600px-Estadio_George_Capwell_-_Emelec.jpg"},
+    {"id": "americadecali", "name": "América de Cali", "strength": 76, "shield": "https://upload.wikimedia.org/wikipedia/commons/4/41/Escudo_de_Am%C3%A9rica_de_Cali.svg", "league": "south_america", "balance": 14000000, "stadium": "Pascual Guerrero", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Estadio_Pascual_Guerrero.jpg/600px-Estadio_Pascual_Guerrero.jpg"},
+    {"id": "universitario", "name": "Universitario", "strength": 75, "shield": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Universitario_de_Deportes_logo.svg", "league": "south_america", "balance": 12000000, "stadium": "Monumental U", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Estadio_Monumental_U.jpg/600px-Estadio_Monumental_U.jpg"},
+    {"id": "tachira", "name": "Deportivo Táchira", "strength": 72, "shield": "https://upload.wikimedia.org/wikipedia/commons/3/36/Deportivo_T%C3%A1chira_logo.svg", "league": "south_america", "balance": 8000000, "stadium": "Pueblo Nuevo", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Pueblo_Nuevo_Stadium.jpg/600px-Pueblo_Nuevo_Stadium.jpg"},
+    {"id": "caracas", "name": "Caracas FC", "strength": 71, "shield": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Caracas_FC_logo.svg", "league": "south_america", "balance": 7000000, "stadium": "Olímpico UCV", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Estadio_Ol%C3%ADmpico_de_la_UCV.jpg/600px-Estadio_Ol%C3%ADmpico_de_la_UCV.jpg"},
+    {"id": "wilstermann", "name": "Jorge Wilstermann", "strength": 71, "shield": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Club_Jorge_Wilstermann_logo.svg", "league": "south_america", "balance": 6000000, "stadium": "Félix Capriles", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Estadio_F%C3%A9lix_Capriles_Cochabamba.jpg/600px-Estadio_F%C3%A9lix_Capriles_Cochabamba.jpg"},
+    {"id": "alhilal", "name": "Al Hilal", "strength": 84, "shield": "https://r2.thesportsdb.com/images/media/team/badge/5trzvq1660439102.png", "league": "arabia", "balance": 350000000, "stadium": "King Fahd Stadium", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/King_Fahd_International_Stadium.jpg/600px-King_Fahd_International_Stadium.jpg"},
+    {"id": "alnassr", "name": "Al Nassr", "strength": 83, "shield": "https://r2.thesportsdb.com/images/media/team/badge/84yvqi1748524565.png", "league": "arabia", "balance": 300000000, "stadium": "Al-Awwal Park", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/King_Saud_University_Stadium.jpg/600px-King_Saud_University_Stadium.jpg"},
+    {"id": "alittihad", "name": "Al Ittihad", "strength": 82, "shield": "https://r2.thesportsdb.com/images/media/team/badge/e5q6lh1745436268.png", "league": "arabia", "balance": 280000000, "stadium": "King Abdullah Sports City", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/King_Abdullah_Sports_City_-_Jeddah.jpg/600px-King_Abdullah_Sports_City_-_Jeddah.jpg"},
+    {"id": "alahli", "name": "Al Ahli", "strength": 81, "shield": "https://r2.thesportsdb.com/images/media/team/badge/5jxyip1687165392.png", "league": "arabia", "balance": 250000000, "stadium": "Prince Abdullah Al Faisal", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Prince_Abdullah_Al-Faisal_Stadium_2.jpg/600px-Prince_Abdullah_Al-Faisal_Stadium_2.jpg"},
+    {"id": "alshabab", "name": "Al Shabab", "strength": 78, "shield": "https://r2.thesportsdb.com/images/media/team/badge/x9pqf01618586414.png", "league": "arabia", "balance": 150000000, "stadium": "Prince Faisal bin Fahd", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Prince_Faisal_bin_Fahd_Stadium.jpg/600px-Prince_Faisal_bin_Fahd_Stadium.jpg"},
+    {"id": "altaawoun", "name": "Al Taawoun", "strength": 76, "shield": "https://r2.thesportsdb.com/images/media/team/badge/rlsmp91646835052.png", "league": "arabia", "balance": 80000000, "stadium": "King Abdullah Sport City Stadium", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/King_Abdullah_Sport_City_Stadium_%28Buraidah%29.jpg/600px-King_Abdullah_Sport_City_Stadium_%28Buraidah%29.jpg"},
+    {"id": "alettifaq", "name": "Al Ettifaq", "strength": 77, "shield": "https://r2.thesportsdb.com/images/media/team/badge/m272h51694761970.png", "league": "arabia", "balance": 100000000, "stadium": "Prince Mohamed bin Fahd", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Prince_Mohamed_bin_Fahd_Stadium.jpg/600px-Prince_Mohamed_bin_Fahd_Stadium.jpg"},
+    {"id": "alfateh", "name": "Al Fateh", "strength": 75, "shield": "https://r2.thesportsdb.com/images/media/team/badge/a5cjf41662659789.png", "league": "arabia", "balance": 70000000, "stadium": "Prince Abdullah bin Jalawi", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Prince_Abdullah_bin_Jalawi_Stadium.jpg/600px-Prince_Abdullah_bin_Jalawi_Stadium.jpg"},
+    {"id": "alfayha", "name": "Al Fayha", "strength": 74, "shield": "https://r2.thesportsdb.com/images/media/team/badge/jl3spp1677530565.png", "league": "arabia", "balance": 60000000, "stadium": "Al Majma'ah Sports City", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Al_Majma%27ah_Sports_City.jpg/600px-Al_Majma%27ah_Sports_City.jpg"},
+    {"id": "damac", "name": "Damac", "strength": 74, "shield": "https://r2.thesportsdb.com/images/media/team/badge/z2l4w31677530963.png", "league": "arabia", "balance": 65000000, "stadium": "Prince Sultan bin Abdul Aziz", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Prince_Sultan_bin_Abdul_Aziz_Stadium.jpg/600px-Prince_Sultan_bin_Abdul_Aziz_Stadium.jpg"},
+    {id: "intermiamicf", name: "Inter Miami CF", strength: 78, shield: "https://r2.thesportsdb.com/images/media/team/badge/m4it3e1602103647.png", league: "mls", balance: 60000000, stadium: "Chase Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "columbuscrew", name: "Columbus Crew", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/dzs8cp1629059854.png", league: "mls", balance: 60000000, stadium: "Lower.com Field", stadiumImg: "img/estadio.jpg"},
+    {id: "losangelesfc", name: "Los Angeles FC", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/7nbj2a1602103638.png", league: "mls", balance: 60000000, stadium: "BMO Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "lagalaxy", name: "LA Galaxy", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/ysyysr1420227188.png", league: "mls", balance: 60000000, stadium: "Dignity Health Sports Park", stadiumImg: "img/estadio.jpg"},
+    {id: "nashvillesc", name: "Nashville SC", strength: 73, shield: "https://r2.thesportsdb.com/images/media/team/badge/znrwt71602103062.png", league: "mls", balance: 60000000, stadium: "GEODIS Park", stadiumImg: "img/estadio.jpg"},
+    {id: "charlottefc", name: "Charlotte FC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/b6p4uz1595434047.png", league: "mls", balance: 60000000, stadium: "Bank of America Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "fccincinnati", name: "FC Cincinnati", strength: 75, shield: "https://r2.thesportsdb.com/images/media/team/badge/vvhsqc1707631046.png", league: "mls", balance: 60000000, stadium: "TQL Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "seattlesoundersfc", name: "Seattle Sounders FC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/7em1q51580480820.png", league: "mls", balance: 60000000, stadium: "Lumen Field", stadiumImg: "img/estadio.jpg"},
+    {id: "newyorkredbulls", name: "New York Red Bulls", strength: 73, shield: "https://r2.thesportsdb.com/images/media/team/badge/suytvy1473536462.png", league: "mls", balance: 60000000, stadium: "Red Bull Arena", stadiumImg: "img/estadio.jpg"},
+    {id: "orlandocitysc", name: "Orlando City SC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/qyppxw1423832326.png", league: "mls", balance: 60000000, stadium: "Inter&Co Stadium", stadiumImg: "img/estadio.jpg"}
 ];
 
 // --- Sistema de Som ---
@@ -359,7 +444,18 @@ let myTeam = null;
 let currentRound = 1;
 let matchSchedule = [];
 let standings = [];
-let allTeams = []; 
+let allTeams = [
+    {id: "intermiamicf", name: "Inter Miami CF", strength: 78, shield: "https://r2.thesportsdb.com/images/media/team/badge/m4it3e1602103647.png", league: "mls", balance: 60000000, stadium: "Chase Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "columbuscrew", name: "Columbus Crew", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/dzs8cp1629059854.png", league: "mls", balance: 60000000, stadium: "Lower.com Field", stadiumImg: "img/estadio.jpg"},
+    {id: "losangelesfc", name: "Los Angeles FC", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/7nbj2a1602103638.png", league: "mls", balance: 60000000, stadium: "BMO Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "lagalaxy", name: "LA Galaxy", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/ysyysr1420227188.png", league: "mls", balance: 60000000, stadium: "Dignity Health Sports Park", stadiumImg: "img/estadio.jpg"},
+    {id: "nashvillesc", name: "Nashville SC", strength: 73, shield: "https://r2.thesportsdb.com/images/media/team/badge/znrwt71602103062.png", league: "mls", balance: 60000000, stadium: "GEODIS Park", stadiumImg: "img/estadio.jpg"},
+    {id: "charlottefc", name: "Charlotte FC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/b6p4uz1595434047.png", league: "mls", balance: 60000000, stadium: "Bank of America Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "fccincinnati", name: "FC Cincinnati", strength: 75, shield: "https://r2.thesportsdb.com/images/media/team/badge/vvhsqc1707631046.png", league: "mls", balance: 60000000, stadium: "TQL Stadium", stadiumImg: "img/estadio.jpg"},
+    {id: "seattlesoundersfc", name: "Seattle Sounders FC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/7em1q51580480820.png", league: "mls", balance: 60000000, stadium: "Lumen Field", stadiumImg: "img/estadio.jpg"},
+    {id: "newyorkredbulls", name: "New York Red Bulls", strength: 73, shield: "https://r2.thesportsdb.com/images/media/team/badge/suytvy1473536462.png", league: "mls", balance: 60000000, stadium: "Red Bull Arena", stadiumImg: "img/estadio.jpg"},
+    {id: "orlandocitysc", name: "Orlando City SC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/qyppxw1423832326.png", league: "mls", balance: 60000000, stadium: "Inter&Co Stadium", stadiumImg: "img/estadio.jpg"}
+]; 
 let cupBracket = []; 
 let isCupMode = false;
 let libertadoresPhase = 'groups'; // 'groups' ou 'knockout'
@@ -368,11 +464,22 @@ let libertadoresGroupStandings = [];
 let libertadoresBracket = [];
 let isLibertadoresMode = false;
 let libertadoresParticipants = []; // Armazena quem se classificou para a próxima Liberta
+let sulAmericanaBracket = [];
+let isSulAmericanaMode = false;
+let sulAmericanaParticipants = [];
+let sulAmericanaPhase = 'groups';
+let sulAmericanaGroups = [];
+let sulAmericanaGroupStandings = [];
+let intercontinentalBracket = [];
+let isIntercontinentalMode = false;
 let cupWinnerId = null;
 let cupRunnerUpId = null;
 let cupFinished = false;
 let databaseVersion = "2026-07-12-v1";
+let currentYear = 2026;
 // Som: preferência do usuário
+let hallOfFameData = { titles: [], topScorers: [], legends: [] };
+let newsFeedItems = [];
 window.soundEnabled = true;
 
 function loadSoundPreference() {
@@ -414,7 +521,9 @@ let users = (function() {
 
 let isRegisterMode = false;
 
-function toggleLoginMode() {
+function toggleLoginMode(e) {
+    if (e) e.preventDefault();
+    console.log("Toggling login/register mode.");
     isRegisterMode = !isRegisterMode;
     document.getElementById('login-title').innerText = isRegisterMode ? 'Criar Conta' : 'Entrar';
     document.getElementById('btn-login-action').innerHTML = isRegisterMode ? '<i class="fas fa-user-plus"></i> Cadastrar' : '<i class="fas fa-sign-in-alt"></i> Entrar';
@@ -422,11 +531,28 @@ function toggleLoginMode() {
     document.getElementById('user-list-container').style.display = isRegisterMode ? 'none' : 'block';
 }
 
-function handleLogin() {
+function bypassLogin() {
+    console.log("Bypass login activated.");
+    unlockAudio();
+    const bypassUser = "treinador";
+    if (!users[bypassUser]) {
+        users[bypassUser] = {
+            password: "123", // Senha padrão para o bypass
+            gameState: null
+        };
+    }
+    currentUser = bypassUser;
+    loadGame();
+    renderUserList();
+    alert("Login ignorado. Entrando com o usuário 'Treinador'.");
+}
+
+function handleLogin(event) {
+    if (event) event.preventDefault(); // Previne o recarregamento da página
     console.log("handleLogin: Iniciando...");
     unlockAudio();
     const userInput = document.getElementById('login-username').value;
-    const user = userInput ? userInput.trim() : "";
+    const user = userInput ? userInput.trim().toLowerCase() : "";
     const passwordInput = document.getElementById('login-password').value;
     const password = passwordInput ? passwordInput.trim() : "";
 
@@ -453,7 +579,11 @@ function handleLogin() {
                 password: password,
                 gameState: null 
             };
-            localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            try {
+                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            } catch (e) {
+                console.warn("localStorage indisponível. Usando sessão em memória.", e);
+            }
             alert("Conta criada com sucesso! Entrando...");
             
             currentUser = user;
@@ -471,7 +601,11 @@ function handleLogin() {
             // Se for uma conta legada sem senha, define a senha digitada como a senha dessa conta
             if (savedPassword === undefined) {
                 users[user].password = password;
-                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                try {
+                    localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                } catch (e) {
+                    console.warn("localStorage indisponível. Usando sessão em memória.", e);
+                }
                 alert("Senha cadastrada com sucesso para este usuário antigo!");
             } else if (savedPassword !== password) {
                 return alert("Senha incorreta. Tente novamente.");
@@ -486,7 +620,11 @@ function handleLogin() {
         alert("Erro nos dados salvos. Iniciando uma nova carreira para este usuário.");
         if (users[user]) {
             users[user].gameState = null;
-            localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            try {
+                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            } catch (lsError) {
+                console.warn("localStorage indisponível. Usando sessão em memória.", lsError);
+            }
         }
         // Tenta carregar de novo, que vai iniciar um novo jogo
         loadGame(); 
@@ -517,6 +655,7 @@ function saveGame() {
     if (!currentUser) return;
     users[currentUser].gameState = {
         databaseVersion,
+        currentYear,
         myTeamId: myTeam ? myTeam.id : null,
         currentRound,
         matchSchedule,
@@ -532,7 +671,15 @@ function saveGame() {
         libertadoresGroups,
         libertadoresGroupStandings,
         isLibertadoresMode,
-        libertadoresParticipants
+        libertadoresParticipants,
+        sulAmericanaBracket,
+        isSulAmericanaMode,
+        sulAmericanaParticipants,
+        sulAmericanaPhase,
+        sulAmericanaGroups,
+        sulAmericanaGroupStandings,
+        intercontinentalBracket,
+        isIntercontinentalMode
     };
     try {
         localStorage.setItem('brasfoot_users', JSON.stringify(users));
@@ -550,9 +697,89 @@ function confirmReset() {
     if (confirm("Deseja realmente apagar seu progresso atual e voltar para a seleção de times? Isso resetará todos os elencos para o estado original.")) {
         if (currentUser && users[currentUser]) {
             users[currentUser].gameState = null; // Limpa o save do usuário
-            localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            try {
+                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            } catch (e) {
+                console.warn("localStorage indisponível. Usando sessão em memória.", e);
+            }
             myTeam = null; // Reseta o time atual na memória
             loadGame(); // Recarrega, e como o gameState é null, vai para a seleção
+        }
+    }
+}
+
+function ensureSafeState(team, forceReset = false) {
+    const defaultState = {
+        balance: 80000000,
+        stadiumLevel: 1, 
+        stadiumCapacity: 10000 + (team.rep || 10) * 1000, 
+        ticketPriceSetting: 'Medium',
+        medicalDeptLevel: 1, // IDEIA 18: Nível do Departamento Médico
+        commerceLevel: { bars: 0, food: 0, gourmet: 0 },
+        sponsorships: { Master: null, Costas: null, Mangas: null, Calcoes: null, propostas: [] },
+        academyLevel: 1,
+        consecutiveLosses: 0,
+        plantelJuniores: []
+    };
+
+    if (forceReset || isNaN(team.balance) || team.balance == null) team.balance = defaultState.balance;
+    if (forceReset || isNaN(team.stadiumLevel) || team.stadiumLevel == null) team.stadiumLevel = defaultState.stadiumLevel;
+    if (forceReset || isNaN(team.stadiumCapacity) || team.stadiumCapacity == null) team.stadiumCapacity = defaultState.stadiumCapacity;
+    if (forceReset || !team.ticketPriceSetting) team.ticketPriceSetting = defaultState.ticketPriceSetting;
+    if (forceReset || isNaN(team.medicalDeptLevel) || team.medicalDeptLevel == null) team.medicalDeptLevel = defaultState.medicalDeptLevel;
+    
+    if (forceReset || !team.commerceLevel || isNaN(team.commerceLevel.bars) || isNaN(team.commerceLevel.food) || isNaN(team.commerceLevel.gourmet)) {
+        // Objeto novo para evitar partilha de referência
+        team.commerceLevel = { bars: 0, food: 0, gourmet: 0 };
+    }
+    
+    if (forceReset || !team.sponsorships) {
+        // IMPORTANTE: sempre criar um objeto NOVO para evitar partilha de referência entre times
+        team.sponsorships = { Master: null, Costas: null, Mangas: null, Calcoes: null, propostas: [] };
+    } else {
+        if (!team.sponsorships.propostas) team.sponsorships.propostas = [];
+        if (team.sponsorships.Master === undefined) team.sponsorships.Master = null;
+        if (team.sponsorships.Costas === undefined) team.sponsorships.Costas = null;
+        if (team.sponsorships.Mangas === undefined) team.sponsorships.Mangas = null;
+        if (team.sponsorships.Calcoes === undefined) team.sponsorships.Calcoes = null;
+    }
+    
+    if (forceReset || isNaN(team.academyLevel) || team.academyLevel == null) team.academyLevel = defaultState.academyLevel;
+    if (forceReset || isNaN(team.consecutiveLosses) || team.consecutiveLosses == null) team.consecutiveLosses = defaultState.consecutiveLosses;
+    if (forceReset || isNaN(team.boardConfidence) || team.boardConfidence == null) team.boardConfidence = 80;
+    if (forceReset || !team.hallOfFame) team.hallOfFame = defaultState.hallOfFame;
+
+    if (team.squad) {
+        team.squad.forEach(p => {
+            if (forceReset || isNaN(p.energy) || p.energy == null) p.energy = 100;
+            if (forceReset || isNaN(p.morale) || p.morale == null) p.morale = 100;
+            if (forceReset || isNaN(p.age) || p.age == null) p.age = Math.floor(Math.random() * (35 - 20 + 1)) + 20; // Default age 20-35
+        });
+    }
+    
+    if (forceReset || !team.plantelJuniores) team.plantelJuniores = [];
+}
+
+function calculateSalary(player) {
+    if (!player) return 0;
+    const base = 500;
+    const strengthFactor = Math.pow(player.strength || 60, 1.5);
+    
+    // Fator de idade: pico de salário entre 27-30 anos
+    const age = player.age || 25;
+    let ageFactor = 1.0;
+    if (age >= 24 && age <= 26) ageFactor = 1.2;
+    else if (age >= 27 && age <= 30) ageFactor = 1.4;
+    else if (age > 30) ageFactor = 1.1 - ((age - 30) * 0.05);
+    
+    return Math.round((base + strengthFactor) * ageFactor);
+}
+function emergencyReset() {
+    if (confirm("Tem a certeza absoluta? Vai perder os dados das finanças, patrocínios e voltar aos valores base. Os resultados do campeonato manter-se-ão.")) {
+        if (myTeam) {
+            ensureSafeState(myTeam, true);
+            saveGame();
+            location.reload();
         }
     }
 }
@@ -566,11 +793,12 @@ function loadGame() {
     if (state && state.myTeamId && state.allTeams && state.allTeams.length > 0) {
         allTeams = state.allTeams;
         
-        // Verifica a versão da base de dados local. Se for antiga (legacy) ou incompatível, força atualização dos elencos da CPU
+        // Verifica a versão da base de dados local. Se for antiga (legacy) ou incompatível, força atualização dos elencos da CPU e restaura clubes ausentes
         const savedDbVersion = state.databaseVersion || "legacy";
-        const targetDbVersion = "2026-07-12-v1";
+        const targetDbVersion = "2026-07-19-v3";
         
         databaseVersion = targetDbVersion; // Atualiza a variável global
+        currentYear = state.currentYear || 2026; // Carrega o ano ou 2026 como default
         
         myTeam = allTeams.find(t => t.id === state.myTeamId);
         
@@ -581,35 +809,43 @@ function loadGame() {
         }
 
         if (savedDbVersion !== targetDbVersion) {
-            console.log("Migrando elencos do banco de dados antigo:", savedDbVersion);
+            console.log("Migrando elencos do banco de dados antigo e restaurando ligas ausentes:", savedDbVersion);
             
-            allTeams.forEach(team => {
-                if (team.id !== myTeam.id) {
-                    if (typeof realSquads !== 'undefined' && realSquads[team.id]) {
-                        let playerIdCounter = 10000 + Math.floor(Math.random() * 10000);
-                        team.squad = realSquads[team.id].players.map((p, index) => ({
-                            id: playerIdCounter++,
-                            name: p.name,
-                            position: p.pos,
-                            strength: p.str,
-                            energy: 100,
-                            goals: 0,
-                            assists: 0,
-                            yellowCards: 0,
-                            suspensionRounds: 0,
-                            injuryRounds: 0,
-                            redCardInMatch: false,
-                            isStarter: index < 11
-                        }));
-                        team.formation = realSquads[team.id].formation;
-                    }
+            // 1. Restaurar times ausentes (deletados por otimização de RAM) a partir de teamsData
+            const existingTeamIds = new Set(allTeams.map(t => t.id));
+            const teamsDataRaw = JSON.parse(JSON.stringify(teamsData));
+            
+            teamsDataRaw.forEach(teamData => {
+                if (!existingTeamIds.has(teamData.id)) {
+                    const newTeam = { ...teamData };
+                    newTeam.squad = [];
+                    ensureSafeState(newTeam);
+                    allTeams.push(newTeam);
+                    existingTeamIds.add(newTeam.id);
                 }
             });
+
+            const migrationPlayerNames = new Set();
             
-            // Se o usuário estiver na rodada 1, re-sincroniza também o time dele para obter o elenco de 2026 oficial
+            // Registra os nomes do time do usuário ativo para não serem duplicados nas CPUs
+            if (myTeam && myTeam.squad) {
+                myTeam.squad.forEach(p => {
+                    migrationPlayerNames.add(p.name.trim().toLowerCase());
+                });
+            }
+            
+            // Se o usuário estiver na rodada 1, re-sincroniza também o time dele primeiro para não perder os jogadores do usuário para a CPU
             if (state.currentRound === 1 && typeof realSquads !== 'undefined' && realSquads[myTeam.id]) {
                 let playerIdCounter = 20000;
-                myTeam.squad = realSquads[myTeam.id].players.map((p, index) => ({
+                const userUnique = [];
+                realSquads[myTeam.id].players.forEach(p => {
+                    const normalized = p.name.trim().toLowerCase();
+                    if (!migrationPlayerNames.has(normalized)) {
+                        migrationPlayerNames.add(normalized);
+                        userUnique.push(p);
+                    }
+                });
+                myTeam.squad = userUnique.map((p, index) => ({
                     id: playerIdCounter++,
                     name: p.name,
                     position: p.pos,
@@ -625,17 +861,83 @@ function loadGame() {
                 }));
                 myTeam.formation = realSquads[myTeam.id].formation;
             }
+
+            allTeams.forEach(team => {
+                if (team.id !== myTeam.id) {
+                    if (typeof realSquads !== 'undefined' && realSquads[team.id]) {
+                        let playerIdCounter = 10000 + Math.floor(Math.random() * 10000);
+                        const uniqueCpu = [];
+                        realSquads[team.id].players.forEach(p => {
+                            const normalized = p.name.trim().toLowerCase();
+                            if (!migrationPlayerNames.has(normalized)) {
+                                migrationPlayerNames.add(normalized);
+                                uniqueCpu.push(p);
+                            }
+                        });
+                        team.squad = uniqueCpu.map((p, index) => ({
+                            id: playerIdCounter++,
+                            name: p.name,
+                            position: p.pos,
+                            strength: p.str,
+                            energy: 100,
+                            goals: 0,
+                            assists: 0,
+                            yellowCards: 0,
+                            suspensionRounds: 0,
+                            injuryRounds: 0,
+                            redCardInMatch: false,
+                    isStarter: index < 11,
+                    allTimeStats: { goals: 0, assists: 0, matches: 0 }
+                        }));
+                        team.formation = realSquads[team.id].formation;
+                    }
+                }
+            });
+
+            // Garante que nenhum time CPU fique sem elenco mínimo de 18 jogadores
+            allTeams.forEach(team => {
+                if (team.id !== myTeam.id && (!team.squad || team.squad.length < 18)) {
+                    const existingPlayers = team.squad || [];
+                    const neededPlayers = 18 - existingPlayers.length;
+                    const genericPositions = ['GOL', 'ZAG', 'ZAG', 'LAT', 'LAT', 'MEI', 'MEI', 'MEI', 'ATA', 'ATA', 'ATA', 'GOL', 'ZAG', 'LAT', 'MEI', 'MEI', 'ATA', 'ATA'];
+                    let playerIdCounter = 40000 + Math.floor(Math.random() * 10000);
+                    for (let i = 0; i < neededPlayers; i++) {
+                        const pos = genericPositions[existingPlayers.length + i] || 'MEI';
+                        existingPlayers.push({
+                            id: playerIdCounter++,
+                            name: `Jogador ${existingPlayers.length + i + 1} ${team.name.split(' ')[0]}`,
+                            position: pos,
+                            strength: Math.round(team.strength - 5 + Math.random() * 10),
+                            energy: 100, goals: 0, assists: 0, yellowCards: 0, suspensionRounds: 0, redCardInMatch: false,
+                            isStarter: existingPlayers.length + i < 11,
+                            age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                            matchesPlayed: 0
+                        });
+                    }
+                    team.squad = existingPlayers;
+                    team.formation = team.formation || '4-3-3';
+                }
+            });
             saveGame();
         }
         
-        // Migração de dados: garante que todos os jogadores tenham propriedades essenciais
-        // (corrige saves antigos onde injuryRounds não era inicializado)
+        // Migração de dados e desduplicação retroativa de elencos para saves existentes
+        const seenNormalizedNames = new Set();
         allTeams.forEach(team => {
             if (team.squad) {
                 const seenIds = new Set();
                 team.squad = team.squad.filter(p => {
                     if (!p || !p.id || !p.name || seenIds.has(p.id)) return false;
+                    
+                    const normalizedName = p.name.trim().toLowerCase();
+                    // Garante que o mesmo jogador não esteja em duas equipes
+                    if (seenNormalizedNames.has(normalizedName)) {
+                        console.warn(`[EXCLUSIVIDADE SAVE] Removendo duplicado retroativo: ${p.name} do time ${team.name}`);
+                        return false;
+                    }
+                    
                     seenIds.add(p.id);
+                    seenNormalizedNames.add(normalizedName);
                     return true;
                 });
                 team.squad.forEach(p => {
@@ -643,15 +945,13 @@ function loadGame() {
                     if (p.suspensionRounds === undefined || p.suspensionRounds === null) p.suspensionRounds = 0;
                     if (p.energy === undefined || p.energy === null) p.energy = 100;
                     if (p.yellowCards === undefined || p.yellowCards === null) p.yellowCards = 0;
+                    if (p.age === undefined || p.age === null) p.age = Math.floor(Math.random() * (35 - 18 + 1)) + 18;
+                    if (p.matchesPlayed === undefined || p.matchesPlayed === null) p.matchesPlayed = 0;
+                    if (p.salario === undefined || p.salario === null) p.salario = calculateSalary(p);
                 });
             }
             
-            // Inicializa dados do Estádio e Finanças para os times (necessário para o novo módulo)
-            if (team.stadiumLevel === undefined || team.stadiumLevel === null) team.stadiumLevel = 1;
-            if (team.stadiumCapacity === undefined || team.stadiumCapacity === null) team.stadiumCapacity = 10000 + (team.rep || 10) * 1000;
-            if (team.ticketPriceSetting === undefined || team.ticketPriceSetting === null) team.ticketPriceSetting = 'Medium';
-            if (team.sponsorships === undefined || team.sponsorships === null) team.sponsorships = { Master: null, Costas: null, Mangas: null, Calcoes: null };
-            if (team.consecutiveLosses === undefined || team.consecutiveLosses === null) team.consecutiveLosses = 0;
+            ensureSafeState(team);
         });
         
         myTeam = allTeams.find(t => t.id === state.myTeamId);
@@ -672,7 +972,31 @@ function loadGame() {
         libertadoresGroupStandings = state.libertadoresGroupStandings || [];
         libertadoresBracket = state.libertadoresBracket || [];
         libertadoresParticipants = state.libertadoresParticipants || [];
+        // Correção retroativa do bug de participantes vazios
+        if (libertadoresParticipants.length === 0 && libertadoresGroups.length > 0) {
+            const listIds = [];
+            libertadoresGroups.forEach(g => listIds.push(...g.teams));
+            libertadoresParticipants = listIds;
+            console.log("[BUG FIX LIBERTADORES] Reconstruídos participantes a partir dos grupos:", libertadoresParticipants);
+        }
+        
         isLibertadoresMode = state.isLibertadoresMode || false;
+        sulAmericanaBracket = state.sulAmericanaBracket || [];
+        isSulAmericanaMode = state.isSulAmericanaMode || false;
+        sulAmericanaParticipants = state.sulAmericanaParticipants || [];
+        sulAmericanaPhase = state.sulAmericanaPhase || 'groups';
+        sulAmericanaGroups = state.sulAmericanaGroups || [];
+        sulAmericanaGroupStandings = state.sulAmericanaGroupStandings || [];
+        // Correção retroativa do bug de participantes vazios
+        if (sulAmericanaParticipants.length === 0 && sulAmericanaGroups.length > 0) {
+            const listIds = [];
+            sulAmericanaGroups.forEach(g => listIds.push(...g.teams));
+            sulAmericanaParticipants = listIds;
+            console.log("[BUG FIX SULAMERICANA] Reconstruídos participantes a partir dos grupos:", sulAmericanaParticipants);
+        }
+        
+        intercontinentalBracket = state.intercontinentalBracket || [];
+        isIntercontinentalMode = state.isIntercontinentalMode || false;
         cupWinnerId = state.cupWinnerId || null;
         cupRunnerUpId = state.cupRunnerUpId || null;
         cupFinished = state.cupFinished || false;
@@ -695,16 +1019,31 @@ function loadGame() {
         libertadoresGroupStandings = [];
         libertadoresBracket = [];
         libertadoresParticipants = [];
+        sulAmericanaBracket = [];
+        isSulAmericanaMode = false;
+        sulAmericanaParticipants = [];
+        sulAmericanaPhase = 'groups';
+        sulAmericanaGroups = [];
+        sulAmericanaGroupStandings = [];
+        intercontinentalBracket = [];
+        isIntercontinentalMode = false;
         cupWinnerId = null; // Reset cup winner for new season
         cupRunnerUpId = null; // Reset cup runner-up for new season
-        databaseVersion = "2026-07-12-v1";
+        databaseVersion = "2026-07-19-v3";
         
         allTeams = JSON.parse(JSON.stringify(teamsData)); 
         let playerIdCounter = 1;
+        const loadedPlayerNames = new Set(); // Conjunto para rastrear exclusividade de jogadores
+        
         allTeams.forEach(team => {
             team.id = team.id;
             if (typeof realSquads !== 'undefined' && realSquads[team.id]) {
-                team.squad = realSquads[team.id].players.map((p, index) => ({
+                const uniquePlayers = [];
+                realSquads[team.id].players.forEach((p) => {
+                    uniquePlayers.push(p);
+                });
+
+                team.squad = uniquePlayers.map((p, index) => ({
                     id: playerIdCounter++, // Ensure unique IDs across all players
                     name: p.name,
                     position: p.pos,
@@ -716,7 +1055,10 @@ function loadGame() {
                     suspensionRounds: 0,
                     injuryRounds: 0,
                     redCardInMatch: false,
-                    isStarter: index < 11
+                    isStarter: index < 11,
+                    age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                    matchesPlayed: 0,
+                    salario: calculateSalary(p)
                 }));
                 team.formation = realSquads[team.id].formation;
             }
@@ -736,7 +1078,9 @@ function loadGame() {
                         position: pos,
                         strength: Math.round(team.strength - 5 + Math.random() * 10), // Strength around team average
                         energy: 100, goals: 0, assists: 0, yellowCards: 0, suspensionRounds: 0, redCardInMatch: false,
-                        isStarter: existingPlayers.length + i < 11
+                        isStarter: existingPlayers.length + i < 11,
+                        age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                        matchesPlayed: 0
                     });
                 }
                 team.squad = existingPlayers;
@@ -765,6 +1109,7 @@ function loadGame() {
 
             // The previous 'else' block for generic squads is now integrated into the check above
             // This ensures all teams, regardless of league or realSquads entry, have a complete squad.
+            ensureSafeState(team);
         });
         console.log("loadGame: Exibindo screen-selection.");
         ensureShields();
@@ -797,6 +1142,68 @@ function ensureShields() {
     });
 }
 
+// ============================================================
+// BASE FIXA DE CLUBES CLÁSSICOS SUL-AMERICANOS (CONMEBOL)
+// Garante presença de estrangeiros na Libertadores e Sul-Am.
+// ============================================================
+const equipasSulAmericanas = [
+    // Argentina
+    { id: 'riverplate', vagas: 2 },
+    { id: 'bocajuniors', vagas: 2 },
+    { id: 'racing', vagas: 1 },
+    { id: 'sanlorenzo', vagas: 1 },
+    { id: 'talleres', vagas: 1 },
+    { id: 'estudiantes', vagas: 1 },
+    { id: 'rosariocentral', vagas: 1 },
+    // Uruguai
+    { id: 'penarol', vagas: 1 },
+    { id: 'nacional', vagas: 1 },
+    // Chile
+    { id: 'colocolo', vagas: 1 },
+    { id: 'ucatolica', vagas: 1 },
+    // Equador
+    { id: 'ldu', vagas: 1 },
+    { id: 'independientedelvalle', vagas: 1 },
+    { id: 'barcelonasc', vagas: 1 },
+    // Paraguai
+    { id: 'olimpia', vagas: 1 },
+    { id: 'cerroporteno', vagas: 1 },
+    { id: 'libertad', vagas: 1 },
+    // Colômbia
+    { id: 'atleticonacional', vagas: 1 },
+    { id: 'millonarios', vagas: 1 },
+    { id: 'junior', vagas: 1 },
+    // Peru
+    { id: 'alianzalima', vagas: 1 },
+    { id: 'sportingcristal', vagas: 1 },
+    // Bolívia
+    { id: 'bolivar', vagas: 1 },
+    { id: 'thestrongest', vagas: 1 },
+    // Chile
+    { id: 'udechile', vagas: 1 },
+    // Novas Adições
+    { id: 'independiente', vagas: 1 },
+    { id: 'velez', vagas: 1 },
+    { id: 'emelec', vagas: 1 },
+    { id: 'americadecali', vagas: 1 },
+    { id: 'universitario', vagas: 1 },
+    { id: 'tachira', vagas: 1 },
+    { id: 'caracas', vagas: 1 },
+    { id: 'wilstermann', vagas: 1 },
+];
+
+/**
+ * Retorna um array de equipas estrangeiras sul-americanas para compor as taças,
+ * garantindo diversidade de países. Embaralha para variedade a cada sorteio.
+ */
+function getEquipasEstrangeirasSulAmericanas(quantidade) {
+    const ids = equipasSulAmericanas.map(e => e.id);
+    const disponiveis = allTeams.filter(t => ids.includes(t.id) && t.id !== myTeam.id && !libertadoresParticipants.includes(t.id));
+    // Embaralha aleatoriamente para variedade
+    disponiveis.sort(() => 0.5 - Math.random());
+    return disponiveis.slice(0, quantidade);
+}
+
 function initLibertadores(silent = false) {
     if (libertadoresGroups.length > 0 || libertadoresBracket.length > 0) return;
 
@@ -805,38 +1212,63 @@ function initLibertadores(silent = false) {
     let pTeams = [];
     
     const isBrazil = myTeam.league.startsWith('brazil');
-    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(myTeam.league);
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
 
-    // Se for a primeira temporada, usamos times reais/fortes de 2026
     if (libertadoresParticipants.length === 0) {
         if (isEurope) {
-            pTeams = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(t.league))
+            pTeams = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(t.league))
                              .sort((a, b) => b.strength - a.strength).slice(0, 32);
         } else {
-        // IDs de times brasileiros que costumam estar na Libertadores
-        const brIds = ['flamengo', 'palmeiras', 'botafogo', 'atleticomg', 'saopaulo', 'fluminense', 'fortaleza', 'cruzeiro', 'corinthians', 'internacional', 'bahia', 'athleticopr', 'gremio', 'vasco'];
-        let brQualifiers = allTeams.filter(t => brIds.includes(t.id));
-        
-        // Garante que o time do jogador participe se ele for de uma liga que dá vaga (Brasil A ou S. Am)
-        if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brQualifiers.find(t => t.id === myTeam.id)) {
-            brQualifiers.push(myTeam);
-        }
-        
-        // Times da América do Sul
-        const saQualifiers = allTeams.filter(t => t.league === 'south_america');
-        
-        // Seleciona os times mais fortes entre brasileiros convidados e sul-americanos
-        pTeams = [...brQualifiers, ...saQualifiers].sort((a, b) => b.strength - a.strength).slice(0, 32);
+            // FIX: Mix obrigatório — vagas brasileiras + vagas de clubes estrangeiros sul-americanos
+            // 8 vagas para times estrangeiros CONMEBOL clássicos
+            const VAGAS_ESTRANGEIROS_LIB = 8;
+            const estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_ESTRANGEIROS_LIB);
+
+            // IDs dos estrangeiros já escolhidos (para não duplicar)
+            const estrangeirosIds = estrangeiros.map(t => t.id);
+
+            // IDs de times brasileiros que costumam estar na Libertadores (6 vagas diretas mínimas)
+            const brIds = ['flamengo', 'palmeiras', 'botafogo', 'atleticomg', 'saopaulo', 'fluminense', 'fortaleza', 'cruzeiro', 'corinthians', 'internacional', 'bahia', 'athleticopr', 'gremio', 'vasco'];
+            let brQualifiers = allTeams.filter(t => brIds.includes(t.id) && !estrangeirosIds.includes(t.id));
+
+            // Garante que o time do jogador participe
+            if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brQualifiers.find(t => t.id === myTeam.id) && !estrangeirosIds.includes(myTeam.id)) {
+                brQualifiers.unshift(myTeam);
+            }
+
+            // Ordena brasileiros por força e pega os melhores para completar 32
+            brQualifiers.sort((a, b) => b.strength - a.strength);
+            const vagasBrasil = 32 - estrangeiros.length;
+            const brSelecionados = brQualifiers.slice(0, vagasBrasil);
+
+            pTeams = [...estrangeiros, ...brSelecionados];
         } 
     } else {
         pTeams = libertadoresParticipants.map(id => allTeams.find(t => t.id === id)).filter(t => t);
+
+        // FIX: Se os participants vieram APENAS de times brasileiros, injeta estrangeiros
+        if (!isEurope) {
+            const temEstrangeiro = pTeams.some(t => t.league === 'south_america');
+            if (!temEstrangeiro) {
+                const VAGAS_ESTRANGEIROS_LIB = 8;
+                const estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_ESTRANGEIROS_LIB);
+                const estIds = estrangeiros.map(t => t.id);
+                // Remove alguns times brasileiros para abrir vagas e injeta estrangeiros
+                pTeams = pTeams.filter(t => !estIds.includes(t.id));
+                pTeams = pTeams.slice(0, 32 - estrangeiros.length);
+                pTeams = [...estrangeiros, ...pTeams];
+            }
+        }
     }
 
     // GARANTIA: Se houver menos de 32 times, preenche com os mais fortes disponíveis no jogo
     if (pTeams.length < 32) {
         const usedIds = pTeams.map(t => t.id);
-        const fillTeams = allTeams.filter(t => !usedIds.includes(t.id))
-                                  .sort((a, b) => b.strength - a.strength);
+        const isTeamEurope = (league) => ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].some(l => league === l || league.startsWith(l + '_'));
+        const fillTeams = allTeams.filter(t => {
+            if (usedIds.includes(t.id)) return false;
+            return isEurope ? isTeamEurope(t.league) : !isTeamEurope(t.league);
+        }).sort((a, b) => b.strength - a.strength);
         pTeams = [...pTeams, ...fillTeams.slice(0, 32 - pTeams.length)];
     }
     // Se ainda assim faltar (cenário extremo), adiciona BYE ou times genéricos
@@ -864,6 +1296,7 @@ function initLibertadores(silent = false) {
     
     // Agora embaralha os 32 selecionados para distribuir nos grupos
     pTeams.sort(() => 0.5 - Math.random());
+    libertadoresParticipants = pTeams.map(t => t.id);
 
     // Criar 8 grupos de 4
     libertadoresGroups = [];
@@ -901,7 +1334,7 @@ function renderLibertadoresBracket() {
     const list = document.getElementById('lib-matches-list');
     list.innerHTML = '';
 
-    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(myTeam.league);
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
     const compName = isEurope ? "Champions League" : "Copa Libertadores";
 
     if (libertadoresPhase === 'groups') {
@@ -985,9 +1418,14 @@ function renderTeams(league = 'brazil_a') {
 }
 
 // Seleciona o time e vai para a tela principal
-function selectTeam(teamId, league = 'brazil_a') {
+function selectTeam(teamId) {
     unlockAudio(); // Garante o áudio caso o login tenha sido pulado ou resetado
     myTeam = allTeams.find(t => t.id === teamId);
+    
+    const baseLeague = myTeam.league.replace('_b', '').replace('_a', '');
+    
+    // NOVA MECÂNICA: Otimização de Memória e Geração de Ligas B
+    optimizeMemoryAndGenerateLeagues(baseLeague);
     
     // Initialize the championship only with teams from the same league
     initChampionship(myTeam.league);
@@ -1011,6 +1449,54 @@ function selectTeam(teamId, league = 'brazil_a') {
 }
 
 // Event listener for league selection
+function optimizeMemoryAndGenerateLeagues(baseLeague) {
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(baseLeague);
+    
+    // 1. Otimização de Memória desativada para viabilizar mercado de transferências global
+    const neededTeams = allTeams;
+    allTeams = neededTeams;
+
+    // 2. Garantir que o país atual tenha uma 2ª Divisão (Liga B)
+    const leagueA_name = (baseLeague === 'brazil') ? 'brazil_a' : baseLeague;
+    const leagueB_name = (baseLeague === 'brazil') ? 'brazil_b' : baseLeague + '_b';
+    
+    const existingBTeams = allTeams.filter(t => t.league === leagueB_name);
+    
+    // Se não houver times suficientes na 2ª divisão, gera-os dinamicamente
+    if (existingBTeams.length < 20) {
+        let leagueNameDisplay = baseLeague.charAt(0).toUpperCase() + baseLeague.slice(1);
+        if (leagueNameDisplay === 'England') leagueNameDisplay = 'Inglaterra';
+        if (leagueNameDisplay === 'Spain') leagueNameDisplay = 'Espanha';
+        if (leagueNameDisplay === 'Italy') leagueNameDisplay = 'Itália';
+        if (leagueNameDisplay === 'France') leagueNameDisplay = 'França';
+        if (leagueNameDisplay === 'Germany') leagueNameDisplay = 'Alemanha';
+        if (leagueNameDisplay === 'Portugal') leagueNameDisplay = 'Portugal';
+        if (leagueNameDisplay === 'Arabia') leagueNameDisplay = 'Arábia';
+
+        const teamsToCreate = 20 - existingBTeams.length;
+        for (let i = 1; i <= teamsToCreate; i++) {
+            const genericId = `${baseLeague}_gen_${i}`;
+            const genericName = `${leagueNameDisplay} B ${i}`;
+            const genericStrength = 65 + Math.floor(Math.random() * 8); // Entre 65 e 72
+            
+            const newTeam = {
+                id: genericId,
+                name: genericName,
+                strength: genericStrength,
+                shield: `https://ui-avatars.com/api/?name=${encodeURIComponent(genericName)}&background=random`,
+                league: leagueB_name,
+                balance: 5000000,
+                stadium: `Estádio ${genericName}`,
+                squad: [] // Jogadores serão gerados caso necessário na partida
+            };
+            allTeams.push(newTeam);
+        }
+        
+        // Também precisamos adicionar as traduções das ligas criadas caso não existam
+        names[leagueB_name] = { league: `LIGA ${leagueNameDisplay.toUpperCase()} B`, cup: 'COPA NACIONAL', continental: isEurope ? 'CHAMPIONS LEAGUE' : 'LIBERTADORES' };
+    }
+}
+
 document.getElementById('league-select').addEventListener('change', function() {
     renderTeams(this.value);
 });
@@ -1031,18 +1517,25 @@ function getCompetitionNames(leagueId) {
         'germany': { league: 'BUNDESLIGA', cup: 'DFB-POKAL', continental: 'CHAMPIONS LEAGUE' },
         'france': { league: 'LIGUE 1', cup: 'COUPE DE FRANCE', continental: 'CHAMPIONS LEAGUE' },
         'portugal': { league: 'PRIMEIRA LIGA', cup: 'TAÇA DE PORTUGAL', continental: 'CHAMPIONS LEAGUE' },
+        'arabia': { league: 'SAUDI PRO LEAGUE', cup: 'KINGS CUP', continental: 'CHAMPIONS LEAGUE' },
         'south_america': { league: 'LIGA SUL-AMERICANA', cup: 'COPA SUL-AMERICANA', continental: 'LIBERTADORES' }
     };
     return names[leagueId] || { league: 'LIGA NACIONAL', cup: 'COPA NACIONAL', continental: 'TORNEIO CONTINENTAL' };
 }
 
 function updateDashboardUI() {
+    // FIX: Previne a execução na tela de login, onde os elementos do dashboard não existem.
+    // Isso evita que o script quebre e congele a tela inicial.
+    if (!myTeam) {
+        return;
+    }
+
     if (!myTeam || !matchSchedule) return;
 
     const totalDates = matchSchedule.length;
     if (totalDates === 0) return;
     
-    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(myTeam.league);
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
     const isSA = myTeam.league.startsWith('brazil') || myTeam.league === 'south_america';
 
     const isWindowOpen = (currentRound === 1 || currentRound > totalDates || (currentRound >= 15 && currentRound <= 25)); // Janela de transferências
@@ -1054,10 +1547,15 @@ function updateDashboardUI() {
     }
     
     const libBtn = document.getElementById('btn-view-libertadores');
+    const sulBtn = document.getElementById('btn-view-sulamericana');
     if (myTeam.league) {
         if (libBtn) {
             libBtn.style.display = (isSA || isEurope) ? 'inline-block' : 'none';
             libBtn.innerHTML = isEurope ? '<i class="fas fa-globe-europe" style="color: #3f51b5;"></i> Ver Champions' : '<i class="fas fa-globe-americas" style="color: #3f51b5;"></i> Ver Libertadores';
+        }
+        if (sulBtn) {
+            sulBtn.style.display = (isSA || isEurope) ? 'inline-block' : 'none';
+            sulBtn.innerHTML = isEurope ? '<i class="fas fa-fire" style="color: #f44336;"></i> Ver Europa League' : '<i class="fas fa-fire" style="color: #f44336;"></i> Ver Sul-Americana';
         }
 
         const cupBtn = document.querySelector('button[onclick="viewCupBracket()"]');
@@ -1071,6 +1569,30 @@ function updateDashboardUI() {
 
     const balanceFormatted = myTeam.balance.toLocaleString('pt-BR');
     document.getElementById('my-team-balance').innerText = balanceFormatted;
+    
+    const confidenceBar = document.getElementById('my-team-confidence-bar');
+    if (confidenceBar) {
+        const conf = myTeam.boardConfidence || 80;
+        confidenceBar.style.width = `${conf}%`;
+        if (conf >= 70) {
+            confidenceBar.style.background = '#4CAF50';
+            confidenceBar.style.animation = 'none';
+        } else if (conf >= 31) {
+            confidenceBar.style.background = '#FFEB3B';
+            confidenceBar.style.animation = 'none';
+        } else {
+            confidenceBar.style.background = '#f44336';
+            // Adiciona CSS piscar caso não exista na stylesheet principal
+            if (!document.getElementById('blink-css')) {
+                const style = document.createElement('style');
+                style.id = 'blink-css';
+                style.innerHTML = `@keyframes blink-danger { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }`;
+                document.head.appendChild(style);
+            }
+            confidenceBar.style.animation = 'blink-danger 1s infinite';
+        }
+    }
+    
     if (document.getElementById('market-balance')) {
         document.getElementById('market-balance').innerText = balanceFormatted;
     }
@@ -1228,6 +1750,11 @@ let livePlayerToSwapId = null;
 let subsUsedInMatch = 0;
 let windowsUsedInMatch = 0;
 let subMadeInThisSession = false;
+
+// --- IDEIA 20: Indisciplina / Noitada ---
+let _indisciplinaPlayer = null;      // Jogador envolvido no evento
+let _indisciplinaCallback = null;    // Callback para continuar o fluxo após decisão
+// ----------------------------------------
 
 // Função auxiliar para obter um jogador aleatório
 function getRandomPlayer(team, preferredPosition) {
@@ -1501,64 +2028,153 @@ function getGoalProbabilities(match) {
 
 // Avança instantaneamente para os 90 minutos simulando dinamicamente os minutos restantes
 function skipMatch() {
-    // Stop any running simulated loop and run fast-forward logic
+    if (window.simulationEnded) return;
+    
+    // Para qualquer loop em execução
     simController.stop();
     simInterval = null;
 
     addCommentaryItem("⚡ O jogo foi avançado rapidamente para os 90 minutos finais!", "info", simMinute);
 
-    while (simMinute < 90) {
-        simMinute++;
-        simulatedRoundMatches.forEach((m, idx) => {
-            const {
-                probA,
-                probB
-            } = getGoalProbabilities(m);
-            
-            // Simular cartões/disciplina no modo rápido
-            simulateDisciplines(m, simMinute);
+    // Simula todos os minutos restantes até ao minuto 90
+    try {
+        while (simMinute < 90) {
+            simMinute++;
+            simulatedRoundMatches.forEach((m, idx) => {
+                try {
+                    const { probA, probB } = getGoalProbabilities(m);
+                    
+                    simulateDisciplines(m, simMinute);
 
-            if (Math.random() < probA) {
-                m.currentHomeGoals++;
-                const scorerName = attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
-                if (m === userSimMatch) {
-                    addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.homeTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
+                    if (Math.random() < probA) {
+                        m.currentHomeGoals++;
+                        // FIX: null-check em homeTeam (partidas continentais podem não ter .homeTeam)
+                        if (m.homeTeam && m === userSimMatch) {
+                            const scorerName = attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
+                            addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.homeTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
+                        } else if (m.homeTeam) {
+                            attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
+                        }
+                    }
+                    if (Math.random() < probB) {
+                        m.currentAwayGoals++;
+                        // FIX: null-check em awayTeam
+                        if (m.awayTeam && m === userSimMatch) {
+                            const scorerName = attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
+                            addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.awayTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
+                        } else if (m.awayTeam) {
+                            attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
+                        }
+                    }
+                    
+                    updateOtherMatchUI(idx, m);
+                } catch (matchErr) {
+                    console.warn('Erro num jogo durante skipMatch (minuto ' + simMinute + '):', matchErr);
                 }
-            }
-            if (Math.random() < probB) {
-                m.currentAwayGoals++;
-                const scorerName = attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
-                if (m === userSimMatch) {
-                    addCommentaryItem(`⚽ [Simulado] <strong>GOL!</strong> do ${m.awayTeam.name} marcado por ${scorerName}!`, 'goal', simMinute);
-                }
-            }
-            
-            updateOtherMatchUI(idx, m);
-        });
+            });
+        }
+    } catch (loopErr) {
+        console.error('Erro no loop de skipMatch:', loopErr);
     }
 
-    document.getElementById('live-home-score').innerText = userSimMatch.currentHomeGoals;
-    document.getElementById('live-away-score').innerText = userSimMatch.currentAwayGoals;
+    // Actualiza UI do placar com null-check
+    const homeScoreEl = document.getElementById('live-home-score');
+    const awayScoreEl = document.getElementById('live-away-score');
+    if (homeScoreEl && userSimMatch) homeScoreEl.innerText = userSimMatch.currentHomeGoals;
+    if (awayScoreEl && userSimMatch) awayScoreEl.innerText = userSimMatch.currentAwayGoals;
 
-    document.getElementById('live-match-minute').innerText = 90;
-    document.getElementById('live-progress-bar').style.width = '100%';
+    const minEl = document.getElementById('live-match-minute');
+    const barEl = document.getElementById('live-progress-bar');
+    if (minEl) minEl.innerText = 90;
+    if (barEl) barEl.style.width = '100%';
 
     playSFX('whistle');
     setTimeout(() => playSFX('crowd'), 500);
-    endSimulation();
+    
+    // FIX: Envolve a chamada final em try/catch para garantir que nunca congela
+    try {
+        endSimulation(true);
+    } catch (e) {
+        console.error('Erro crítico em skipMatch ao chamar endSimulation:', e);
+        window.simulationEnded = true;
+        try { finishMatchSimulation(); } catch (e2) {
+            console.error('Erro também em finishMatchSimulation:', e2);
+            showScreen('screen-main');
+            if (myTeam) updateDynamicBackground(myTeam.id);
+        }
+    }
+}
+
+function advanceRound() {
+    try {
+        closeModal('modal-academy');
+    } catch (e) {
+        console.warn('Não foi possível fechar modal de juniores:', e);
+    }
+
+
+
+    try {
+        if (window.simController && typeof window.simController.stop === 'function') {
+            window.simController.stop();
+        }
+    } catch (e) {}
+    if (window.simInterval) {
+        clearInterval(window.simInterval);
+        window.simInterval = null;
+    }
+    window.finishMatchRunning = false;
+    window.simulationEnded = false;
+    try {
+        finishMatchSimulation();
+    } catch (e) {
+        console.error('Erro ao avançar para a próxima rodada:', e);
+        try {
+            if (typeof currentRound === 'number' && currentRound < matchSchedule.length) {
+                currentRound++;
+                console.warn('fallback: avançando para a próxima rodada apesar do erro.');
+            }
+        } catch (err) {
+            console.warn('Falha ao avançar currentRound no fallback:', err);
+        }
+        try { updateDashboardUI(); } catch (err) {}
+        try { saveGame(); } catch (err) {}
+        showScreen('screen-main');
+    }
 }
 
 // Finaliza o tempo de jogo
-function endSimulation() {
+function endSimulation(immediate = false) {
+    if (window.simulationEnded) return;
+    window.simulationEnded = true;
     simController.stop();
     simInterval = null;
 
     playSFX('whistle');
     setTimeout(() => playSFX('crowd'), 500);
-    addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida. Placar final: ${userSimMatch.homeTeam.name} ${userSimMatch.currentHomeGoals} x ${userSimMatch.currentAwayGoals} ${userSimMatch.awayTeam.name}!`, "info", 90);
+    
+    // FIX: null-check em userSimMatch e homeTeam para evitar TypeError na mensagem final
+    if (userSimMatch && userSimMatch.homeTeam && userSimMatch.awayTeam) {
+        addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida. Placar final: ${userSimMatch.homeTeam.name} ${userSimMatch.currentHomeGoals} x ${userSimMatch.currentAwayGoals} ${userSimMatch.awayTeam.name}!`, "info", 90);
+    } else {
+        addCommentaryItem(`🏁 FIM DE JOGO! O árbitro apita o término da partida.`, "info", 90);
+    }
 
-    document.getElementById('btn-live-continue').style.display = 'inline-block';
-    document.getElementById('btn-live-continue').onclick = finishMatchSimulation; // Garante que a função correta seja chamada
+    if (immediate) {
+        finishMatchSimulation();
+    } else {
+        // Não avança automaticamente. Exibe o botão de continuar para o usuário avançar de rodada manualmente.
+        if (window.endSimTimeout) {
+            clearTimeout(window.endSimTimeout);
+            window.endSimTimeout = null;
+        }
+        const continueBtn = document.getElementById('btn-live-continue');
+        if (continueBtn) {
+            continueBtn.style.display = 'inline-block';
+            continueBtn.innerHTML = '<i class="fas fa-step-forward"></i> Avançar para Próxima Rodada';
+            continueBtn.onclick = finishMatchSimulation;
+        }
+    }
 }
 
 // Gera um evento aleatório no jogo do jogador (faltas, escanteios, chutes)
@@ -1659,55 +2275,70 @@ function simulateDisciplines(m, minute) {
 
 // Tick a cada minuto da partida dinamicamente baseado nas forças e táticas ativas
 function tickSimulation() {
+    // FIX CRÍTICO: Impede execução dupla se a simulação já terminou
+    if (window.simulationEnded) return;
+
     simMinute++;
     if (simMinute > 90) return endSimulation();
 
-    document.getElementById('live-match-minute').innerText = simMinute;
-    document.getElementById('live-progress-bar').style.width = `${(simMinute / 90) * 100}%`;
+    // FIX CRÍTICO: Null-checks nos elementos do DOM para evitar crash
+    const minuteEl = document.getElementById('live-match-minute');
+    const progressEl = document.getElementById('live-progress-bar');
+    if (minuteEl) minuteEl.innerText = simMinute;
+    if (progressEl) progressEl.style.width = `${(simMinute / 90) * 100}%`;
 
     simulatedRoundMatches.forEach((m, idx) => {
-        const {
-            probA,
-            probB
-        } = getGoalProbabilities(m);
-        
-        // Simular disciplina (cartões amarelos e vermelhos)
-        simulateDisciplines(m, simMinute);
-        // Probabilidade de gol para o mandante
-        if (Math.random() < probA) {
-            m.currentHomeGoals++;
-            const scorerName = attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
-            if (m === userSimMatch) {
-                addCommentaryItem(`⚽ <strong>GOL! Sensacional!</strong> Gol do ${m.homeTeam.name}! ${scorerName} recebe a bola na grande área, ajeita o corpo e finaliza sem chances para o goleiro!`, 'goal', simMinute);
-                flashScoreboard();
-                playSFX('goal');
+        try {
+            const {
+                probA,
+                probB
+            } = getGoalProbabilities(m);
+            
+            // Simular disciplina (cartões amarelos e vermelhos)
+            simulateDisciplines(m, simMinute);
+            // Probabilidade de gol para o mandante
+            if (Math.random() < probA) {
+                m.currentHomeGoals++;
+                const scorerName = attributeGoalStats(m.homeTeam, m.id, simMinute, m.matchType || 'league');
+                if (m === userSimMatch) {
+                    addCommentaryItem(`⚽ <strong>GOL! Sensacional!</strong> Gol do ${m.homeTeam.name}! ${scorerName} recebe a bola na grande área, ajeita o corpo e finaliza sem chances para o goleiro!`, 'goal', simMinute);
+                    flashScoreboard();
+                    playSFX('goal');
+                }
             }
-        }
 
-        // Probabilidade de gol para o visitante
-        if (Math.random() < probB) {
-            m.currentAwayGoals++;
-            const scorerName = attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
-            if (m === userSimMatch) {
-                addCommentaryItem(`⚽ <strong>GOL! Sensacional!</strong> Gol do ${m.awayTeam.name}! ${scorerName} recebe a bola na grande área, ajeita o corpo e finaliza sem chances para o goleiro!`, 'goal', simMinute);
-                flashScoreboard();
-                playSFX('goal');
+            // Probabilidade de gol para o visitante
+            if (Math.random() < probB) {
+                m.currentAwayGoals++;
+                const scorerName = attributeGoalStats(m.awayTeam, m.id, simMinute, m.matchType || 'league');
+                if (m === userSimMatch) {
+                    addCommentaryItem(`⚽ <strong>GOL! Sensacional!</strong> Gol do ${m.awayTeam.name}! ${scorerName} recebe a bola na grande área, ajeita o corpo e finaliza sem chances para o goleiro!`, 'goal', simMinute);
+                    flashScoreboard();
+                    playSFX('goal');
+                }
             }
-        }
 
-        if (Math.random() < 0.008) {
-            const penaltyTeam = Math.random() < 0.5 ? m.homeTeam : m.awayTeam;
-            simulatePenaltyKick(m, simMinute, penaltyTeam);
-        }
+            if (Math.random() < 0.008) {
+                const penaltyTeam = Math.random() < 0.5 ? m.homeTeam : m.awayTeam;
+                simulatePenaltyKick(m, simMinute, penaltyTeam);
+            }
 
-        updateOtherMatchUI(idx, m);
+            updateOtherMatchUI(idx, m);
+        } catch (tickErr) {
+            console.warn(`[tickSimulation] Erro no jogo ${idx} no minuto ${simMinute}:`, tickErr);
+        }
     });
 
-    document.getElementById('live-home-score').innerText = userSimMatch.currentHomeGoals;
-    document.getElementById('live-away-score').innerText = userSimMatch.currentAwayGoals;
+    // FIX CRÍTICO: Null-checks no placar e em userSimMatch para evitar TypeError
+    if (userSimMatch) {
+        const homeScoreEl = document.getElementById('live-home-score');
+        const awayScoreEl = document.getElementById('live-away-score');
+        if (homeScoreEl) homeScoreEl.innerText = userSimMatch.currentHomeGoals;
+        if (awayScoreEl) awayScoreEl.innerText = userSimMatch.currentAwayGoals;
 
-    if (Math.random() < 0.12) {
-        generateRandomMatchEvent(userSimMatch, simMinute);
+        if (Math.random() < 0.12) {
+            try { generateRandomMatchEvent(userSimMatch, simMinute); } catch(e) {}
+        }
     }
 
     if (simMinute === 45) {
@@ -1722,10 +2353,13 @@ function pauseForHalftime() {
     simInterval = null;
     playSFX('whistle');
 
+    // FIX CRÍTICO: Null-check para evitar crash se o botão não existir no DOM
     const continueBtn = document.getElementById('btn-live-continue');
-    continueBtn.style.display = 'inline-block';
-    continueBtn.innerHTML = '<i class="fas fa-play-circle"></i> Começar 2º Tempo';
-    continueBtn.onclick = resumeSimulationAfterHalftime;
+    if (continueBtn) {
+        continueBtn.style.display = 'inline-block';
+        continueBtn.innerHTML = '<i class="fas fa-play-circle"></i> Começar 2º Tempo';
+        continueBtn.onclick = resumeSimulationAfterHalftime;
+    }
 }
 
 // Função para escalar de forma automática os 11 titulares ativos do computador
@@ -1799,21 +2433,181 @@ function autoSelectStarters(team) {
 }
 
 // Inicia a rodada com a simulação ao vivo interativa
-function playRound() {
-    if (currentRound > matchSchedule.length) {
-        alert("A temporada acabou!");
+// =============================================================
+// IDEIA 20 — Eventos de Indisciplina / Noitada
+// =============================================================
+
+/**
+ * Cenários imersivos de noitada (selecionado aleatoriamente)
+ */
+const _indisciplinaScenarios = [
+    (nome) => `📸 Fotos nas redes sociais vieram à tona! <strong>${nome}</strong> foi fotografado numa balada até de manhã, com bebidas na mão e em grupo animado. A imprensa já está a noticiar.`,
+    (nome) => `🍾 Uma testemunha contactou o clube! <strong>${nome}</strong> foi visto numa festa privada ontem à noite, claramente fora dos protocolos de concentração exigidos antes do jogo.`,
+    (nome) => `🎰 O staff de segurança encontrou <strong>${nome}</strong> num casino às 3 da manhã, com sinais visíveis de cansaço e excesso de bebidas alcoólicas.`,
+    (nome) => `💃 Um vídeo viral está a circular nas redes: <strong>${nome}</strong> numa discoteca, a dançar e a beber até tarde. O jogo é hoje e ele mal consegue treinar.`,
+    (nome) => `🌙 A preparação foi comprometida! <strong>${nome}</strong> não pernoitou no hotel de concentração do clube — foi apanhado numa festa com amigos até altas horas da madrugada.`,
+    (nome) => `🍺 Membros do staff alertaram: <strong>${nome}</strong> voltou ao hotel visivelmente alcoolizado de madrugada. A sua prestação no treino de ontem foi péssima e hoje há jogo.`
+];
+
+/**
+ * Verifica se acontece um evento de indisciplina antes do jogo.
+ * @param {Function} callback - Chamado após o utilizador tomar uma decisão
+ */
+function checkIndisciplineEvent(callback) {
+    // Probabilidade de 4% por rodada
+    const CHANCE = 0.04;
+
+    if (!myTeam || !myTeam.squad || myTeam.squad.length === 0 || Math.random() > CHANCE) {
+        callback();
         return;
     }
 
+    // Escolhe aleatoriamente um jogador (preferencialmente titular)
+    const candidates = myTeam.squad.filter(p =>
+        (p.injuryRounds || 0) === 0 &&
+        (p.suspensionRounds || 0) === 0 &&
+        !(p.indisciplinaRound === currentRound) // Não repetir na mesma rodada
+    );
+    if (candidates.length === 0) { callback(); return; }
+
+    const titulares = candidates.filter(p => p.isStarter);
+    const pool = titulares.length > 0 ? titulares : candidates;
+    const player = pool[Math.floor(Math.random() * pool.length)];
+
+    // Marca para não repetir
+    player.indisciplinaRound = currentRound;
+
+    // Guarda estado global
+    _indisciplinaPlayer = player;
+    _indisciplinaCallback = callback;
+
+    // Preenche o modal
+    const scenarioFn = _indisciplinaScenarios[Math.floor(Math.random() * _indisciplinaScenarios.length)];
+    document.getElementById('indisciplina-emoji').textContent = '😴';
+    document.getElementById('indisciplina-player-name').textContent = player.name;
+    document.getElementById('indisciplina-player-info').textContent =
+        `${player.position} · FOR ${player.strength} · Idade ${player.age} · Salário R$ ${(player.salario || 0).toLocaleString('pt-BR')}`;
+    document.getElementById('indisciplina-text').innerHTML = scenarioFn(player.name);
+
+    // Exibe o modal
+    document.getElementById('modal-indisciplina').style.display = 'flex';
+}
+
+/**
+ * Chamado pelos botões do modal de indisciplina.
+ * @param {'multa'|'barrar'|'perdoar'} opcao
+ */
+function resolveIndisciplina(opcao) {
+    const player = _indisciplinaPlayer;
+    const callback = _indisciplinaCallback;
+
+    // Fecha o modal
+    document.getElementById('modal-indisciplina').style.display = 'none';
+
+    if (!player) { if (callback) callback(); return; }
+
+    // Aplica consequência de energia em todos os casos
+    player.energy = Math.min(player.energy || 100, 50);
+
+    if (opcao === 'multa') {
+        // 20% do salário deduzido → reverte para o clube
+        const multa = Math.round((player.salario || 0) * 0.20);
+        player.salario = Math.max(0, (player.salario || 0) - multa);
+        myTeam.balance += multa;
+        player.emoji = '😡';
+        newsFeedItems.push({
+            type: 'info',
+            text: `🔴 Indisciplina: ${player.name} foi multado em R$ ${multa.toLocaleString('pt-BR')} após ser apanhado numa noitada.`
+        });
+        alert(`🔴 MULTA APLICADA!
+
+${player.name} foi multado em R$ ${multa.toLocaleString('pt-BR')}.
+O valor foi creditado ao saldo do clube.
+O jogador joga com 50% de energia e humor péssimo.`);
+
+    } else if (opcao === 'barrar') {
+        // Suspenso desta rodada
+        player.suspensionRounds = 1;
+        player.isStarter = false;
+        player.emoji = '⛔';
+        newsFeedItems.push({
+            type: 'info',
+            text: `⛔ Disciplina: ${player.name} foi barrado do jogo de hoje pelo treinador após incidente extra-campo.`
+        });
+        alert(`⛔ BARRADO!
+
+${player.name} foi excluído do jogo desta rodada.
+O plantel fica reduzido — verifique a escalação!`);
+        // Volta à tela de escalação para o utilizador ajustar
+        if (typeof renderSquad === 'function') renderSquad();
+        showScreen('screen-squad');
+        _indisciplinaPlayer = null;
+        _indisciplinaCallback = null;
+        // Importante: o callback é chamado quando o utilizador clicar em "Jogar Rodada" novamente
+        // (a validação de escalação já está em continuePlayRound)
+        saveGame();
+        return;
+
+    } else {
+        // Perdoar
+        player.emoji = '😊';
+        newsFeedItems.push({
+            type: 'info',
+            text: `💛 ${player.name} foi perdoado pelo treinador, mas joga hoje com apenas 50% de energia.`
+        });
+    }
+
+    _indisciplinaPlayer = null;
+    _indisciplinaCallback = null;
+    saveGame();
+    if (callback) callback();
+}
+// =============================================================
+
+function playRound() {
+    // FIX CRÍTICO: Limpa os guards de execução única no início de cada rodada
+    window.simulationEnded = false;
+    window.finishMatchRunning = false;
+
+    if (currentRound > matchSchedule.length) {
+        endOfSeason();
+        return;
+    }
+
+    continuePlayRound();
+    // Dispara eventos aleatórios com uma pequena probabilidade (ex: 15% por ronda)
+    if (Math.random() < 0.15) {
+        checkRandomEvents();
+    }
+}
+
+function continuePlayRound() {
+    if (currentRound > matchSchedule.length) return endOfSeason();
+
     const currentData = matchSchedule[currentRound - 1];
     isCupMode = currentData.type === 'cup';
-    isLibertadoresMode = currentData.type === 'libertadores';
+    
+    // Agora o tipo é continental. O usuário joga na Libertadores, Sul-Americana ou nenhum dos dois.
+    // Vamos simular ambos nos mesmos dias.
+    const isContinentalRound = currentData.type === 'continental';
+    isIntercontinentalMode = currentData.type === 'intercontinental';
+    
+    // Descobre em qual o usuário está jogando para atualizar a UI
+    isLibertadoresMode = isContinentalRound && libertadoresParticipants.includes(myTeam.id);
+    isSulAmericanaMode = isContinentalRound && sulAmericanaParticipants.includes(myTeam.id);
+    
+    // Se não estiver em nenhuma mas for rodada continental, força Libertadores por padrão para a UI
+    if (isContinentalRound && !isLibertadoresMode && !isSulAmericanaMode) {
+        isLibertadoresMode = true; 
+    }
 
     // Aplica o tema visual da competição na tela de jogo ao vivo
     const liveScreen = document.getElementById('screen-match-live');
-    liveScreen.classList.remove('match-live-league', 'match-live-cup', 'match-live-libertadores');
+    liveScreen.classList.remove('match-live-league', 'match-live-cup', 'match-live-libertadores', 'match-live-sulamericana', 'match-live-intercontinental');
     if (isCupMode) liveScreen.classList.add('match-live-cup');
     else if (isLibertadoresMode) liveScreen.classList.add('match-live-libertadores');
+    else if (isSulAmericanaMode) liveScreen.classList.add('match-live-sulamericana'); // CSS custom necessário
+    else if (isIntercontinentalMode) liveScreen.classList.add('match-live-intercontinental'); // CSS custom necessário
     else liveScreen.classList.add('match-live-league');
 
     // Correção: Se for rodada de mata-mata ou fase de grupos continental, busca os jogos nos chaveamentos/grupos
@@ -1824,28 +2618,52 @@ function playRound() {
         } else {
             matchesToSimulate = [];
         }
-    } else if (isLibertadoresMode) {
+    } else if (isContinentalRound) {
+        matchesToSimulate = [];
+        
+        // 1. Libertadores
         if (libertadoresPhase === 'knockout' && libertadoresBracket.length > 0) {
-            matchesToSimulate = libertadoresBracket[libertadoresBracket.length - 1];
+            matchesToSimulate.push(...libertadoresBracket[libertadoresBracket.length - 1]);
         } else if (libertadoresPhase === 'groups') {
-            // Gerar jogos da fase de grupos (32 times em 8 grupos de 4)
-            const libRoundIdx = matchSchedule.slice(0, currentRound).filter(r => r.type === 'libertadores').length - 1;
-            matchesToSimulate = [];
+            const libRoundIdx = matchSchedule.slice(0, currentRound).filter(r => r.type === 'continental').length - 1;
             if (libertadoresGroups.length === 0) initLibertadores(true);
             
-            libertadoresGroups.forEach(group => { // Here, the loop variable is `group`
+            libertadoresGroups.forEach(group => {
                 const teams = group.teams;
                 let m1, m2;
-                // Esquema de 6 rodadas para grupo de 4 times (Round Robin)
                 if (libRoundIdx === 0) { m1 = {home: teams[0], away: teams[1]}; m2 = {home: teams[2], away: teams[3]}; }
                 else if (libRoundIdx === 1) { m1 = {home: teams[0], away: teams[2]}; m2 = {home: teams[1], away: teams[3]}; }
                 else if (libRoundIdx === 2) { m1 = {home: teams[0], away: teams[3]}; m2 = {home: teams[1], away: teams[2]}; }
                 else if (libRoundIdx === 3) { m1 = {home: teams[1], away: teams[0]}; m2 = {home: teams[3], away: teams[2]}; }
                 else if (libRoundIdx === 4) { m1 = {home: teams[2], away: teams[0]}; m2 = {home: teams[3], away: teams[1]}; }
                 else if (libRoundIdx === 5) { m1 = {home: teams[3], away: teams[0]}; m2 = {home: teams[2], away: teams[1]}; }
-                
                 if (m1) matchesToSimulate.push(m1, m2);
             });
+        }
+
+        // 2. Sul-Americana
+        if (sulAmericanaPhase === 'knockout' && sulAmericanaBracket.length > 0) {
+            matchesToSimulate.push(...sulAmericanaBracket[sulAmericanaBracket.length - 1]);
+        } else if (sulAmericanaPhase === 'groups') {
+            const sulRoundIdx = matchSchedule.slice(0, currentRound).filter(r => r.type === 'continental').length - 1;
+            if (sulAmericanaGroups.length === 0) initSulAmericana(true);
+            
+            sulAmericanaGroups.forEach(group => {
+                const teams = group.teams;
+                let m1, m2;
+                if (sulRoundIdx === 0) { m1 = {home: teams[0], away: teams[1]}; m2 = {home: teams[2], away: teams[3]}; }
+                else if (sulRoundIdx === 1) { m1 = {home: teams[0], away: teams[2]}; m2 = {home: teams[1], away: teams[3]}; }
+                else if (sulRoundIdx === 2) { m1 = {home: teams[0], away: teams[3]}; m2 = {home: teams[1], away: teams[2]}; }
+                else if (sulRoundIdx === 3) { m1 = {home: teams[1], away: teams[0]}; m2 = {home: teams[3], away: teams[2]}; }
+                else if (sulRoundIdx === 4) { m1 = {home: teams[2], away: teams[0]}; m2 = {home: teams[3], away: teams[1]}; }
+                else if (sulRoundIdx === 5) { m1 = {home: teams[3], away: teams[0]}; m2 = {home: teams[2], away: teams[1]}; }
+                if (m1) matchesToSimulate.push(m1, m2);
+            });
+        }
+    } else if (isIntercontinentalMode) {
+        if (intercontinentalBracket.length === 0) initIntercontinental(true);
+        if (intercontinentalBracket.length > 0) {
+            matchesToSimulate = intercontinentalBracket[0];
         }
     }
 
@@ -1861,18 +2679,18 @@ function playRound() {
     }
 
     // 2. Validação da escalação do usuário antes da rodada
+    let _userHasMatchThisRound = false;
     if (myTeam && myTeam.squad) {
-        let userHasMatch = false;
         if (isCupMode && cupBracket.length > 0) {
             const currentCupMatches = cupBracket[cupBracket.length - 1];
-            userHasMatch = currentCupMatches.some(m => m.home === myTeam.id || m.away === myTeam.id);
+            _userHasMatchThisRound = currentCupMatches.some(m => m.home === myTeam.id || m.away === myTeam.id);
         } else if (isLibertadoresMode) {
-            userHasMatch = matchesToSimulate.some(m => m.home === myTeam.id || m.away === myTeam.id);
+            _userHasMatchThisRound = matchesToSimulate.some(m => m.home === myTeam.id || m.away === myTeam.id);
         } else {
-            userHasMatch = currentData.matches.some(m => m.home === myTeam.id || m.away === myTeam.id);
+            _userHasMatchThisRound = currentData.matches.some(m => m.home === myTeam.id || m.away === myTeam.id);
         }
 
-        if (userHasMatch) {
+        if (_userHasMatchThisRound) {
             const userStarters = myTeam.squad.filter(p => p.isStarter);
             const availableHealthy = myTeam.squad.filter(p => p.injuryRounds === 0 && p.suspensionRounds === 0).length;
             
@@ -1900,6 +2718,26 @@ function playRound() {
             }
         }
     }
+
+    // --- IDEIA 20: Evento de Indisciplina/Noitada (apenas quando o utilizador tem jogo) ---
+    if (_userHasMatchThisRound) {
+        // Captura o estado atual em closures para a callback
+        const _matchesToSimulate = matchesToSimulate;
+        const _currentData = currentData;
+        checkIndisciplineEvent(() => {
+            _continuePlayRoundCore(_matchesToSimulate, _currentData);
+        });
+        return; // Suspende — o resto será chamado pela callback
+    }
+    // Se não há jogo do utilizador, continua diretamente
+    _continuePlayRoundCore(matchesToSimulate, currentData);
+}
+
+/**
+ * Núcleo do pré-jogo: monta simulatedRoundMatches e lança a tela de jogo ao vivo.
+ * Separado de continuePlayRound() para permitir pausa assíncrona pelo evento de indisciplina.
+ */
+function _continuePlayRoundCore(matchesToSimulate, currentData) {
     
     simulatedRoundMatches = matchesToSimulate
         .filter(m => m && m.home !== 'BYE' && m.away !== 'BYE')
@@ -1907,13 +2745,26 @@ function playRound() {
             const homeTeam = allTeams.find(t => t.id === match.home) || { name: "Time A", strength: 70, squad: [] };
             const awayTeam = allTeams.find(t => t.id === match.away) || { name: "Time B", strength: 70, squad: [] };
             
-            // Auto-escalar times controlados pelo computador para poupar jogadores e substituir lesionados/suspensos
-            if (homeTeam.id !== myTeam.id) autoSelectStarters(homeTeam);
-            if (awayTeam.id !== myTeam.id) autoSelectStarters(awayTeam);
+            // Auto-escalar e atribuir táticas aos times controlados pelo computador
+            const aiPlaystyles = ['Posse de Bola', 'Contra-Ataque', 'Pressão Alta'];
+            const aiMentalities = ['Defensivo', 'Equilibrado', 'Ofensivo'];
+            
+            if (homeTeam.id !== myTeam.id) {
+                autoSelectStarters(homeTeam);
+                if (!homeTeam.tactics) homeTeam.tactics = {};
+                homeTeam.tactics.playstyle = aiPlaystyles[Math.floor(Math.random() * aiPlaystyles.length)];
+                homeTeam.tactics.mentality = aiMentalities[Math.floor(Math.random() * aiMentalities.length)];
+            }
+            if (awayTeam.id !== myTeam.id) {
+                autoSelectStarters(awayTeam);
+                if (!awayTeam.tactics) awayTeam.tactics = {};
+                awayTeam.tactics.playstyle = aiPlaystyles[Math.floor(Math.random() * aiPlaystyles.length)];
+                awayTeam.tactics.mentality = aiMentalities[Math.floor(Math.random() * aiMentalities.length)];
+            }
 
             // Marca os titulares de cada time como participantes da partida
-            if (homeTeam.squad) homeTeam.squad.forEach(p => { if (p.isStarter) p.playedInMatch = true; });
-            if (awayTeam.squad) awayTeam.squad.forEach(p => { if (p.isStarter) p.playedInMatch = true; });
+            if (homeTeam.squad) homeTeam.squad.forEach(p => { if (p.isStarter) { p.playedInMatch = true; p.startedMatch = true; } });
+            if (awayTeam.squad) awayTeam.squad.forEach(p => { if (p.isStarter) { p.playedInMatch = true; p.startedMatch = true; } });
             
             // --- GESTÃO DE ESTÁDIO E FINANÇAS ---
             const price = homeTeam.ticketPriceSetting || 'Medium';
@@ -1932,6 +2783,15 @@ function playRound() {
             
             const attendanceRate = attendance / capacity;
             const revenue = attendance * ticketValue;
+            
+            // --- NOVA RECEITA DE COMÉRCIO ---
+            let commerceRevenue = 0;
+            if (homeTeam.commerceLevel) {
+                const comm = homeTeam.commerceLevel;
+                commerceRevenue += attendance * (comm.bars * 5);
+                commerceRevenue += attendance * (comm.food * 8);
+                commerceRevenue += attendance * (comm.gourmet * 15);
+            }
             // ------------------------------------
             
             return {
@@ -1944,6 +2804,7 @@ function playRound() {
                 attendance,
                 attendanceRate,
                 revenue,
+                commerceRevenue,
                 currentHomeGoals: 0,
                 currentAwayGoals: 0,
                 goals: []
@@ -1986,6 +2847,7 @@ function playRound() {
     
     if (isCupMode || isLibertadoresMode) {
         const compNames = getCompetitionNames(myTeam.league);
+        const currentType = matchSchedule[currentRound - 1].type;
         if (isCupMode) {
             title = `${compNames.cup} - ${phaseNames[Math.log2(simulatedRoundMatches.length)] || "Copa"}`;
         } else {
@@ -2016,7 +2878,10 @@ function playRound() {
     document.getElementById('live-progress-bar').style.width = '0%';
     
     document.getElementById('live-commentary-list').innerHTML = '';
-    const othersList = document.getElementById('live-others-list');    othersList.innerHTML = '';    simulatedRoundMatches.forEach((m, idx) => {
+    const othersList = document.getElementById('live-others-list');
+    othersList.innerHTML = '';
+
+    simulatedRoundMatches.forEach((m, idx) => {
         const li = document.createElement('li');
         li.id = `live-other-${idx}`;
         li.className = `live-others-item ${m === userSimMatch ? 'user-match' : ''}`;
@@ -2032,6 +2897,9 @@ function playRound() {
 
     document.getElementById('btn-live-continue').style.display = 'none';
     document.getElementById('btn-live-continue').onclick = finishMatchSimulation;
+    
+    const relatorioDiv = document.getElementById('relatorio-fim-de-jogo');
+    if (relatorioDiv) relatorioDiv.style.display = 'none';
     
     showScreen('screen-match-live');
     simMinute = 0;
@@ -2070,7 +2938,11 @@ function renderUserList() {
 function deleteUser(name) {
     if (confirm(`Deseja apagar o usuário "${name}"?`)) {
         delete users[name];
-        localStorage.setItem('brasfoot_users', JSON.stringify(users));
+        try {
+            localStorage.setItem('brasfoot_users', JSON.stringify(users));
+        } catch (e) {
+            console.warn("localStorage indisponível. Usando sessão em memória.", e);
+        }
         renderUserList();
     }
 }
@@ -2107,7 +2979,7 @@ function initChampionship(selectedLeague = 'brazil_a') {
     let fullLeague = [...leagueRounds, ...secondHalf];
     matchSchedule = [];
     const isBrazil = selectedLeague.startsWith('brazil');
-    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(selectedLeague);
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(selectedLeague);
     
     let leagueIdx = 0;
     let currentRoundCounter = 1;
@@ -2118,13 +2990,16 @@ function initChampionship(selectedLeague = 'brazil_a') {
         if ((isBrazil || isEurope) && cupIndices.includes(currentRoundCounter)) {
             matchSchedule.push({ type: 'cup', matches: [] });
         } else if ((isBrazil || isEurope) && continentalIndices.includes(currentRoundCounter)) {
-            matchSchedule.push({ type: 'libertadores', matches: [] });
+            matchSchedule.push({ type: 'continental', matches: [] });
         } else {
             matchSchedule.push({ type: 'league', matches: fullLeague[leagueIdx] });
             leagueIdx++;
         }
         currentRoundCounter++;
     }
+    
+    // Adiciona a rodada do Mundial Intercontinental no fim do ano
+    matchSchedule.push({ type: 'intercontinental', matches: [] });
 }
 
 function initCopaDoBrasil(silent = false) { 
@@ -2150,32 +3025,46 @@ function initCopaDoBrasil(silent = false) {
 }
 
 document.addEventListener('DOMContentLoaded', () => { 
-    renderUserList();
-    const loginInput = document.getElementById('login-username');
-    if (loginInput) {
-        loginInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleLogin();
-        });
+    try {
+        // O listener para toggle-link já está no HTML via onclick="toggleLoginMode()"
+        // para evitar dupla execução, não adicionamos via JS aqui.
+
+        const bypassButton = document.getElementById('btn-bypass-login');
+        if (bypassButton) bypassButton.addEventListener('click', bypassLogin);
+
+        renderUserList();
+        const loginInput = document.getElementById('login-username');
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', handleLogin);
+            loginInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin(e);
+            });
+        }
+        const passwordInput = document.getElementById('login-password');
+        if (passwordInput) {
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin(e);
+            });
+        }
+        const loginButton = document.getElementById('btn-login-action');
+        if (loginButton) loginButton.addEventListener('click', handleLogin);
+        setInterval(() => { if (currentUser) saveGame(); }, 300000);
+    } catch (e) {
+        console.error("Erro fatal na inicialização dos listeners de login:", e);
+        alert("Ocorreu um erro ao carregar a página. Por favor, recarregue.");
     }
-    const passwordInput = document.getElementById('login-password');
-    if (passwordInput) {
-        passwordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleLogin();
-        });
-    }
-    const loginButton = document.getElementById('btn-login-action');
-    if (loginButton) {
-        loginButton.addEventListener('click', handleLogin);
-    }
-    setInterval(() => { if (currentUser) saveGame(); }, 300000);
 });
 
 // Função para retomar a simulação após o intervalo
 function resumeSimulationAfterHalftime() {
+    // FIX CRÍTICO: Null-check para evitar crash se o botão não existir
     const continueBtn = document.getElementById('btn-live-continue');
-    continueBtn.style.display = 'none'; // Esconde o botão novamente
-    continueBtn.innerHTML = '<i class="fas fa-check"></i> Continuar'; // Restaura o texto original
-    continueBtn.onclick = finishMatchSimulation; // Restaura a função original para o final do jogo
+    if (continueBtn) {
+        continueBtn.style.display = 'none'; // Esconde o botão novamente
+        continueBtn.innerHTML = '<i class="fas fa-check"></i> Continuar'; // Restaura o texto original
+        continueBtn.onclick = finishMatchSimulation; // Restaura a função original para o final do jogo
+    }
 
     addCommentaryItem("🔊 Começa o segundo tempo! A bola volta a girar no gramado.", "info", 46);
 
@@ -2196,17 +3085,197 @@ function viewCupBracket() {
     renderCupBracket();
 }
 
-// Função `checkSeasonEnd` removida — o sistema usa `endOfSeason()`
+// Verifica o fim da temporada e mostra a tela de campeão/resumo
+// antigo `checkSeasonEnd()` removido — usar `endOfSeason()`
 
-// Lógica de troca de times entre as ligas A e B do Brasil
+// Função orquestradora de Fim de Temporada (ordem precisa)
+function endOfSeason() {
+    try {
+        // 1. Identificar o fim: só executa se a última rodada foi ultrapassada
+        if (!(typeof currentRound === 'number' && Array.isArray(matchSchedule) && currentRound > matchSchedule.length)) return;
+
+        // --- HALL OF FAME: Atualização de Fim de Temporada ---
+        if (myTeam && myTeam.hallOfFame) {
+            // Título da Liga
+            if (standings[0] && standings[0].id === myTeam.id) {
+                const compNames = getCompetitionNames(myTeam.league);
+                myTeam.hallOfFame.titles.push({ year: currentYear, title: compNames.league });
+            }
+
+            // Artilheiros e Lendas
+            myTeam.squad.forEach(p => {
+                // Atualiza artilheiros
+                const scorerIndex = myTeam.hallOfFame.topScorers.findIndex(s => s.playerId === p.id);
+                if (scorerIndex > -1) {
+                    myTeam.hallOfFame.topScorers[scorerIndex].goals = p.allTimeStats.goals;
+                } else {
+                    if (p.allTimeStats.goals > 0) {
+                        myTeam.hallOfFame.topScorers.push({ playerId: p.id, name: p.name, goals: p.allTimeStats.goals });
+                    }
+                }
+
+                // Verifica se virou lenda
+                const isLegend = myTeam.hallOfFame.legends.some(l => l.playerId === p.id);
+                if (!isLegend) {
+                    if (p.allTimeStats.matches >= 200 || p.allTimeStats.goals >= 100) {
+                        const reason = p.allTimeStats.matches >= 200 ? `Disputou ${p.allTimeStats.matches} jogos` : `Marcou ${p.allTimeStats.goals} gols`;
+                        myTeam.hallOfFame.legends.push({ playerId: p.id, name: p.name, reason: reason });
+                        alert(`⭐ LENDA DO CLUBE! ${p.name} entrou para o Hall da Fama!`);
+                    }
+                }
+            });
+        }
+
+        // 2. Classificações e Vagas (ler posições finais antes de limpar a tabela)
+        sortStandings();
+        const nextLibParticipants = [];
+        const nextSulParticipants = [];
+
+        const baseLeague = (myTeam && myTeam.league) ? myTeam.league.replace('_b', '').replace('_a', '') : '';
+        const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(baseLeague);
+
+        if (cupWinnerId) nextLibParticipants.push(cupWinnerId);
+        let localLibCount = nextLibParticipants.length;
+        let localSulCount = 0;
+
+        const maxLib = isEurope ? 4 : 7;
+        const maxSul = isEurope ? 2 : 6;
+
+        standings.forEach(t => {
+            if (localLibCount < maxLib && !nextLibParticipants.includes(t.id)) {
+                nextLibParticipants.push(t.id);
+                localLibCount++;
+            } else if (localSulCount < maxSul && !nextLibParticipants.includes(t.id)) {
+                nextSulParticipants.push(t.id);
+                localSulCount++;
+            }
+        });
+
+        // Preenchimento continental (garante 32 vagas por competição)
+        if (isEurope) {
+            let continentalPool = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(t.league) && t.league !== myTeam.league);
+            continentalPool = continentalPool.sort((a,b) => b.strength - a.strength);
+
+            const neededLib = 32 - nextLibParticipants.length;
+            continentalPool.slice(0, neededLib).forEach(t => nextLibParticipants.push(t.id));
+
+            const neededSul = 32 - nextSulParticipants.length;
+            continentalPool.slice(neededLib, neededLib + neededSul).forEach(t => nextSulParticipants.push(t.id));
+        } else {
+            const poolEstrangeiros = allTeams.filter(t => t.league === 'south_america').sort(() => 0.5 - Math.random());
+            const poolBrasil = allTeams.filter(t => t.league === 'brazil_a' && t.league !== myTeam.league).sort((a,b) => b.strength - a.strength);
+
+            const neededLib = 32 - nextLibParticipants.length;
+            const vagasEstLibMin = Math.min(6, neededLib);
+            const estLibIds = new Set(nextLibParticipants);
+
+            const estLibFill = poolEstrangeiros.filter(t => !estLibIds.has(t.id)).slice(0, vagasEstLibMin);
+            estLibFill.forEach(t => nextLibParticipants.push(t.id));
+
+            const estLibIds2 = new Set(nextLibParticipants);
+            const brLibFill = poolBrasil.filter(t => !estLibIds2.has(t.id)).slice(0, 32 - nextLibParticipants.length);
+            brLibFill.forEach(t => nextLibParticipants.push(t.id));
+
+            if (nextLibParticipants.length < 32) {
+                const usedIds = new Set(nextLibParticipants);
+                poolEstrangeiros.filter(t => !usedIds.has(t.id)).slice(0, 32 - nextLibParticipants.length).forEach(t => nextLibParticipants.push(t.id));
+            }
+
+            const neededSul = 32 - nextSulParticipants.length;
+            const vagasEstSulMin = Math.min(6, neededSul);
+            const estSulIds = new Set([...nextLibParticipants, ...nextSulParticipants]);
+
+            const estSulFill = poolEstrangeiros.filter(t => !estSulIds.has(t.id)).slice(0, vagasEstSulMin);
+            estSulFill.forEach(t => nextSulParticipants.push(t.id));
+
+            const estSulIds2 = new Set([...nextLibParticipants, ...nextSulParticipants]);
+            const brSulFill = poolBrasil.filter(t => !estSulIds2.has(t.id)).slice(0, 32 - nextSulParticipants.length);
+            brSulFill.forEach(t => nextSulParticipants.push(t.id));
+
+            if (nextSulParticipants.length < 32) {
+                const usedIds = new Set([...nextLibParticipants, ...nextSulParticipants]);
+                allTeams.filter(t => t.league === 'south_america' && !usedIds.has(t.id)).slice(0, 32 - nextSulParticipants.length).forEach(t => nextSulParticipants.push(t.id));
+            }
+        }
+
+        libertadoresParticipants = nextLibParticipants;
+        sulAmericanaParticipants = nextSulParticipants;
+
+        // 2b. Aplica regras de promoção/rebaixamento ANTES de limpar a tabela
+        try { processPromotionsAndRelegations(); } catch (e) { console.warn('Erro ao processar subidas/descidas:', e); }
+
+        // 3. Virar o Ano e Limpar Tabela (só depois de distribuir as vagas)
+        currentYear = (currentYear || new Date().getFullYear()) + 1;
+
+        // Zera os pontos e estatísticas da classificação
+        if (Array.isArray(standings)) {
+            standings.forEach(t => {
+                t.p = 0; t.j = 0; t.v = 0; t.e = 0; t.d = 0; t.gp = 0; t.gc = 0; t.sg = 0;
+            });
+        }
+        // Também limpa campos similares em allTeams caso existam
+        allTeams.forEach(t => {
+            if (t && typeof t === 'object') {
+                if (t.p !== undefined) { t.p = 0; t.j = 0; t.v = 0; t.e = 0; t.d = 0; t.gp = 0; t.gc = 0; t.sg = 0; }
+            }
+        });
+        currentRound = 1;
+
+        // 4. Envelhecimento: incrementa a idade de todos os jogadores
+        allTeams.forEach(team => {
+            if (!team || !Array.isArray(team.squad)) return;
+            team.squad.forEach(player => {
+                try {
+                    player.age = (player.age || 18) + 1;
+                    // mantém compatibilidade com possíveis propriedades em pt
+                    if (!player.allTimeStats) player.allTimeStats = { goals: 0, assists: 0, matches: 0 };
+
+                    if (player.idade !== undefined) player.idade = player.age;
+                    else player.idade = player.age;
+                } catch (e) {}
+            });
+        });
+
+        // 5. Novo Calendário: reinicializa competições respeitando as novas ligas
+        try {
+            isCupMode = false; cupBracket = []; cupWinnerId = null; cupRunnerUpId = null; cupFinished = false;
+            isLibertadoresMode = false; libertadoresPhase = 'groups'; libertadoresBracket = []; libertadoresGroups = []; libertadoresGroupStandings = [];
+            isSulAmericanaMode = false; sulAmericanaBracket = []; /* BUG FIX: sulAmericanaParticipants não deve ser limpo aqui */ sulAmericanaPhase = 'groups'; sulAmericanaGroups = []; sulAmericanaGroupStandings = [];
+            initChampionship(myTeam.league);
+        } catch (e) { console.warn('Erro ao gerar novo calendário:', e); }
+
+        // 6. Interface: mostrar resumo e boas-vindas à nova época
+        try {
+            const champEl = document.getElementById('champion-msg');
+            if (champEl) champEl.innerHTML = `Fim de Temporada! As vagas foram distribuídas. Bem-vindo à época ${currentYear}.`;
+            const nameEl = document.getElementById('champion-name');
+            if (nameEl && standings[0]) nameEl.innerText = standings[0].name;
+            const shieldEl = document.getElementById('champion-shield');
+            if (shieldEl && standings[0]) shieldEl.src = standings[0].shield || '';
+            saveGame();
+            showScreen('screen-champion');
+        } catch (e) {
+            console.warn('Erro ao mostrar resumo de fim de temporada:', e);
+        }
+
+    } catch (err) {
+        console.error('Erro no endOfSeason():', err);
+    }
+}
+
+// Lógica UNIVERSAL de troca de times entre as ligas A e B do mesmo país
 function processPromotionsAndRelegations() {
     let summaryText = "";
     
+    const baseLeague = myTeam.league.replace('_b', '').replace('_a', '');
+    const leagueA_name = (baseLeague === 'brazil') ? 'brazil_a' : baseLeague;
+    const leagueB_name = (baseLeague === 'brazil') ? 'brazil_b' : baseLeague + '_b';
+    
     // Identifica as ligas antes das alterações para evitar que times rebaixados subam no mesmo turno
-    const leagueA = allTeams.filter(t => t.league === 'brazil_a');
-    const leagueB = allTeams.filter(t => t.league === 'brazil_b');
+    const leagueA = allTeams.filter(t => t.league === leagueA_name);
+    const leagueB = allTeams.filter(t => t.league === leagueB_name);
 
-    if (myTeam.league === 'brazil_a') {
+    if (myTeam.league === leagueA_name) {
         // Rebaixar os 4 últimos da Série A (baseado na tabela de classificação recém-encerrada)
         const relegated = standings.slice(-4);
         const relegatedIds = relegated.map(t => t.id);
@@ -2216,14 +3285,14 @@ function processPromotionsAndRelegations() {
         const promotedIds = promoted.map(t => t.id);
 
         allTeams.forEach(t => {
-            if (relegatedIds.includes(t.id)) t.league = 'brazil_b';
-            if (promotedIds.includes(t.id)) t.league = 'brazil_a';
+            if (relegatedIds.includes(t.id)) t.league = leagueB_name;
+            if (promotedIds.includes(t.id)) t.league = leagueA_name;
         });
 
-        summaryText = `⬇️ Rebaixados para a Série B: ${relegated.map(t => t.name).join(', ')}.<br>` +
-                      `⬆️ Promovidos para a Série A: ${promoted.map(t => t.name).join(', ')}.`;
+        summaryText = `⬇️ Rebaixados para a 2ª Divisão: ${relegated.map(t => t.name).join(', ')}.<br>` +
+                      `⬆️ Promovidos para a 1ª Divisão: ${promoted.map(t => t.name).join(', ')}.`;
     } 
-    else if (myTeam.league === 'brazil_b') {
+    else if (myTeam.league === leagueB_name) {
         // Promover os 4 primeiros da Série B (baseado na tabela de classificação)
         const promoted = standings.slice(0, 4);
         const promotedIds = promoted.map(t => t.id);
@@ -2233,12 +3302,12 @@ function processPromotionsAndRelegations() {
         const relegatedIds = relegated.map(t => t.id);
 
         allTeams.forEach(t => {
-            if (promotedIds.includes(t.id)) t.league = 'brazil_a';
-            if (relegatedIds.includes(t.id)) t.league = 'brazil_b';
+            if (promotedIds.includes(t.id)) t.league = leagueA_name;
+            if (relegatedIds.includes(t.id)) t.league = leagueB_name;
         });
 
-        summaryText = `⬆️ Promovidos para a Série A: ${promoted.map(t => t.name).join(', ')}.<br>` +
-                      `⬇️ Rebaixados para a Série B: ${relegated.map(t => t.name).join(', ')}.`;
+        summaryText = `⬆️ Promovidos para a 1ª Divisão: ${promoted.map(t => t.name).join(', ')}.<br>` +
+                      `⬇️ Rebaixados para a 2ª Divisão: ${relegated.map(t => t.name).join(', ')}.`;
     }
 
     document.getElementById('relegation-summary').innerHTML = summaryText;
@@ -2246,7 +3315,13 @@ function processPromotionsAndRelegations() {
 
 // Reinicia o estado para uma nova temporada mantendo o progresso dos times
 function startNextSeason() {
-    // 1. Recuperar as energias de todos os jogadores
+    // 1. Avançar o ano
+    currentYear++;
+    
+    // Geração de jovens da Escola de Formação (Fornada Anual)
+    generateYouthIntake(myTeam);
+
+    // 2. Recuperar as energias e evoluir jogadores
     allTeams.forEach(team => {
         if (team.squad) {
             const loanedOut = team.squad.filter(p => p.isLoaned);
@@ -2259,12 +3334,93 @@ function startNextSeason() {
                 // mas para simplificar o MVP, eles apenas são resetados.
             });
 
+            let newSquad = [];
             team.squad.forEach(p => {
                 p.energy = 100;
                 p.injuryRounds = 0;
                 p.yellowCards = 0;
                 p.suspensionRounds = 0;
+                
+                // --- NOVA MECÂNICA: ENVELHECIMENTO, EVOLUÇÃO E APOSENTADORIA ---
+                p.age = (p.age || 18) + 1;
+                let matches = p.matchesPlayed || 0;
+                
+                if (p.age <= 23) {
+                    if (matches >= 15) p.strength += Math.floor(Math.random() * 3) + 1; // +1 a +3
+                    else p.strength += Math.floor(Math.random() * 2); // 0 a +1
+                } else if (p.age <= 31) {
+                    if (matches >= 20 || (p.goals + p.assists) >= 5) p.strength += 1;
+                    else p.strength -= 1;
+                } else {
+                    p.strength -= Math.floor(Math.random() * 2) + 1; // -1 a -2
+                }
+                
+                p.strength = Math.max(40, Math.min(99, Math.round(p.strength) || 40));
+                p.matchesPlayed = 0;
+                p.goals = 0;
+                p.assists = 0;
+                
+                let retireChance = 0;
+                if (p.age === 38 || p.age === 39) retireChance = 0.8;
+                else if (p.age >= 40) retireChance = 1.0;
+                
+                if (Math.random() >= retireChance) {
+                    newSquad.push(p);
+                }
             });
+            team.squad = newSquad;
+            
+            // Repor jogadores para times controlados pela CPU (manter mínimo de 18)
+            if (team.id !== myTeam?.id && team.squad.length < 18) {
+                let playerIdCounter = Date.now() + Math.floor(Math.random() * 10000);
+                const needed = 18 - team.squad.length;
+                const genericPositions = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'];
+                for (let i = 0; i < needed; i++) {
+                    const pos = genericPositions[Math.floor(Math.random() * genericPositions.length)];
+                    team.squad.push({
+                        id: playerIdCounter++,
+                        name: `Jogador ${team.squad.length + 1} ${team.name.split(' ')[0]}`,
+                        position: pos,
+                        strength: Math.round(team.strength - 5 + Math.random() * 10),
+                        energy: 100, goals: 0, assists: 0, yellowCards: 0, suspensionRounds: 0, injuryRounds: 0, redCardInMatch: false,
+                        isStarter: false,
+                        age: Math.floor(Math.random() * (30 - 18 + 1)) + 18,
+                        matchesPlayed: 0
+                    });
+                }
+            }
+            
+            // --- NOVA MECÂNICA: ESCOLAS DE FORMAÇÃO ---
+            if (team.id === myTeam.id) {
+                const acLevel = team.academyLevel || 1;
+                // Entre 1 e 3 jogadores, mas níveis maiores tem mais chance de ser 2-3
+                const maxPlayers = Math.min(3, Math.max(1, Math.floor(acLevel / 2) + 1));
+                const numPlayers = Math.floor(Math.random() * maxPlayers) + 1;
+                
+                for (let i = 0; i < numPlayers; i++) {
+                    const positions = ['ATA', 'MEI', 'VOL', 'LAT', 'ZAG', 'GOL'];
+                    const pos = positions[Math.floor(Math.random() * positions.length)];
+                    const strength = 30 + (acLevel * 5) + Math.floor(Math.random() * 10);
+                    const youngPlayer = {
+                        id: 'youth_' + Date.now() + '_' + i,
+                        name: `Jovem Promessa ${Math.floor(Math.random() * 999)}`,
+                        position: pos,
+                        strength: strength,
+                        age: 16 + Math.floor(Math.random() * 2), // 16 ou 17 anos
+                        price: 50000 + (acLevel * 50000),
+                        salary: 2000 + (acLevel * 500),
+                        energy: 100,
+                        yellowCards: 0,
+                        suspensionRounds: 0,
+                        injuryRounds: 0,
+                        isStarter: false,
+                        matchesPlayed: 0
+                    };
+                    team.squad.push(youngPlayer);
+                }
+                console.log(`Gerados ${numPlayers} jovens promessas para a equipa.`);
+            }
+            // ------------------------------------------
         }
     });
 
@@ -2376,7 +3532,7 @@ function renderLiveModalSquad() {
 
         item.innerHTML = `
             <div class="player-info" style="display: flex; align-items: center; gap: 8px;">
-                <span class="player-pos" style="font-weight: 800; color: var(--text-muted); font-size: 0.75rem;">${player.position}</span>
+                <span class="player-pos" style="font-weight: 800; color: var(--text-muted); font-size: 0.75rem; min-width: 55px;">${player.position} <span style="font-weight:normal;">i${player.age}</span></span>
                 <span class="player-name">${player.name}${injuryLabel}${suspLabel}${yellowLabel}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -2486,29 +3642,105 @@ function updateStandings(teamId, goalsFor, goalsAgainst) {
     }
 }
 
-// Função que finaliza a rodada, processa resultados e avança o calendário
 function finishMatchSimulation() {
-    console.log("finishMatchSimulation: Finalizando rodada...");
-    document.getElementById('btn-live-continue').style.display = 'none';
+    // Cancela o timeout pendente do fim da simulação se existir
+    if (window.endSimTimeout) {
+        clearTimeout(window.endSimTimeout);
+        window.endSimTimeout = null;
+    }
+
+    // FIX CRÍTICO: Guard contra chamada dupla
+    if (window.finishMatchRunning) {
+        console.warn('finishMatchSimulation: chamada dupla ignorada.');
+        return;
+    }
+    window.finishMatchRunning = true;
 
     try {
+        console.log('[FIM DO JOGO] finishMatchSimulation iniciada.');
+        
+        // Oculta o botão de continuar
+        const continueBtn = document.getElementById('btn-live-continue');
+        if (continueBtn) continueBtn.style.display = 'none';
+
+        // --- ANÁLISE TÁTICA ---
+        try {
+            if (userSimMatch && (userSimMatch.home === myTeam.id || userSimMatch.away === myTeam.id)) {
+                const isHome = userSimMatch.home === myTeam.id;
+                const oppId = isHome ? userSimMatch.away : userSimMatch.home;
+                const oppTeam = allTeams.find(t => t.id === oppId);
+                if (oppTeam && oppTeam.tactics) {
+                    const oppPlaystyle = oppTeam.tactics.playstyle || 'Equilibrado';
+                    const oppMentality = oppTeam.tactics.mentality || 'Equilibrado';
+                    addCommentaryItem(`📊 <strong>Análise Tática:</strong> O ${oppTeam.name} tentou sufocar com ${oppPlaystyle} (${oppMentality}).`, 'info', 90);
+                }
+            }
+        } catch(tacticErr) {
+            console.warn('[FIM DO JOGO] Erro na análise tática:', tacticErr);
+        }
+
+        console.log('[FIM DO JOGO] Iniciando cálculos financeiros...');
+        const safeMatches = Array.isArray(simulatedRoundMatches) ? simulatedRoundMatches.filter(m => m && m.home && m.away) : [];
+        
         // --- GESTÃO DE ESTÁDIO E FINANÇAS: Pagamento de Bilheteira ---
-        simulatedRoundMatches.forEach(m => {
-            if (m.home === myTeam.id && m.revenue) {
-                myTeam.balance += m.revenue;
-                addCommentaryItem(`💰 Receita de Bilheteria: R$ ${m.revenue.toLocaleString('pt-BR')} (${m.attendance.toLocaleString('pt-BR')} torcedores)`, 'info', 90);
+        safeMatches.forEach(m => {
+            try {
+                if (m.home === myTeam.id && m.revenue) {
+                    const safeRevenue = isNaN(m.revenue) ? 0 : m.revenue;
+                    myTeam.balance += safeRevenue;
+                    const safeAttendance = isNaN(m.attendance) ? 0 : m.attendance;
+                    addCommentaryItem(`💰 Receita de Bilheteira: R$ ${safeRevenue.toLocaleString('pt-BR')} (${safeAttendance.toLocaleString('pt-BR')} torcedores)`, 'info', 90);
+                    
+                    if (m.commerceRevenue && m.commerceRevenue > 0) {
+                        const safeCommerce = isNaN(m.commerceRevenue) ? 0 : m.commerceRevenue;
+                        myTeam.balance += safeCommerce;
+                        addCommentaryItem(`🍔 Receita de Comércio: R$ ${safeCommerce.toLocaleString('pt-BR')}`, 'info', 90);
+                    }
+                }
+            } catch(finErr) {
+                console.warn('[FIM DO JOGO] Erro no cálculo financeiro de bilheteira:', finErr);
             }
         });
         
-        // --- GESTÃO DE ESTÁDIO E FINANÇAS: Patrocínios e Rescisões ---
+        // Pagamento de direitos de TV para o visitante
+        if (userSimMatch && userSimMatch.away === myTeam.id) {
+            myTeam.balance += 800000;
+            addCommentaryItem(`📺 Direitos de TV: R$ 800.000`, 'info', 90);
+        }
+        
+        // --- GESTÃO DE ESTÁDIO E FINANÇAS: Patrocinadores e Rescisões ---
         if (userSimMatch && (userSimMatch.home === myTeam.id || userSimMatch.away === myTeam.id)) {
-            // Lógica de vitórias/derrotas consecutivas
-            const userG = userSimMatch.home === myTeam.id ? userSimMatch.currentHomeGoals : userSimMatch.currentAwayGoals;
-            const oppG = userSimMatch.home === myTeam.id ? userSimMatch.currentAwayGoals : userSimMatch.currentHomeGoals;
+            const userG = userSimMatch.home === myTeam.id ? (userSimMatch.currentHomeGoals || 0) : (userSimMatch.currentAwayGoals || 0);
+            const oppG = userSimMatch.home === myTeam.id ? (userSimMatch.currentAwayGoals || 0) : (userSimMatch.currentHomeGoals || 0);
+            const isHomeMatch = userSimMatch.home === myTeam.id;
             
-            if (userG < oppG) {
+            if (isNaN(myTeam.boardConfidence) || myTeam.boardConfidence == null) myTeam.boardConfidence = 80;
+            
+            if (userG > oppG) {
+                myTeam.consecutiveLosses = 0;
+                myTeam.boardConfidence = Math.min(100, myTeam.boardConfidence + 5);
+            } else if (userG === oppG) {
+                myTeam.consecutiveLosses = 0;
+                if (isHomeMatch) {
+                    myTeam.boardConfidence -= 2;
+                } else {
+                    myTeam.boardConfidence = Math.min(100, myTeam.boardConfidence + 1);
+                }
+            } else {
                 myTeam.consecutiveLosses = (myTeam.consecutiveLosses || 0) + 1;
-                // Rescisão
+                if (oppG - userG >= 3) {
+                    myTeam.boardConfidence -= 12;
+                } else {
+                    myTeam.boardConfidence -= 8;
+                }
+                
+                // Notícia de crise
+                if (myTeam.boardConfidence < 30) {
+                    newsFeedItems.push({
+                        type: 'crisis', club: myTeam.name, manager: currentUser
+                    });
+                }
+
                 if (myTeam.consecutiveLosses >= 3) {
                     sponsorSlots.forEach(slot => {
                         if (myTeam.sponsorships && myTeam.sponsorships[slot] && Math.random() < 0.3) {
@@ -2518,113 +3750,275 @@ function finishMatchSimulation() {
                         }
                     });
                 }
-            } else {
-                myTeam.consecutiveLosses = 0; // Reset nas vitórias e empates
             }
             
-            // Pagamentos
             let sponIncome = 0;
-            if (myTeam.sponsorships) {
-                sponsorSlots.forEach(slot => {
-                    const contract = myTeam.sponsorships[slot];
-                    if (contract) {
-                        sponIncome += contract.value;
-                        contract.duration--;
-                        if (contract.duration <= 0) {
-                            myTeam.sponsorships[slot] = null;
-                            addCommentaryItem(`📜 O contrato de patrocínio com a <strong>${contract.brand}</strong> (${slot}) chegou ao fim.`, 'info', 90);
+            try {
+                if (myTeam.sponsorships) {
+                    sponsorSlots.forEach(slot => {
+                        const contract = myTeam.sponsorships[slot];
+                        if (contract) {
+                            const safeValue = isNaN(contract.value) ? 0 : (contract.value || 0);
+                            sponIncome += safeValue;
+                            contract.duration--;
+                            if (contract.duration <= 0) {
+                                myTeam.sponsorships[slot] = null;
+                                addCommentaryItem(`📜 O contrato de patrocínio com a <strong>${contract.brand}</strong> (${slot}) chegou ao fim.`, 'info', 90);
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            } catch(sponErr) {
+                console.warn('[FIM DO JOGO] Erro no processamento de patrocinadores:', sponErr);
             }
             if (sponIncome > 0) {
                 myTeam.balance += sponIncome;
                 addCommentaryItem(`💰 Receita de Patrocínios: R$ ${sponIncome.toLocaleString('pt-BR')}`, 'info', 90);
             }
         }
-        // -----------------------------------------------------------
+        
+        const currentRoundData = matchSchedule[currentRound - 1];
+        const currentType = currentRoundData ? currentRoundData.type : 'league';
         
         if (isCupMode) {
             finishCupRound();
-        } else if (isLibertadoresMode) {
+        } else if (currentType === 'continental') {
             finishLibertadoresRound();
+            if (typeof finishSulAmericanaRound === 'function') finishSulAmericanaRound();
+        } else if (currentType === 'intercontinental') {
+            if (typeof finishIntercontinentalRound === 'function') finishIntercontinentalRound();
         } else {
-            // Lógica de Liga (Brasileirão/Nacionais)
-            simulatedRoundMatches.forEach(m => {
-                updateStandings(m.home, m.currentHomeGoals, m.currentAwayGoals);
-                updateStandings(m.away, m.currentAwayGoals, m.currentHomeGoals);
+            safeMatches.forEach(m => {
+                try {
+                    const hg = isNaN(m.currentHomeGoals) ? 0 : (m.currentHomeGoals || 0);
+                    const ag = isNaN(m.currentAwayGoals) ? 0 : (m.currentAwayGoals || 0);
+                    updateStandings(m.home, hg, ag);
 
-                // Bônus financeiro por partida para o jogador
-                if (m.home === myTeam.id || m.away === myTeam.id) {
-                    const userG = m.home === myTeam.id ? m.currentHomeGoals : m.currentAwayGoals;
-                    const oppG = m.home === myTeam.id ? m.currentAwayGoals : m.currentHomeGoals;
-                    if (userG > oppG) myTeam.balance += 600000;
-                    else if (userG === oppG) myTeam.balance += 250000;
-                }
-                
-                // Salva o placar no calendário
-                const roundIdx = currentRound - 1;
-                if (matchSchedule[roundIdx] && matchSchedule[roundIdx].matches) {
-                    const scheduleMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
-                    if (scheduleMatch) {
-                        scheduleMatch.homeScore = m.currentHomeGoals;
-                        scheduleMatch.awayScore = m.currentAwayGoals;
+                    // Gerar notícia de goleada
+                    if (Math.abs(hg - ag) >= 4) {
+                        const winner = hg > ag ? m.homeTeam : m.awayTeam;
+                        const loser = hg > ag ? m.awayTeam : m.homeTeam;
+                        newsFeedItems.push({
+                            type: 'result', winner: winner.name, loser: loser.name, score: `${hg}-${ag}`
+                        });
                     }
+
+                    updateStandings(m.away, ag, hg);
+
+                    if (m.home === myTeam.id || m.away === myTeam.id) {
+                        const userG = m.home === myTeam.id ? hg : ag;
+                        const oppG = m.home === myTeam.id ? ag : hg;
+                        if (userG > oppG) myTeam.balance += 600000;
+                        else if (userG === oppG) myTeam.balance += 250000;
+                    }
+                    
+                    const roundIdx = currentRound - 1;
+                    if (matchSchedule[roundIdx] && matchSchedule[roundIdx].matches) {
+                        const scheduleMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
+                        if (scheduleMatch) {
+                            scheduleMatch.homeScore = hg;
+                            scheduleMatch.awayScore = ag;
+                        }
+                    }
+                } catch(matchProcErr) {
+                    console.warn('[FIM DO JOGO] Erro ao processar resultado:', matchProcErr, m);
                 }
             });
             sortStandings();
         }
 
-        // Processamento de cansaço e recuperação física
         allTeams.forEach(team => {
             if (!team.squad) return;
-            team.squad.forEach(p => {
+            team.squad.forEach(p => { // IDEIA 18: Recuperação de Lesão
+                if (p.injuryRounds > 0) p.injuryRounds--;
+
                 if (p.suspensionRounds > 0) p.suspensionRounds--;
                 if (p.injuryRounds > 0) p.injuryRounds--;
                 
-                // Lógica de suspensão por acúmulo de cartões amarelos (3 cartões)
                 if ((p.yellowCards || 0) >= 3) {
                     p.suspensionRounds = 1;
                     p.yellowCards = 0;
-                    p.isStarter = false; // Tira dos titulares para a próxima rodada
+                    p.isStarter = false;
                     if (team.id === myTeam.id) {
                         addCommentaryItem(`🚫 <strong>Suspensão:</strong> <strong>${p.name}</strong> acumulou 3 cartões amarelos e está suspenso para a próxima rodada.`, 'info', 90);
                     }
                 }
 
-                // Verifica se o jogador participou da partida usando a flag temporária
-                if (p.playedInMatch) {
-                    // Jogadores que jogam cansam mais (perdem entre 5 e 12 de energia)
-                    p.energy = Math.max(0, p.energy - (Math.floor(Math.random() * 8) + 5));
-                    // Chance de lesão baseada na energia
-                    if (Math.random() < (p.energy < 40 ? 0.03 : 0.005)) {
-                        p.injuryRounds = Math.floor(Math.random() * 3) + 1;
-                        p.isStarter = false;
-                    }
-                } else if (!p.injuryRounds || p.injuryRounds === 0) {
-                    // Quem não joga (permanece no banco de reservas toda a partida) recupera 100% da energia
-                    p.energy = 100;
+                // IDEIA 20: Limpa o emoji de indisciplina após o jogo (dura apenas 1 rodada)
+                if (p.emoji && team.id === myTeam.id) {
+                    delete p.emoji;
                 }
-                // Limpa as flags temporárias de todos os jogadores para a próxima rodada
+
+                if (p.playedInMatch) {
+                    p.matchesPlayed = (p.matchesPlayed || 0) + 1;
+                    
+                    // --- LÓGICA DE DESGASTE FÍSICO POR IDADE ---
+                    let baseEnergyLoss = p.startedMatch ? 20 : 10; // Desgaste padrão para 26-31 anos
+                    if (p.age <= 25) {
+                        baseEnergyLoss -= 5; // Jovens cansam menos
+                    } else if (p.age >= 32) {
+                        baseEnergyLoss += 10; // Veteranos cansam mais
+                    }
+                    
+                    let energyLoss = baseEnergyLoss + Math.floor(Math.random() * 6) - 3; // Adiciona pequena variação
+                    
+                    if (team.id === myTeam.id && team.tactics && team.tactics.trainingFocus) {
+                        if (team.tactics.trainingFocus === 'Intenso') energyLoss += 8;
+                        if (team.tactics.trainingFocus === 'Recuperacao') energyLoss -= 8;
+                    }
+                    
+                    p.energy = Math.max(0, (p.energy || 100) - energyLoss);
+                    p.morale = Math.min(100, (p.morale || 100) + 5); // IDEIA 17
+                    p.consecutiveMatchesNotPlayed = 0; // Zera o contador de jogos sem jogar
+                    
+                    // --- IDEIA 18: SISTEMA DE LESÕES ---
+                    let injuryRisk = 0.015; // 1.5% de chance base por jogo
+                    if ((p.energy || 100) < 60) {
+                        injuryRisk *= 2; // Dobra a chance se a energia estiver baixa
+                    }
+
+                    if (team.id === myTeam.id && team.tactics && team.tactics.trainingFocus) {
+                        if (team.tactics.trainingFocus === 'Intenso') injuryRisk *= 2.5;
+                        if (team.tactics.trainingFocus === 'Recuperacao') injuryRisk /= 4;
+                    }
+                    
+                    if (Math.random() < injuryRisk) {
+                        const isSevere = Math.random() < 0.2; // 20% de chance de ser grave
+                        let duration = isSevere ? Math.floor(Math.random() * 6) + 5 : Math.floor(Math.random() * 2) + 1; // 5-10 ou 1-2 rodadas
+                        newsFeedItems.push({ type: 'injury', player: p.name, club: myTeam.name, duration: duration });
+                        
+                        // Aplica redução do Departamento Médico
+                        const reduction = 1 - ((myTeam.medicalDeptLevel || 1) - 1) * 0.20;
+                        p.injuryRounds = Math.max(1, Math.round(duration * reduction));
+                        p.isStarter = false;
+                        if (team.id === myTeam.id) {
+                            alert(`🚑 LESÃO!
+
+${p.name} lesionou-se e vai desfalcar a equipa por ${p.injuryRounds} rodada(s)!`);
+                        }
+                    }
+                    
+                    if (p.age && p.age <= 19) {
+                        if (Math.random() < 0.15) {
+                            p.strength = Math.min(99, p.strength + 1);
+                            if (team.id === myTeam.id) {
+                                addCommentaryItem(`🌟 <strong>Evolução:</strong> O jovem <strong>${p.name}</strong> ganhou experiência em campo e evoluiu para OVR ${p.strength}!`, 'info', 90);
+                            }
+                        }
+                    }
+                    
+                } else if (!p.injuryRounds || p.injuryRounds === 0) {
+                    let energyGain = 25;
+                    if (team.id === myTeam.id && team.tactics && team.tactics.trainingFocus) {
+                        if (team.tactics.trainingFocus === 'Intenso') energyGain -= 10;
+                        if (team.tactics.trainingFocus === 'Recuperacao') energyGain += 15;
+                    }
+                    p.energy = Math.min(100, (p.energy || 100) + energyGain);
+                    p.morale = Math.max(0, (p.morale || 100) - 5);
+
+                    // --- IDEIA 17: SISTEMA DE FEEDBACK DE INSATISFAÇÃO ---
+                    if (team.id === myTeam.id) {
+                        p.consecutiveMatchesNotPlayed = (p.consecutiveMatchesNotPlayed || 0) + 1;
+                        if (p.morale < 40 && p.consecutiveMatchesNotPlayed >= 4 && Math.random() < 0.4) {
+                            alert(`💬 MENSAGEM DO JOGADOR
+
+${p.name} enviou uma mensagem: "Mister, estou chateado por não estar a ter minutos em campo. Preciso de jogar!"`);
+                            p.consecutiveMatchesNotPlayed = 0; // Reseta para não spammar
+                        }
+                    }
+                }
                 delete p.playedInMatch;
+                delete p.startedMatch;
                 delete p.matchYellowCards;
             });
         });
 
-    } catch (error) {
-        console.error("Erro ao processar fim da rodada:", error);
+    } catch (globalError) {
+        console.error('ERRO EM FINISHMATCHSIMULATION:', globalError);
     } finally {
+        // Garante a liberação dos guards, incremento da rodada e retorno à tela principal
+        
+        // --- SISTEMA DE SALÁRIOS: Desconto da folha salarial ---
+        if (myTeam && myTeam.squad) {
+            const payroll = myTeam.squad.reduce((acc, p) => acc + (p.salario || 0), 0);
+            if (payroll > 0) {
+                myTeam.balance -= payroll;
+                addCommentaryItem(`💸 Folha Salarial: R$ ${payroll.toLocaleString('pt-BR')} foram deduzidos do caixa.`, 'info', 90);
+            }
+        }
+        // ----------------------------------------------------
+
+        window.finishMatchRunning = false;
+        window.simulationEnded = false;
+        
         currentRound++;
+
+        // IDEIA 19: Verifica se deve checar por propostas de outros clubes
+        if (isTransferWindowOpen()) {
+            setTimeout(checkForIncomingBids, 1000); // Pequeno delay para não sobrepor alertas
+            setTimeout(checkForManagerOffers, 1500); // Verifica propostas para o técnico
+        }
         isCupMode = false;
         isLibertadoresMode = false;
-        
-        updateDashboardUI();
-        saveGame();
-        showScreen('screen-main');
-        updateDynamicBackground(myTeam.id);
-        window.scrollTo(0,0);
+
+        const finBtn = document.getElementById('btn-live-continue');
+        if (finBtn) finBtn.style.display = 'none';
+
+        try { updateDashboardUI(); } catch (err) { console.warn('Erro ao atualizar UI do dashboard:', err); }
+        try { saveGame(); } catch (err) { console.warn('Erro ao salvar jogo:', err); }
+
+        try {
+            showScreen('screen-main');
+        } catch (e) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const main = document.getElementById('screen-main');
+            if (main) main.classList.add('active');
+        }
+
+        try { if (myTeam) updateDynamicBackground(myTeam.id); } catch(e) {}
+        window.scrollTo(0, 0);
+
+        // Verifica Demissão ou Alerta de Confiança
+        setTimeout(() => {
+            try {
+                if (myTeam && myTeam.boardConfidence <= 0) {
+                    const sackedModal = document.getElementById('modal-sacked');
+                    if (sackedModal) sackedModal.style.display = 'flex';
+                } else if (myTeam && myTeam.boardConfidence <= 15) {
+                    alert("Aviso da Direção: Estás em risco de ser despedido devido aos maus resultados!");
+                }
+            } catch(e) {}
+        }, 800);
     }
 }
+
+
+function handleSacking() {
+    const modal = document.getElementById('modal-sacked');
+    if (modal) modal.style.display = 'none';
+    
+    if (myTeam) {
+        // Zera finanças e infraestrutura
+        ensureSafeState(myTeam, true);
+        myTeam.boardConfidence = 80;
+        
+        // Downgrade do plantel para a equipa base original
+        if (typeof squads !== 'undefined') {
+            const originalTeam = squads.find(t => t.id === myTeam.id);
+            if (originalTeam && originalTeam.squad) {
+                myTeam.squad = JSON.parse(JSON.stringify(originalTeam.squad));
+                myTeam.squad.forEach(p => {
+                    p.energy = 100;
+                    p.morale = 100;
+                });
+            }
+        }
+        
+        saveGame();
+        location.reload();
+    }
+}
+
 
 function finishCupRound() {
     console.log("finishCupRound: Iniciando...");
@@ -2638,6 +4032,7 @@ function finishCupRound() {
         const winnerId = hg > ag ? m.home : m.away;
         const runnerUpId = hg > ag ? m.away : m.home;
         winners.push(allTeams.find(t => t.id === winnerId));
+        const compNames = getCompetitionNames(myTeam.league);
 
         if (simulatedRoundMatches.length === 1) {
             cupWinnerId = winnerId;
@@ -2648,7 +4043,7 @@ function finishCupRound() {
             if (winnerId === myTeam.id) {
                 const prize = 2500000; // Bônus fixo por avançar
                 myTeam.balance += prize;
-                addCommentaryItem(`💰 COPA: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
+                addCommentaryItem(`💰 ${compNames.cup}: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
             } else {
                 addCommentaryItem(`❌ COPA: O ${myTeam.name} foi eliminado.`, 'info', 90);
             }
@@ -2666,9 +4061,11 @@ function finishCupRound() {
     } else if (winners.length === 1) {
         cupFinished = true; // Marca a copa como encerrada para não repetir a final
         const champion = winners[0];
-        alert(`🏆 FIM DA COPA! O ${champion.name} é o campeão!`);
+        const compNames = getCompetitionNames(myTeam.league);
+        alert(`🏆 FIM DA COPA! O ${champion.name} é o campeão da ${compNames.cup}!`);
         if (champion.id === myTeam.id) {
             const finalPrize = 10000000;
+            myTeam.hallOfFame.titles.push({ year: currentYear, title: compNames.cup });
             myTeam.balance += finalPrize;
         }
     }
@@ -2676,16 +4073,23 @@ function finishCupRound() {
 
 function finishLibertadoresRound() {
     console.log("finishLibertadoresRound: Iniciando...");
+    const libMatches = simulatedRoundMatches.filter(m => libertadoresParticipants.includes(m.home));
+    if (libMatches.length === 0) return;
+
     if (libertadoresPhase === 'groups') {
         console.log("finishLibertadoresRound: Processando fase de grupos.");
-        simulatedRoundMatches.forEach(m => {
+        libMatches.forEach(m => {
             const homeId = m.home;
             const awayId = m.away;
             let h = libertadoresGroupStandings.find(s => s.id === homeId);
             let a = libertadoresGroupStandings.find(s => s.id === awayId);
             
             if (!h || !a) return; // Segurança contra times não encontrados
-            console.log(`finishLibertadoresRound: Processando partida de grupo ${m.homeTeam.name} vs ${m.awayTeam.name}`);
+            // FIX BUG #2: m.homeTeam pode ser undefined em partidas continentais (sem enriquecimento)
+            // Usa fallback seguro para o log
+            const htName = (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : m.home;
+            const atName = (m.awayTeam && m.awayTeam.name) ? m.awayTeam.name : m.away;
+            console.log(`finishLibertadoresRound: Processando partida de grupo ${htName} vs ${atName}`);
 
             h.j++; a.j++; h.gp += m.currentHomeGoals; h.gc += m.currentAwayGoals; a.gp += m.currentAwayGoals; a.gc += m.currentHomeGoals;
             h.sg = h.gp - h.gc; a.sg = a.gp - a.gc;
@@ -2723,7 +4127,7 @@ function finishLibertadoresRound() {
         }
     } else {
         console.log("finishLibertadoresRound: Processando fase de mata-mata.");
-        const currentPhase = simulatedRoundMatches;
+        const currentPhase = libMatches;
         const winners = [];
         currentPhase.forEach(m => {
             let homeGoals = m.currentHomeGoals;
@@ -2731,10 +4135,15 @@ function finishLibertadoresRound() {
             if (homeGoals === awayGoals) {
                 if (Math.random() > 0.5) homeGoals++; else awayGoals++;
             }
-            console.log(`finishLibertadoresRound: Processando partida de mata-mata ${m.homeTeam.name} vs ${m.awayTeam.name}`);
+            // FIX BUG #3: m.homeTeam pode ser undefined em partidas de mata-mata continental
+            const htNameKO = (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : m.home;
+            const atNameKO = (m.awayTeam && m.awayTeam.name) ? m.awayTeam.name : m.away;
+            console.log(`finishLibertadoresRound: Processando partida de mata-mata ${htNameKO} vs ${atNameKO}`);
             const winnerId = homeGoals > awayGoals ? m.home : m.away;
             const winnerObj = allTeams.find(t => t.id === winnerId);
             if (winnerObj) winners.push(winnerObj);
+            const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
+            const compName = isEurope ? "Champions League" : "Libertadores";
             if (m.home === myTeam.id || m.away === myTeam.id) {
                 if (winnerId === myTeam.id) {
                     const prizes = {
@@ -2745,8 +4154,9 @@ function finishLibertadoresRound() {
                     };
                     const prize = prizes[currentPhase.length] || 0;
                     if (prize > 0) {
-                        myTeam.balance += prize;
-                        addCommentaryItem(`🌎 LIBERTADORES: O ${myTeam.name} recebeu R$ ${(prize/1000000).toFixed(1)}M por avançar de fase!`, 'info', 90);
+                        myTeam.balance += prize; // FIX: Corrigido para usar o nome dinâmico da competição
+                        if (currentPhase.length === 1) myTeam.hallOfFame.titles.push({ year: currentYear, title: compName });
+                        addCommentaryItem(`🌎 ${compName.toUpperCase()}: O ${myTeam.name} recebeu R$ ${(prize/1000000).toFixed(1)}M por avançar de fase!`, 'info', 90);
                     }
                     if (currentPhase.length === 1) addCommentaryItem("GLÓRIA ETERNA! Você é o campeão da América!", 'info', 90);
                 }
@@ -2857,7 +4267,7 @@ function renderStandings() {
 
         tr.innerHTML = `
             <td class="${rankClass}">${rankText}</td>
-            <td class="standings-team-cell">
+            <td class="standings-team-cell" style="cursor: pointer;" onclick="viewOpponentSquad('${team.id}')">
                 <img src="${team.shield}" alt="${team.name}" onerror="this.src='https://ui-avatars.com/api/?name=${team.name}&background=random'">
                 ${team.name}
             </td>
@@ -2884,19 +4294,14 @@ function getTeamTacticalModifiers(team) {
 
     if (team.tactics) {
         // 1. Mentalidade
-        if (team.tactics.mentality === 'Muito Ofensivo') {
-            attackMod += 0.30;
-            defenseMod += 0.30; // Mais exposto a sofrer gols
-        } else if (team.tactics.mentality === 'Ofensivo') {
-            attackMod += 0.15;
-            defenseMod += 0.15;
+        if (team.tactics.mentality === 'Ofensivo') {
+            attackMod += 0.20;
+            defenseMod += 0.15; // Mais exposto a sofrer gols
         } else if (team.tactics.mentality === 'Defensivo') {
             attackMod -= 0.15;
-            defenseMod -= 0.15; // Defesa mais sólida
-        } else if (team.tactics.mentality === 'Muito Defensivo') {
-            attackMod -= 0.30;
-            defenseMod -= 0.30;
+            defenseMod -= 0.20; // Defesa mais sólida, sofre menos gols
         }
+        // Equilibrado mantém os multiplicadores em 1.0
 
         // 2. Laterais
         if (team.tactics.laterais === 'Apoiando') {
@@ -2927,6 +4332,23 @@ function getTeamTacticalModifiers(team) {
                 attackMod += (cornerPlayer.strength / 100) * 0.02;
             }
         }
+        
+        // 5. Foco de Treino Semanal
+        const trainingFocus = team.tactics.trainingFocus || 'Equilibrado';
+        if (trainingFocus === 'Intenso') {
+            attackMod += 0.05;
+            defenseMod -= 0.05; // attackMod > 1 gives more power, defenseMod < 1 gives more solid defense. Wait, let's look at mentality.
+            // Mentality: 'Ofensivo' -> defenseMod += 0.15 (Mais exposto a sofrer gols).
+            // Intenso should just increase both attacking and defending power (so attackMod+, defenseMod-).
+            // Let's use:
+            // attackMod += 0.05;
+            // defenseMod -= 0.05;
+        } else if (trainingFocus === 'Tecnico') {
+            attackMod += 0.08;
+        } else if (trainingFocus === 'Recuperacao') {
+            attackMod -= 0.03;
+            defenseMod += 0.03;
+        }
     }
 
     return { attackMod, defenseMod };
@@ -2952,8 +4374,32 @@ function calculateGoals(teamA, teamB, match = null) {
     // ------------------------------------------
     
     // Força efetiva ponderada
-    const effectiveStrengthA = strengthA * modA.attackMod * modB.defenseMod;
-    const effectiveStrengthB = strengthB * modB.attackMod * modA.defenseMod;
+    let effectiveStrengthA = strengthA * modA.attackMod * modB.defenseMod;
+    let effectiveStrengthB = strengthB * modB.attackMod * modA.defenseMod;
+    
+    // --- ESTILO DE JOGO (PEDRA-PAPEL-TESOURA) ---
+    if (teamA.tactics && teamB.tactics) {
+        const styleA = teamA.tactics.playstyle || 'Posse de Bola';
+        const styleB = teamB.tactics.playstyle || 'Posse de Bola';
+        
+        if (styleA === 'Posse de Bola' && styleB === 'Contra-Ataque') {
+            effectiveStrengthA *= 1.10;
+        } else if (styleA === 'Contra-Ataque' && styleB === 'Pressão Alta') {
+            effectiveStrengthA *= 1.10;
+        } else if (styleA === 'Pressão Alta' && styleB === 'Posse de Bola') {
+            effectiveStrengthA *= 1.10;
+        }
+        
+        // E o inverso para o B (caso seja ele a ter vantagem sobre o A)
+        if (styleB === 'Posse de Bola' && styleA === 'Contra-Ataque') {
+            effectiveStrengthB *= 1.10;
+        } else if (styleB === 'Contra-Ataque' && styleA === 'Pressão Alta') {
+            effectiveStrengthB *= 1.10;
+        } else if (styleB === 'Pressão Alta' && styleA === 'Posse de Bola') {
+            effectiveStrengthB *= 1.10;
+        }
+    }
+    // --------------------------------------------
     
     // Diferença de força
     const ratio = effectiveStrengthA / effectiveStrengthB;
@@ -3023,9 +4469,16 @@ function calcEffectiveStrength(player, slotPosText) {
     const compatible = positionCompatibility[player.position] || [];
     const isOutOfPosition = !compatible.includes(slotPosText);
     
-    const effectiveStrength = isOutOfPosition 
+    let effectiveStrength = isOutOfPosition 
         ? Math.floor(player.strength * OUT_OF_POSITION_PENALTY) 
         : player.strength;
+        
+    if ((player.energy || 100) < 60) {
+        effectiveStrength = Math.floor(effectiveStrength * 0.8);
+    }
+    if ((player.morale || 100) < 40) {
+        effectiveStrength = Math.floor(effectiveStrength * 0.9);
+    }
     
     return { effectiveStrength, isOutOfPosition };
 }
@@ -3195,6 +4648,10 @@ function renderSquad() {
             const strColor = isOutOfPosition ? '#ffa726' : 'var(--primary-color)';
             const strDisplay = isOutOfPosition ? `${effectiveStrength} ⚠` : `${effectiveStrength}`;
 
+            const hasTrainedThisYear = player.ultimoAnoTreinado === currentYear;
+            const trainButtonDisabled = hasTrainedThisYear ? 'disabled' : '';
+            const trainButtonStyle = hasTrainedThisYear ? 'opacity: 0.4; cursor: not-allowed;' : 'cursor: pointer; background: rgba(0,0,0,0.4);';
+
             node.onclick = (e) => {
                 e.stopPropagation();
                 selectPitchPlayer(player.id);
@@ -3229,11 +4686,15 @@ function renderSquad() {
 
             node.innerHTML = `
                 <div class="pitch-player-badge${isOutOfPosition ? ' penalty-badge' : ''}">
-                    <span class="pitch-pos-box sector-${slot.sector}">${slot.posText}</span>
+                    <span class="pitch-pos-box sector-${slot.sector}" title="Salário: R$ ${player.salario.toLocaleString('pt-BR')}">${slot.posText}</span>
                     <span class="pitch-str-box" style="color: ${strColor}">${strDisplay}</span>
                 </div>
                 <div class="pitch-player-name" title="${player.name}${isOutOfPosition ? ' (Fora de Posição: -15%)' : ''}">${player.name}${injuryIcon}${suspIcon}</div>
-                <div class="pitch-player-energy" style="font-size: 0.65rem; color: #2196f3; margin-top: 1px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⚡ ${Math.round(player.energy || 100)}%</div>
+                <div style="display: flex; gap: 5px; justify-content: center; margin-top: 1px; align-items: center;">
+                    <div class="pitch-player-energy" style="font-size: 0.7rem; color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⚡ ${Math.round(player.energy || 100)}%</div>
+                    <div style="font-size: 0.7rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))} <span style="color: var(--text-muted); font-weight: normal;">i${player.age}</span></div>
+                </div>
+                <button onclick="event.stopPropagation(); trainPlayer(${player.id})" style="margin-top: 3px; padding: 2px 6px; font-size: 0.65rem; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; font-weight: bold; transition: background 0.2s; ${trainButtonStyle}" onmouseover="if(!this.disabled) this.style.background='rgba(76,175,80,0.2)';" onmouseout="if(!this.disabled) this.style.background='rgba(0,0,0,0.4)';" ${trainButtonDisabled}>Treinar</button>
             `;
             pitchField.appendChild(node);
         });
@@ -3274,27 +4735,27 @@ function renderSquad() {
             // Eventos Drag & Drop
             item.setAttribute('draggable', 'true');
             item.ondragstart = (e) => {
-                e.dataTransfer.setData('text/plain', player.id);
+                e.dataTransfer.setData('text/plain', String(player.id));
                 e.dataTransfer.effectAllowed = 'move';
-                setTimeout(() => item.style.opacity = '0.5', 0);
+                setTimeout(() => item.classList.add('dragging'), 0);
             };
             item.ondragend = () => {
-                item.style.opacity = isInjured || isSuspended ? '0.6' : '1';
+                item.classList.remove('dragging');
             };
             item.ondragover = (e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
-                item.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                item.classList.add('drag-over');
             };
             item.ondragleave = () => {
-                item.style.backgroundColor = '';
+                item.classList.remove('drag-over');
             };
             item.ondrop = (e) => {
                 e.preventDefault();
-                item.style.backgroundColor = '';
+                item.classList.remove('drag-over');
                 const draggedId = e.dataTransfer.getData('text/plain');
-                if (draggedId && draggedId !== player.id) {
-                    handlePlayerSwap(draggedId, player.id);
+                if (draggedId && Number(draggedId) !== player.id) {
+                    handlePlayerSwap(Number(draggedId), player.id);
                 }
             };
 
@@ -3304,8 +4765,10 @@ function renderSquad() {
                     <span class="reserve-player-name">${player.name}${injuryIcon}${suspIcon}</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="reserve-player-energy" style="color: #2196f3; font-size: 0.75rem; min-width: 40px; font-weight: bold;">⚡ ${Math.round(player.energy || 100)}%</span>
-                    <span class="reserve-player-str">${player.strength}</span>
+                    <span class="reserve-player-energy" style="color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-size: 0.75rem; min-width: 40px; font-weight: bold;">⚡ ${Math.round(player.energy || 100)}%</span>
+                    <span style="font-size: 0.8rem; margin-right: 5px;">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))}</span>
+                    <span class="reserve-player-str" style="min-width: 50px;">${player.strength} <span style="font-size:0.7rem; color: var(--text-muted); font-weight: normal;">i${player.age}</span></span>
+                    <button class="btn btn-train-mini" onclick="event.stopPropagation(); trainPlayer(${player.id})" title="Treino Profissional" style="padding: 2px 6px; font-size: 0.7rem; color: #4CAF50; border: 1px solid #4CAF50; background: transparent; border-radius: 4px; font-weight: bold; margin-right: 2px; transition: background 0.2s; ${player.ultimoAnoTreinado === currentYear ? 'opacity: 0.4; cursor: not-allowed;' : 'cursor: pointer;'}" onmouseover="if(!this.disabled) this.style.backgroundColor='rgba(76,175,80,0.1)';" onmouseout="if(!this.disabled) this.style.backgroundColor='transparent';" ${player.ultimoAnoTreinado === currentYear ? 'disabled' : ''}>Treinar</button>
                     <button class="btn btn-sell-mini" onclick="event.stopPropagation(); sellPlayer(${player.id})" title="Vender Jogador" style="padding: 2px 6px; font-size: 0.7rem; color: #f44336; border-color: #f44336; background: transparent; border-radius: 4px; border: 1px solid var(--border-color);">Vender</button>
                 </div>
             `;
@@ -3314,6 +4777,68 @@ function renderSquad() {
     }
 
     renderTacticsPanel();
+}
+
+function trainPlayer(playerId) {
+    if (!myTeam) return;
+    
+    // Busca o jogador no elenco
+    const player = myTeam.squad.find(p => p.id === playerId);
+    if (!player) return;
+    
+    // 1. Validação de custo financeiro (R$ 2.000.000)
+    const cost = 2000000;
+    if (myTeam.balance < cost) {
+        alert("Saldo insuficiente! O treino custa R$ 2.000.000.");
+        return;
+    }
+    
+    // 2. Validação de limitação anual (ultimoAnoTreinado)
+    if (player.ultimoAnoTreinado === currentYear) {
+        alert("Este jogador já treinou este ano!");
+        return;
+    }
+    
+    // 3. Validação de cansaço físico (Energia)
+    const currentEnergy = player.energy !== undefined ? player.energy : 100;
+    if (currentEnergy < 50) {
+        alert("Jogador demasiado cansado para treinar!");
+        return;
+    }
+    
+    // Gasto garantido de dinheiro e energia
+    myTeam.balance -= cost;
+    player.energy = currentEnergy - 30;
+    if (player.energy < 0) player.energy = 0;
+    player.ultimoAnoTreinado = currentYear;
+    
+    // 4. Probabilidade de sucesso (30% de chance)
+    const success = Math.random() < 0.3;
+    if (success) {
+        player.strength = (player.strength || 50) + 1;
+        if (player.strength > 99) player.strength = 99; // Cap
+        alert("Treino Excelente! Overall +1");
+    } else {
+        alert("Treino concluído, mas o jogador não evoluiu.");
+    }
+    
+    console.log(`[TREINO PROFISSIONAL] ${player.name} treinou! Sucesso: ${success}. OVR: ${player.strength}, Energia: ${player.energy}%, Saldo Restante: R$ ${myTeam.balance.toLocaleString('pt-BR')}`);
+    
+    // Salva o estado e atualiza a interface
+    saveGame();
+    renderSquad();
+    updateTeamStrength();
+    
+    // Sincroniza o saldo exibido nas outras telas
+    const balEl = document.getElementById('stadium-balance');
+    if (balEl) balEl.innerText = myTeam.balance.toLocaleString('pt-BR');
+    
+    const marketBalEl = document.getElementById('market-balance');
+    if (marketBalEl) marketBalEl.innerText = myTeam.balance.toLocaleString('pt-BR');
+
+    // FIX: Atualiza também o saldo no painel principal do manager
+    const mainBalEl = document.getElementById('my-team-balance');
+    if (mainBalEl) mainBalEl.innerText = myTeam.balance.toLocaleString('pt-BR');
 }
 
 function selectPitchPlayer(playerId) {
@@ -3473,7 +4998,13 @@ function renderTacticsPanel() {
     // 1. Preenche os seletores básicos
     document.getElementById('tactics-formation').value = myTeam.tactics.formation;
     document.getElementById('tactics-mentality').value = myTeam.tactics.mentality;
+    if (document.getElementById('tactics-playstyle')) {
+        document.getElementById('tactics-playstyle').value = myTeam.tactics.playstyle || 'Posse de Bola';
+    }
     document.getElementById('tactics-laterais').value = myTeam.tactics.laterais;
+    if (document.getElementById('tactics-training')) {
+        document.getElementById('tactics-training').value = myTeam.tactics.trainingFocus || 'Equilibrado';
+    }
 
     // 2. Preenche os seletores de funções (Capitão, Faltas, Escanteios) com os titulares atuais
     const starters = myTeam.squad.filter(p => p.isStarter);
@@ -3542,7 +5073,13 @@ function updateTactics() {
 
     myTeam.tactics.formation = document.getElementById('tactics-formation').value;
     myTeam.tactics.mentality = document.getElementById('tactics-mentality').value;
+    if (document.getElementById('tactics-playstyle')) {
+        myTeam.tactics.playstyle = document.getElementById('tactics-playstyle').value;
+    }
     myTeam.tactics.laterais = document.getElementById('tactics-laterais').value;
+    if (document.getElementById('tactics-training')) {
+        myTeam.tactics.trainingFocus = document.getElementById('tactics-training').value;
+    }
 
     myTeam.tactics.captain = Number(document.getElementById('tactics-captain').value);
     myTeam.tactics.penaltyTaker = Number(document.getElementById('tactics-penalty-taker').value);
@@ -3813,6 +5350,17 @@ function renderStadium() {
     document.getElementById('stadium-upgrade-cost').innerText = `R$ ${upgradeCost.toLocaleString('pt-BR')}`;
     
     // Reset classes
+    // --- IDEIA 18: DEPARTAMENTO MÉDICO ---
+    const medLevel = myTeam.medicalDeptLevel || 1;
+    const medUpgradeCost = medLevel * 5000000;
+    const medLvlEl = document.getElementById('medical-level-badge');
+    const medCostEl = document.getElementById('medical-upgrade-cost');
+    const medBonusEl = document.getElementById('medical-bonus-info');
+    if (medLvlEl) medLvlEl.innerText = `Nível ${medLevel}`;
+    if (medCostEl) medCostEl.innerText = `R$ ${medUpgradeCost.toLocaleString('pt-BR')}`;
+    if (medBonusEl) medBonusEl.innerText = `Redução de ${((medLevel - 1) * 20)}% no tempo de recuperação.`;
+    // ------------------------------------
+
     ['Low', 'Medium', 'High'].forEach(type => {
         const btn = document.getElementById(`ticket-btn-${type}`);
         if (btn) {
@@ -3826,6 +5374,51 @@ function renderStadium() {
         activeBtn.classList.remove('btn-secondary');
         activeBtn.classList.add('btn-primary');
     }
+
+    // Initialize extras if not present
+    if (myTeam.academyLevel === undefined) myTeam.academyLevel = 1;
+    if (!myTeam.commerceLevel) myTeam.commerceLevel = { bars: 0, food: 0, gourmet: 0 };
+    if (!myTeam.history) myTeam.history = [];
+
+    // Academy UI
+    const badgeAcademy = document.getElementById('academy-level-badge');
+    if (badgeAcademy) badgeAcademy.innerText = `Nível ${myTeam.academyLevel}`;
+    const academyCost = myTeam.academyLevel * 2000000;
+    const academyCostEl = document.getElementById('academy-upgrade-cost');
+    if (academyCostEl) {
+        if (myTeam.academyLevel >= 10) {
+            academyCostEl.innerText = "MÁX";
+            document.getElementById('btn-upgrade-academy').disabled = true;
+        } else {
+            academyCostEl.innerText = `${academyCost.toLocaleString('pt-BR')}`;
+            document.getElementById('btn-upgrade-academy').disabled = false;
+        }
+    }
+
+    // Commerce UI
+    const comm = myTeam.commerceLevel || {};
+    const barsLvl = Number(comm.bars) || 0;
+    const foodLvl = Number(comm.food) || 0;
+    const gourmetLvl = Number(comm.gourmet) || 0;
+    
+    const badgeBars = document.getElementById('commerce-bars-badge');
+    if (badgeBars) {
+        badgeBars.innerText = `Nv. ${barsLvl}`;
+        document.getElementById('commerce-food-badge').innerText = `Nv. ${foodLvl}`;
+        document.getElementById('commerce-gourmet-badge').innerText = `Nv. ${gourmetLvl}`;
+        
+        document.getElementById('cost-bars').innerText = ((barsLvl + 1) * 100000).toLocaleString('pt-BR');
+        document.getElementById('cost-food').innerText = ((foodLvl + 1) * 150000).toLocaleString('pt-BR');
+        document.getElementById('cost-gourmet').innerText = ((gourmetLvl + 1) * 300000).toLocaleString('pt-BR');
+    }
+
+    // Folha Salarial
+    const payrollEl = document.getElementById('payroll-total');
+    if (payrollEl && myTeam.squad) {
+        const totalPayroll = myTeam.squad.reduce((acc, p) => acc + (p.salario || 0), 0);
+        payrollEl.innerText = `R$ ${totalPayroll.toLocaleString('pt-BR')}`;
+    }
+
     
     renderSponsorships();
 }
@@ -3854,14 +5447,196 @@ function upgradeStadium() {
         
         saveGame();
         renderStadium();
-        alert("Parabéns! O seu estádio foi expandido com sucesso!");
     }
+}
+
+function upgradeAcademy() {
+    if (!myTeam) return;
+    if (myTeam.academyLevel >= 10) return alert("A Escola de Formação já está no nível máximo!");
+    
+    const cost = myTeam.academyLevel * 2000000;
+    if (myTeam.balance < cost) {
+        return alert("Saldo insuficiente para evoluir a Escola de Formação.");
+    }
+    
+    if (confirm(`Evoluir Formação para o Nível ${myTeam.academyLevel + 1} por R$ ${cost.toLocaleString('pt-BR')}?`)) {
+        myTeam.balance -= cost;
+        myTeam.academyLevel += 1;
+        saveGame();
+        renderStadium();
+    }
+}
+
+function upgradeCommerce(type) {
+    if (!myTeam) return;
+    
+    if (!myTeam.commerceLevel) myTeam.commerceLevel = { bars: 0, food: 0, gourmet: 0 };
+    let currentLevel = Number(myTeam.commerceLevel[type]) || 0;
+    
+    let cost = 0;
+    let name = "";
+    if (type === 'bars') { cost = (currentLevel + 1) * 100000; name = "Bares de Bebidas"; }
+    else if (type === 'food') { cost = (currentLevel + 1) * 150000; name = "Roulote de Bifanas"; }
+    else if (type === 'gourmet') { cost = (currentLevel + 1) * 300000; name = "Doces Gourmet"; }
+    
+    if (myTeam.balance < cost) {
+        return alert(`Saldo insuficiente para melhorar ${name}.`);
+    }
+    
+    if (confirm(`Melhorar ${name} para o próximo nível por R$ ${cost.toLocaleString('pt-BR')}?`)) {
+        myTeam.balance -= cost;
+        myTeam.commerceLevel[type] = currentLevel + 1;
+        saveGame();
+        renderStadium();
+    }
+}
+
+function upgradeMedicalDept() {
+    if (!myTeam) return;
+    
+    const currentLevel = myTeam.medicalDeptLevel || 1;
+    const cost = currentLevel * 5000000;
+    
+    if (myTeam.balance < cost) {
+        return alert("Saldo insuficiente para melhorar o Departamento Médico.");
+    }
+    
+    if (confirm(`Melhorar Departamento Médico para o Nível ${currentLevel + 1} por R$ ${cost.toLocaleString('pt-BR')}?`)) {
+        myTeam.balance -= cost;
+        myTeam.medicalDeptLevel = currentLevel + 1;
+        saveGame();
+        renderStadium();
+    }
+}
+
+function checkRandomEvents() {
+    if (!myTeam || !myTeam.squad) return;
+    
+    const events = [
+        {
+            type: 'injury',
+            execute: () => {
+                const starters = myTeam.squad.filter(p => p.isStarter && (p.injuryRounds || 0) === 0);
+                if (starters.length > 0) {
+                    const p = starters[Math.floor(Math.random() * starters.length)];
+                    p.injuryRounds = Math.floor(Math.random() * 3) + 1;
+                    p.energy = Math.max(10, p.energy - 30);
+                    alert(`🚨 EVENTO: Lesão no Treino!
+O jogador ${p.name} lesionou-se durante um treino e ficará indisponível por ${p.injuryRounds} rodada(s).`);
+                }
+            }
+        },
+        {
+            type: 'sponsor',
+            execute: () => {
+                const bonus = Math.floor(Math.random() * 500000) + 100000;
+                myTeam.balance += bonus;
+                alert(`🎉 EVENTO: Bónus de Patrocinador!
+Um patrocinador ficou contente com o clube e ofereceu um prémio de R$ ${bonus.toLocaleString('pt-BR')}.`);
+            }
+        },
+        {
+            type: 'unhappy',
+            execute: () => {
+                const bench = myTeam.squad.filter(p => !p.isStarter);
+                if (bench.length > 0) {
+                    const p = bench[Math.floor(Math.random() * bench.length)];
+                    p.energy = Math.max(10, p.energy - 15);
+                    p.strength = Math.max(1, p.strength - 1);
+                    alert(`😠 EVENTO: Insatisfação!
+O jogador ${p.name} exigiu ser titular e criou mau ambiente no balneário. A sua força e moral diminuíram.`);
+                }
+            }
+        }
+    ];
+    
+    const event = events[Math.floor(Math.random() * events.length)];
+    event.execute();
+    saveGame();
+}
+
+function renderTrophies() {
+    if (!myTeam) return;
+    const container = document.getElementById('trophies-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (!myTeam.history || myTeam.history.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted);">Nenhum histórico de épocas registado ainda.</p>';
+        return;
+    }
+    
+    // Mostramos do mais recente ao mais antigo
+    [...myTeam.history].reverse().forEach(hist => {
+        const div = document.createElement('div');
+        div.style.background = 'rgba(255, 255, 255, 0.05)';
+        div.style.padding = '15px';
+        div.style.borderRadius = '8px';
+        div.style.width = '100%';
+        div.style.textAlign = 'left';
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.gap = '15px';
+        
+        let icon = 'fa-calendar-check';
+        let color = '#ccc';
+        if (hist.toLowerCase().includes('campeão') || hist.toLowerCase().includes('vencedor')) {
+            icon = 'fa-trophy';
+            color = '#ffd700';
+        }
+        
+        div.innerHTML = `
+            <i class="fas ${icon}" style="font-size: 1.5rem; color: ${color};"></i>
+            <span style="font-size: 1rem; color: white;">${hist}</span>
+        `;
+        container.appendChild(div);
+    });
 }
 
 function renderSponsorships() {
     if (!myTeam || !myTeam.sponsorships) return;
     const container = document.getElementById('sponsorships-container');
+    if (!container) return;
     container.innerHTML = '';
+    
+    // Ensure propostas array exists
+    if (!myTeam.sponsorships.propostas) myTeam.sponsorships.propostas = [];
+    
+    // Se não houver propostas espontâneas no array, gera propostas sortidas de forma aleatória para os slots livres
+    if (myTeam.sponsorships.propostas.length === 0) {
+        const freeSlots = sponsorSlots.filter(s => !myTeam.sponsorships[s]);
+        
+        if (freeSlots.length > 0) {
+            let baseValue = 50000;
+            const teamRep = myTeam.rep || myTeam.reputation || 10;
+            if (teamRep >= 50 && teamRep < 100) baseValue = 150000;
+            else if (teamRep >= 100) baseValue = 350000;
+            
+            const brandsPool = [
+                ...sponsorBrands.level1,
+                ...sponsorBrands.level2,
+                ...sponsorBrands.level3
+            ].sort(() => 0.5 - Math.random());
+            const offers = brandsPool.slice(0, 3);
+            
+            myTeam.sponsorships.propostas = offers.map(brand => {
+                // Sorteia um slot de camisa livre para esta proposta
+                const selectedSlot = freeSlots[Math.floor(Math.random() * freeSlots.length)];
+                
+                let slotMult = 1.0;
+                if (selectedSlot === 'Master') slotMult = 2.5;
+                if (selectedSlot === 'Costas') slotMult = 1.5;
+                if (selectedSlot === 'Mangas') slotMult = 1.0;
+                if (selectedSlot === 'Calcoes') slotMult = 0.8;
+                
+                const value = Math.floor(baseValue * slotMult * (0.8 + Math.random() * 0.4));
+                const duration = 10 + Math.floor(Math.random() * 20);
+                return { brand: brand.brand, domain: brand.domain, value, duration, slot: selectedSlot };
+            });
+            saveGame();
+        }
+    }
     
     sponsorSlots.forEach(slot => {
         const contract = myTeam.sponsorships[slot];
@@ -3869,90 +5644,309 @@ function renderSponsorships() {
         
         if (contract) {
             html = `
-                <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center;">
-                    <h4 style="color: var(--accent-color); margin-bottom: 10px;">${slot}</h4>
-                    <img src="https://logo.clearbit.com/${contract.domain}" onerror="this.src='https://via.placeholder.com/64?text=${contract.brand}';" style="width: 64px; height: 64px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; background: white; padding: 5px;">
-                    <div style="font-weight: bold; margin-bottom: 5px;">${contract.brand}</div>
-                    <div style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 5px;">R$ ${contract.value.toLocaleString('pt-BR')} / jogo</div>
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
+                    <div>
+                        <h4 style="color: var(--accent-color); margin-bottom: 10px;">${slot}</h4>
+                        <img src="${getSponsorLogoUrl(contract.brand, contract.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 10px; border-radius: 5px; background: white; padding: 2px; display: inline-block;">
+                        <div style="font-weight: bold; margin-bottom: 5px;">${contract.brand}</div>
+                        <div style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 5px;">R$ ${contract.value.toLocaleString('pt-BR')} / jogo</div>
+                    </div>
                     <div style="color: var(--text-muted); font-size: 0.8rem;">Duração: ${contract.duration} jogos</div>
                 </div>
             `;
         } else {
-            html = `
-                <div style="background: rgba(0,0,0,0.2); border: 1px dashed var(--border-color); border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 180px;">
-                    <h4 style="color: var(--text-muted); margin-bottom: 15px;">${slot}</h4>
-                    <div style="color: var(--text-muted); margin-bottom: 15px;">Espaço Livre</div>
-                    <button class="btn btn-primary" onclick="generateSponsorshipOffers('${slot}')">Buscar Ofertas</button>
-                </div>
-            `;
+            // Filtra as propostas espontâneas destinadas a este slot específico
+            const slotProposals = myTeam.sponsorships.propostas.filter(p => p.slot === slot || (!p.slot && slot === 'Master'));
+            
+            if (slotProposals.length > 0) {
+                let proposalsHtml = slotProposals.map(p => `
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 4px; padding: 10px; margin-bottom: 10px; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                            <img src="${getSponsorLogoUrl(p.brand, p.domain)}" alt="Logo" style="width: 40px; height: 40px; background: white; border-radius: 5px; padding: 2px;">
+                            <div>
+                                <div style="font-weight: bold; font-size: 0.9rem;">${p.brand}</div>
+                                <div style="color: #4CAF50; font-size: 0.8rem;">R$ ${p.value.toLocaleString('pt-BR')}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; padding: 5px; font-size: 0.8rem;" onclick="acceptSponsorship('${slot}', '${p.brand}', '${p.domain}', ${p.value}, ${p.duration})">Assinar (${p.duration}j)</button>
+                    </div>
+                `).join('');
+                
+                html = `
+                    <div style="background: rgba(0,0,0,0.2); border: 1px dashed var(--border-color); border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column;">
+                        <h4 style="color: var(--text-muted); margin-bottom: 15px;">${slot}</h4>
+                        <div style="color: var(--accent-color); margin-bottom: 15px; font-weight: bold;">Temos propostas!</div>
+                        ${proposalsHtml}
+                        <button class="btn btn-secondary" style="margin-top: 5px; padding: 5px; font-size: 0.8rem;" onclick="generateSponsorshipOffers('${slot}')">Mais Ofertas</button>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div style="background: rgba(0,0,0,0.2); border: 1px dashed var(--border-color); border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 180px;">
+                        <h4 style="color: var(--text-muted); margin-bottom: 15px;">${slot}</h4>
+                        <div style="color: var(--text-muted); margin-bottom: 15px;">Espaço Livre</div>
+                        <button class="btn btn-primary" onclick="generateSponsorshipOffers('${slot}')">Buscar Ofertas</button>
+                    </div>
+                `;
+            }
         }
         container.innerHTML += html;
     });
 }
 
 function generateSponsorshipOffers(slot) {
+    console.log("generateSponsorshipOffers: Buscando ofertas para o slot:", slot);
     if (!myTeam) return;
     
-    let level = 'level1';
-    if (myTeam.rep >= 50 && myTeam.rep < 100) level = 'level2';
-    else if (myTeam.rep >= 100) level = 'level3';
-    
-    const brandsPool = [...sponsorBrands[level]].sort(() => 0.5 - Math.random());
-    const offers = brandsPool.slice(0, 3);
-    
-    let baseValue = 50000;
-    if (level === 'level2') baseValue = 150000;
-    if (level === 'level3') baseValue = 350000;
-    
-    let mult = 1.0;
-    if (slot === 'Master') mult = 2.5;
-    if (slot === 'Costas') mult = 1.5;
-    if (slot === 'Mangas') mult = 1.0;
-    if (slot === 'Calcoes') mult = 0.8;
-    
-    const list = document.getElementById('modal-sponsors-list');
-    list.innerHTML = '';
-    
-    offers.forEach(brand => {
-        const value = Math.floor(baseValue * mult * (0.8 + Math.random() * 0.4));
-        const duration = 10 + Math.floor(Math.random() * 20); // 10 to 29 matches
+    try {
+        // Garantir que sponsorships exista
+        if (!myTeam.sponsorships) myTeam.sponsorships = { Master: null, Costas: null, Mangas: null, Calcoes: null, propostas: [] };
         
-        list.innerHTML += `
-            <div class="dashboard-card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05);">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <img src="https://logo.clearbit.com/${brand.domain}" onerror="this.src='https://via.placeholder.com/48?text=${brand.brand}';" style="width: 48px; height: 48px; object-fit: contain; background: white; border-radius: 8px; padding: 2px;">
-                    <div>
-                        <div style="font-weight: bold; font-size: 1.1rem;">${brand.brand}</div>
-                        <div style="color: #4CAF50; font-size: 0.9rem;">R$ ${value.toLocaleString('pt-BR')} / jogo</div>
-                        <div style="color: var(--text-muted); font-size: 0.8rem;">Contrato: ${duration} jogos</div>
+        const teamRep = myTeam.rep || myTeam.reputation || 10;
+        let baseValue = 50000;
+        if (teamRep >= 50 && teamRep < 100) baseValue = 150000;
+        else if (teamRep >= 100) baseValue = 350000;
+        
+        if (!sponsorBrands || !Array.isArray(sponsorBrands)) {
+            console.error("sponsorBrands não está definido ou não é um array!");
+            return;
+        }
+        
+        const brandsPool = [
+            ...sponsorBrands.level1,
+            ...sponsorBrands.level2,
+            ...sponsorBrands.level3
+        ].sort(() => 0.5 - Math.random());
+        const offers = brandsPool.slice(0, 3);
+        
+        let mult = 1.0;
+        if (slot === 'Master') mult = 2.5;
+        if (slot === 'Costas') mult = 1.5;
+        if (slot === 'Mangas') mult = 1.0;
+        if (slot === 'Calcoes') mult = 0.8;
+        
+        const list = document.getElementById('modal-sponsors-list');
+        if (!list) {
+            console.error("modal-sponsors-list não encontrado no HTML!");
+            return;
+        }
+        list.innerHTML = '';
+        
+        offers.forEach(brand => {
+            const value = Math.floor(baseValue * mult * (0.8 + Math.random() * 0.4));
+            const duration = 10 + Math.floor(Math.random() * 20); // 10 to 29 matches
+            const domain = domainMap[brand.brand] || brand.domain || "google.com";
+            
+            list.innerHTML += `
+                <div class="dashboard-card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05); margin-bottom: 5px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <img src="${getSponsorLogoUrl(brand.brand, brand.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 5px; padding: 2px;">
+                        <div>
+                            <div style="font-weight: bold; font-size: 1.1rem; color: white;">${brand.brand}</div>
+                            <div style="color: #4CAF50; font-size: 0.9rem;">R$ ${value.toLocaleString('pt-BR')} / jogo</div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">Contrato: ${duration} jogos</div>
+                        </div>
                     </div>
+                    <button class="btn btn-primary" onclick="acceptSponsorship('${slot}', '${brand.brand}', '${domain}', ${value}, ${duration})">Assinar</button>
                 </div>
-                <button class="btn btn-primary" onclick="acceptSponsorship('${slot}', '${brand.brand}', '${brand.domain}', ${value}, ${duration})">Assinar</button>
-            </div>
-        `;
-    });
-    
-    document.getElementById('modal-sponsors').style.display = 'flex';
+            `;
+        });
+        
+        const modal = document.getElementById('modal-sponsors');
+        if (modal) {
+            modal.style.display = 'flex';
+        } else {
+            console.error("modal-sponsors não encontrado no HTML!");
+        }
+    } catch (err) {
+        console.error("Erro em generateSponsorshipOffers:", err);
+    }
 }
 
 function acceptSponsorship(slot, brand, domain, value, duration) {
     if (!myTeam) return;
     
     myTeam.sponsorships[slot] = { brand, domain, value, duration };
-    document.getElementById('modal-sponsors').style.display = 'none';
+    
+    // Remove apenas as propostas que eram para este slot específico
+    if (myTeam.sponsorships.propostas) {
+        myTeam.sponsorships.propostas = myTeam.sponsorships.propostas.filter(p => p.slot !== slot && p.slot);
+    }
+    
+    const modal = document.getElementById('modal-sponsors');
+    if (modal) modal.style.display = 'none';
+    
     saveGame();
     renderStadium();
 }
 // ----------------------------
+// VISUALIZAR ELENCO ADVERSÁRIO
+// ----------------------------
+function viewOpponentSquad(teamId) {
+    if (teamId === myTeam.id) {
+        showScreen('screen-team');
+        return;
+    }
+
+    const team = allTeams.find(t => String(t.id) === String(teamId));
+    if (!team) return;
+
+    document.getElementById('opponent-squad-name').innerText = team.name;
+    document.getElementById('opponent-squad-shield').src = team.shield;
+    document.getElementById('opponent-squad-shield').onerror = function() {
+        this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(team.name)}&background=random`;
+    };
+    
+    // Atualiza a força visual da equipe
+    const teamStrength = calculateTeamStrength(team);
+    document.getElementById('opponent-squad-info').innerText = `Força: ${teamStrength}`;
+
+    const list = document.getElementById('opponent-squad-list');
+    list.innerHTML = '';
+
+    if (team.squad && team.squad.length > 0) {
+        // Ordena por titulares e depois por força
+        const sortedSquad = [...team.squad].sort((a, b) => {
+            if (a.isStarter && !b.isStarter) return -1;
+            if (!a.isStarter && b.isStarter) return 1;
+            return b.strength - a.strength;
+        });
+
+        sortedSquad.forEach(player => {
+            const price = Math.pow(player.strength, 2) * 14000;
+            const priceFormatted = `R$ ${(price/1000000).toFixed(1)}M`;
+            const isStarterLabel = player.isStarter ? '<span style="font-size: 0.7em; background: #4CAF50; padding: 2px 4px; border-radius: 4px;">Titular</span>' : '<span style="font-size: 0.7em; background: #666; padding: 2px 4px; border-radius: 4px;">Reserva</span>';
+
+            const item = document.createElement('div');
+            item.className = 'player-item market-item';
+            item.style.padding = '10px';
+            item.innerHTML = `
+                <div class="market-item-top" style="flex-direction: column; align-items: flex-start; gap: 5px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <div class="player-info">
+                            <span class="player-pos" style="width: 50px;">${player.position}</span>
+                            <span class="player-name">${player.name} ${isStarterLabel}</span>
+                        </div>
+                        <div class="player-stats">
+                            <span class="stat-str">FOR: ${player.strength}</span>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.85em; color: var(--text-muted);">
+                        Idade: ${player.age} | Valor: <span style="color: #4CAF50; font-weight: bold;">${priceFormatted}</span>
+                    </div>
+                </div>
+                <div class="market-item-actions" style="margin-top: 10px; width: 100%;">
+                    <button class="btn btn-primary btn-swap" style="flex: 1; padding: 5px;" onclick="closeModal('modal-opponent-squad'); makeOffer(${player.id}, '${team.id}', ${price})">Oferta</button>
+                    <button class="btn btn-secondary btn-swap" style="flex: 1; padding: 5px;" onclick="closeModal('modal-opponent-squad'); requestLoan(${player.id}, '${team.id}', ${price})">Empréstimo</button>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    } else {
+        list.innerHTML = '<p style="text-align: center; width: 100%; color: var(--text-muted);">Elenco indisponível.</p>';
+    }
+
+    document.getElementById('modal-opponent-squad').style.display = 'flex';
+}
+
+
+// Popula o dropdown de times conforme a liga selecionada
+function populateMarketTeamFilter(leagueFilter) {
+    if (!allTeams || !myTeam) return;
+    const sel = document.getElementById('market-filter-team');
+    if (!sel) return;
+    // Salva o time atualmente selecionado
+    const prev = sel.value;
+    sel.innerHTML = '<option value="all">⚽ Todos os Times</option>';
+    let teams = allTeams.filter(t => String(t.id) !== String(myTeam.id));
+    if (leagueFilter && leagueFilter !== 'all') {
+        teams = teams.filter(t => t.league === leagueFilter);
+    }
+    // Ordena por nome
+    teams.sort((a, b) => a.name.localeCompare(b.name));
+    teams.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+    });
+    // Restaura seleção se ainda existir
+    if ([...sel.options].some(o => o.value === prev)) {
+        sel.value = prev;
+    } else {
+        sel.value = 'all';
+    }
+}
+
+// Chamado ao mudar o filtro de liga — re-popula o filtro de times e re-renderiza
+function onMarketLeagueChange() {
+    const leagueFilter = document.getElementById('market-filter-league')?.value || 'all';
+    populateMarketTeamFilter(leagueFilter);
+    // Reseta o time selecionado
+    const sel = document.getElementById('market-filter-team');
+    if (sel) sel.value = 'all';
+    updateMarketTeamInfoBar();
+    renderMarket();
+}
+
+// Chamado ao mudar o filtro de time
+function onMarketTeamChange() {
+    updateMarketTeamInfoBar();
+    renderMarket();
+}
+
+// Atualiza a barra de info do time selecionado
+function updateMarketTeamInfoBar() {
+    const teamId = document.getElementById('market-filter-team')?.value || 'all';
+    const bar = document.getElementById('market-team-info-bar');
+    if (!bar) return;
+    if (!teamId || teamId === 'all') {
+        bar.style.display = 'none';
+        return;
+    }
+    const team = allTeams.find(t => String(t.id) === String(teamId));
+    if (!team) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    const shield = document.getElementById('market-team-shield');
+    if (shield) {
+        shield.src = team.shield || '';
+        shield.onerror = function() { this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(team.name)}&background=random`; };
+    }
+    const label = document.getElementById('market-team-label');
+    if (label) label.textContent = team.name;
+    const strengthEl = document.getElementById('market-team-strength');
+    if (strengthEl) {
+        const s = typeof calculateTeamStrength === 'function' ? calculateTeamStrength(team) : (team.strength || '?');
+        strengthEl.textContent = `Força: ${s} | ${(team.squad || []).length} jogadores`;
+    }
+}
+
+// Abre o elenco completo do time atualmente selecionado no filtro
+function viewOpponentSquadFromMarket() {
+    const teamId = document.getElementById('market-filter-team')?.value;
+    if (!teamId || teamId === 'all') return;
+    viewOpponentSquad(teamId);
+}
 
 function renderMarket() {
     if (myTeam) {
         document.getElementById('market-balance').innerText = myTeam.balance.toLocaleString('pt-BR');
     }
 
+    // Popula o filtro de times na primeira abertura ou quando a lista está vazia
+    const teamSel = document.getElementById('market-filter-team');
+    if (teamSel && teamSel.options.length <= 1) {
+        const leagueFilter = document.getElementById('market-filter-league')?.value || 'all';
+        populateMarketTeamFilter(leagueFilter);
+    }
+
     const list = document.getElementById('market-list');
     const searchVal = document.getElementById('market-search-input')?.value.toLowerCase() || "";
+    const filterLeague = document.getElementById('market-filter-league')?.value || "all";
+    const filterPosition = document.getElementById('market-filter-position')?.value || "all";
     list.innerHTML = '';
+
+    const filterTeam = document.getElementById('market-filter-team')?.value || "all";
 
     const marketPlayers = [];
     const otherTeams = allTeams.filter(t => t.id !== myTeam.id);
@@ -3960,11 +5954,17 @@ function renderMarket() {
     otherTeams.forEach(team => {
         if (team.squad) {
             team.squad.forEach(p => {
-                if (searchVal === "" || p.name.toLowerCase().includes(searchVal)) {
-                    // Se não houver busca, prioriza jogadores da mesma liga na "vitrine"
-                    if (searchVal !== "" || team.league === myTeam.league) {
-                        marketPlayers.push({ ...p, teamId: team.id, teamName: team.name });
-                    }
+                // Filtro de Busca por Nome
+                const matchesSearch = searchVal === "" || p.name.toLowerCase().includes(searchVal);
+                // Filtro de Liga
+                const matchesLeague = filterLeague === "all" || team.league === filterLeague;
+                // Filtro de Posição
+                const matchesPosition = filterPosition === "all" || p.position === filterPosition;
+                // Filtro de Time
+                const matchesTeam = filterTeam === "all" || String(team.id) === String(filterTeam);
+
+                if (matchesSearch && matchesLeague && matchesPosition && matchesTeam) {
+                    marketPlayers.push({ ...p, teamId: team.id, teamName: team.name });
                 }
             });
         }
@@ -3972,10 +5972,23 @@ function renderMarket() {
 
     // Ordenação e Limite para performance
     let displayPlayers = marketPlayers;
-    if (searchVal === "") {
+    if (filterTeam !== "all") {
+        // Elenco completo do time selecionado: titulares primeiro, depois por força
+        const posOrder = { 'GOL': 0, 'ZAG': 1, 'LAT': 2, 'MEI': 3, 'ATA': 4 };
+        displayPlayers = marketPlayers.sort((a, b) => {
+            if (a.isStarter && !b.isStarter) return -1;
+            if (!a.isStarter && b.isStarter) return 1;
+            const pa = posOrder[a.position] ?? 5;
+            const pb = posOrder[b.position] ?? 5;
+            if (pa !== pb) return pa - pb;
+            return b.strength - a.strength;
+        });
+    } else if (searchVal === "" && filterLeague === "all" && filterPosition === "all") {
+        // Se não houver busca e nem filtros específicos, mostra a vitrine mista global aleatória
         displayPlayers = marketPlayers.sort(() => 0.5 - Math.random()).slice(0, 20);
     } else {
-        displayPlayers = marketPlayers.sort((a, b) => b.strength - a.strength).slice(0, 30);
+        // Se o usuário buscou ou filtrou, exibe os melhores ordenados por OVR decrescente
+        displayPlayers = marketPlayers.sort((a, b) => b.strength - a.strength).slice(0, 50);
     }
 
     displayPlayers.forEach(player => {
@@ -3985,12 +5998,12 @@ function renderMarket() {
         item.innerHTML = `
             <div class="market-item-top">
                 <div class="player-info" style="flex: 2;">
-                    <span class="player-pos" style="width: 40px;">${player.position}</span>
-                    <span class="player-name">${player.name} <span style="font-size: 0.85em; color: var(--text-muted);">(${player.teamName})</span></span>
+                    <span class="player-pos" style="width: 60px;">${player.position} <span style="font-weight:normal; color: var(--text-muted);">i${player.age}</span></span>
+                    <span class="player-name">${player.name} <span style="font-size: 0.85em; color: var(--text-muted); cursor: pointer;" onclick="viewOpponentSquad('${player.teamId}')" title="Ver elenco do ${player.teamName}">(${player.teamName})</span></span>
                 </div>
                 <div class="player-stats" style="flex: 1; justify-content: flex-end; flex-direction: column; align-items: flex-end; gap: 4px;">
                     <span class="stat-str">FOR: ${player.strength}</span>
-                    <span style="color: #4CAF50; font-weight: bold; font-size: 0.95em;">R$ ${(price/1000000).toFixed(1)}M</span>
+                    <span style="color: #4CAF50; font-weight: bold; font-size: 0.95em;" title="Salário: R$ ${player.salario.toLocaleString('pt-BR')}">R$ ${(price/1000000).toFixed(1)}M</span>
                 </div>
             </div>
             <div class="market-item-actions">
@@ -4005,8 +6018,8 @@ function renderMarket() {
 
 // Função que executa a transferência de fato após sucesso na negociação
 function executeTransfer(playerId, fromTeamId, price) {
-    const fromTeam = allTeams.find(t => t.id === fromTeamId);
-    const pIdx = fromTeam.squad.findIndex(p => p.id === playerId);
+    const fromTeam = allTeams.find(t => String(t.id) === String(fromTeamId));
+    const pIdx = fromTeam.squad.findIndex(p => String(p.id) === String(playerId));
     const player = fromTeam.squad[pIdx];
 
     myTeam.balance -= price;
@@ -4015,6 +6028,15 @@ function executeTransfer(playerId, fromTeamId, price) {
     player.isStarter = false;
     myTeam.squad.push(player);
     fromTeam.squad.splice(pIdx, 1);
+
+    // Adiciona notícia da transferência
+    newsFeedItems.push({
+        type: 'transfer', club: myTeam.name, player: player.name, value: price
+    });
+
+    // Atualiza estatísticas de todos os tempos
+    if (!player.allTimeStats) player.allTimeStats = { goals: 0, assists: 0, matches: 0 };
+    player.allTimeStats.goals += player.goals;
 
     alert(`CONTRATADO! ${player.name} agora é do ${myTeam.name}!`);
     updateDashboardUI();
@@ -4029,50 +6051,44 @@ function attemptPurchase(playerId, fromTeamId, offerPrice) {
         return;
     }
 
-    const fromTeam = allTeams.find(t => t.id === fromTeamId);
-    const player = fromTeam.squad.find(p => p.id === playerId);
+    const fromTeam = allTeams.find(t => String(t.id) === String(fromTeamId));
+    if (!fromTeam) { alert("Erro ao encontrar clube adversário."); return; }
+    const player = fromTeam.squad.find(p => String(p.id) === String(playerId));
+    if (!player) { alert("Erro ao encontrar jogador."); return; }
     const marketPrice = Math.pow(player.strength, 2) * 14000;
 
-    // Regra: Teto Salarial Rigoroso
-    const estimatedSalary = marketPrice * 0.001; 
-    const wageBudget = myTeam.balance * 0.05;
-    if (estimatedSalary > wageBudget) {
-        alert("TRANSFERÊNCIA FRACASSADA!\n\nNão temos orçamento salarial para este salário.");
-        return;
-    }
-
-    // Fatores que influenciam a transferência
+    // Chance de sucesso baseada puramente no fator financeiro
     const offerFactor = offerPrice / marketPrice;
-    const playerImportance = player.strength / fromTeam.strength;
-    const importanceFactor = 1 / (playerImportance * playerImportance);
-
-    const leagueRep = { 'england': 10, 'spain': 10, 'germany': 9, 'italy': 9, 'france': 8, 'portugal': 7, 'brazil_a': 6, 'south_america': 5, 'brazil_b': 4 };
-    const myRep = (myTeam.strength) + (leagueRep[myTeam.league] || 5) * 5;
-    const theirRep = (fromTeam.strength) + (leagueRep[fromTeam.league] || 5) * 5;
-
-    // Regra: Sistema de Reputação/Overall
-    if (player.strength > 80 && myRep < 120) {
-        alert("TRANSFERÊNCIA FRACASSADA!\n\nO jogador recusa jogar num clube desta dimensão.");
-        return;
+    let successChance = 0.50; // Base de 50%
+    
+    if (offerFactor >= 1.0) {
+        successChance = 1.0; // Se pagou o valor de mercado ou mais, aceita na hora (100% de chance)
+    } else if (offerFactor >= 0.9) {
+        successChance = 0.80; // Se ofereceu perto do valor, 80%
+    } else if (offerFactor >= 0.7) {
+        successChance = 0.40; // Se ofereceu 70%, 40%
+    } else {
+        successChance = 0.05; // Menos de 70%, quase impossível
     }
 
-    const reputationFactor = myRep / theirRep;
-
-    // Chance de sucesso final (base de 40%)
-    let successChance = 0.40 * offerFactor * importanceFactor * reputationFactor;
-    successChance = Math.max(0.05, Math.min(0.95, successChance)); // Limita entre 5% e 95%
-
-    if (Math.random() < successChance) {
+    if (Math.random() <= successChance) {
         executeTransfer(playerId, fromTeamId, offerPrice);
     } else {
         let reason = '';
-        if (offerFactor < 0.95) reason = `O ${fromTeam.name} recusou a proposta, considerando o valor oferecido muito baixo.`;
-        else if (importanceFactor < 0.9) reason = `O ${fromTeam.name} considera ${player.name} uma peça-chave e não tem interesse em vendê-lo.`;
-        else if (reputationFactor < 1) reason = `${player.name} não se interessou pelo projeto do ${myTeam.name} e preferiu permanecer em seu clube atual.`;
+        if (offerFactor < 0.9) reason = `O ${fromTeam.name} recusou a proposta, considerando o valor financeiro oferecido muito baixo.`;
         else reason = `A negociação não avançou por detalhes contratuais com o empresário do jogador.`;
         
-        alert(`TRANSFERÊNCIA FRACASSADA!\n\n${reason}`);
+        alert(`TRANSFERÊNCIA FRACASSADA!
+
+${reason}`);
     }
+}
+
+function handleBlockedTransfer(player) {
+    player.morale = Math.max(0, (player.morale || 100) - 30);
+    alert(`💬 MENSAGEM DO JOGADOR
+
+${player.name} enviou uma mensagem: "Fiquei muito triste por ter bloqueado a minha transferência. Era a oportunidade da minha vida."`);
 }
 
 // Botão "Comprar" agora tenta a compra pelo valor de mercado
@@ -4082,10 +6098,25 @@ function buyPlayer(playerId, fromTeamId, price) {
 
 // Botão "Oferta" permite um valor customizado
 function makeOffer(playerId, fromTeamId, originalPrice) {
-    const offerStr = prompt(`O valor de mercado do jogador é R$ ${(originalPrice/1000000).toFixed(1)}M.\n\nQual sua oferta? (Ex: 5000000 para 5M)`);
+    const offerStr = prompt(`O valor de mercado do jogador é R$ ${(originalPrice/1000000).toFixed(1)}M.
+
+Qual sua oferta? (Você pode usar o atalho M, ex: 5M ou 5.5M, ou digitar o valor inteiro)`);
     if (!offerStr) return;
     
-    const offerVal = Number(offerStr);
+    let offerVal = 0;
+    const cleanStr = offerStr.trim().toLowerCase();
+    if (cleanStr.endsWith('m')) {
+        const numPart = cleanStr.slice(0, -1).trim();
+        const parsed = Number(numPart);
+        if (!isNaN(parsed) && parsed > 0) {
+            offerVal = Math.round(parsed * 1000000);
+        } else {
+            offerVal = NaN;
+        }
+    } else {
+        offerVal = Number(offerStr);
+    }
+
     if (isNaN(offerVal) || offerVal <= 0) {
         alert("Valor da oferta inválido.");
         return;
@@ -4102,32 +6133,12 @@ function requestLoan(playerId, fromTeamId, originalPrice) {
         return;
     }
 
-    const fromTeam = allTeams.find(t => t.id === fromTeamId);
-    const player = fromTeam.squad.find(p => p.id === playerId);
+    const fromTeam = allTeams.find(t => String(t.id) === String(fromTeamId));
+    if (!fromTeam) { alert("Erro ao encontrar clube adversário."); return; }
+    const player = fromTeam.squad.find(p => String(p.id) === String(playerId));
+    if (!player) { alert("Erro ao encontrar jogador."); return; }
 
-    // Regra: Lógica Restrita de Empréstimos
-    if (player.isStarter || player.strength >= 75) {
-        alert(`EMPRÉSTIMO RECUSADO!\n\nO ${fromTeam.name} não aceita emprestar titulares ou jogadores importantes.`);
-        return;
-    }
 
-    // Regra: Teto Salarial Rigoroso
-    const marketPrice = Math.pow(player.strength, 2) * 14000;
-    const estimatedSalary = marketPrice * 0.001; 
-    const wageBudget = myTeam.balance * 0.05;
-    if (estimatedSalary > wageBudget) {
-        alert("EMPRÉSTIMO RECUSADO!\n\nNão temos orçamento salarial para este salário.");
-        return;
-    }
-
-    const leagueRep = { 'england': 10, 'spain': 10, 'germany': 9, 'italy': 9, 'france': 8, 'portugal': 7, 'brazil_a': 6, 'south_america': 5, 'brazil_b': 4 };
-    const myRep = (myTeam.strength) + (leagueRep[myTeam.league] || 5) * 5;
-
-    // Regra: Sistema de Reputação/Overall (Empréstimo)
-    if (player.strength > 80 && myRep < 120) {
-        alert("EMPRÉSTIMO RECUSADO!\n\nO jogador recusa jogar num clube desta dimensão.");
-        return;
-    }
 
     const playerImportance = player.strength / fromTeam.strength;
     let successChance = 0.75;
@@ -4135,7 +6146,10 @@ function requestLoan(playerId, fromTeamId, originalPrice) {
     if (!player.isStarter) successChance += 0.15;
     successChance = Math.max(0.10, Math.min(0.95, successChance));
 
-    if (confirm(`Deseja tentar o empréstimo de ${player.name}?\n\nTaxa: R$ ${(loanFee/1000000).toFixed(1)}M.\nChance de sucesso: ~${(successChance * 100).toFixed(0)}%`)) {
+    if (confirm(`Deseja tentar o empréstimo de ${player.name}?
+
+Taxa: R$ ${(loanFee/1000000).toFixed(1)}M.
+Chance de sucesso: ~${(successChance * 100).toFixed(0)}%`)) {
         if (Math.random() < successChance) {
             const pIdx = fromTeam.squad.findIndex(p => p.id === playerId);
             myTeam.balance -= loanFee;
@@ -4172,8 +6186,19 @@ function sellPlayer(playerId) {
     const buyerTeams = allTeams.filter(t => t.id !== myTeam.id);
     const buyer = buyerTeams[Math.floor(Math.random() * buyerTeams.length)];
 
-    const accept = confirm(`PROPOSTA RECEBIDA!\n\nO ${buyer.name} oferece R$ ${(offerValue/1000000).toFixed(1)}M pelo jogador ${player.name} (${player.position}, FOR ${player.strength}).\n\nValor de mercado estimado: R$ ${(marketPrice/1000000).toFixed(1)}M.\n\nDeseja aceitar a venda?`);
+    const accept = confirm(`PROPOSTA RECEBIDA!
 
+O ${buyer.name} oferece R$ ${(offerValue/1000000).toFixed(1)}M pelo jogador ${player.name} (${player.position}, FOR ${player.strength}).
+
+Valor de mercado estimado: R$ ${(marketPrice/1000000).toFixed(1)}M.
+
+Deseja aceitar a venda?`);
+    
+    if (!accept) {
+        handleBlockedTransfer(player);
+        return;
+    }
+    
     if (accept) {
         myTeam.balance += offerValue;
         
@@ -4194,6 +6219,151 @@ function sellPlayer(playerId) {
     }
 }
 
+function isTransferWindowOpen() {
+    if (!matchSchedule || matchSchedule.length === 0) return false;
+    const totalRounds = matchSchedule.length;
+    // Janela de pré-época (rodada 1) e janela de meio de temporada (rodadas 15-20)
+    return currentRound === 1 || (currentRound >= 15 && currentRound <= 20) || currentRound > totalRounds;
+}
+
+function checkForIncomingBids() {
+    if (!isTransferWindowOpen() || Math.random() > 0.35) { // 35% de chance de receber proposta por rodada na janela
+        return;
+    }
+
+    // Prioriza jogadores com bom overall e que não sejam essenciais (para a IA não tentar comprar seu melhor jogador sempre)
+    const sellablePlayers = myTeam.squad.filter(p => p.strength > 75).sort((a, b) => a.strength - b.strength);
+    if (sellablePlayers.length === 0) return;
+
+    const targetPlayer = sellablePlayers[Math.floor(Math.random() * sellablePlayers.length)];
+    if (!targetPlayer) return;
+
+    // Clubes ricos têm mais chance de fazer propostas
+    const potentialBuyers = allTeams.filter(t => t.id !== myTeam.id && t.balance > 50000000).sort((a, b) => b.balance - a.balance);
+    if (potentialBuyers.length === 0) return;
+
+    const buyer = potentialBuyers[Math.floor(Math.random() * Math.min(potentialBuyers.length, 10))]; // Pega um dos 10 mais ricos
+
+    // Cálculo do valor da proposta baseado em overall e idade
+    const basePrice = Math.pow(targetPlayer.strength, 2) * 14000;
+    const ageFactor = targetPlayer.age < 24 ? 1.6 : (targetPlayer.age < 29 ? 1.2 : (targetPlayer.age < 33 ? 0.9 : 0.6));
+    const marketPrice = basePrice * ageFactor;
+    
+    const offerMultiplier = 0.9 + (Math.random() * 0.3); // Proposta entre 90% e 120% do valor de mercado
+    const offerValue = Math.round(marketPrice * offerMultiplier);
+
+    // Exibe o modal de proposta
+    const proposalText = `O <strong>${buyer.name}</strong> oferece <strong>R$ ${(offerValue / 1000000).toFixed(1)}M</strong> pelo seu jogador <strong>${targetPlayer.name}</strong> (FOR: ${targetPlayer.strength}, Idade: ${targetPlayer.age}).`;
+    document.getElementById('proposal-text').innerHTML = proposalText;
+
+    // Configura os botões de ação
+    document.getElementById('btn-accept-proposal').onclick = () => acceptProposal(targetPlayer.id, buyer.id, offerValue);
+    document.getElementById('btn-reject-proposal').onclick = () => rejectProposal(targetPlayer.id);
+
+    // Mostra o modal
+    document.getElementById('modal-proposal').style.display = 'flex';
+}
+
+function checkForManagerOffers() {
+    if (!isTransferWindowOpen() || Math.random() > 0.25) { // 25% de chance de receber proposta por rodada na janela
+        return;
+    }
+
+    // Condição de sucesso: estar no top 4 da liga após 10 rodadas ou ter ganho a copa
+    const myTeamStanding = standings.find(t => t.id === myTeam.id);
+    const myTeamRank = standings.indexOf(myTeamStanding) + 1;
+    const isSuccessful = (myTeamRank <= 4 && currentRound > 10) || (cupWinnerId === myTeam.id);
+
+    if (!isSuccessful) return;
+
+    // Clubes com maior reputação/orçamento que o seu são potenciais interessados
+    const potentialClubs = allTeams.filter(t => 
+        t.id !== myTeam.id && 
+        (t.balance > myTeam.balance * 1.2 || t.strength > myTeam.strength + 2)
+    ).sort((a, b) => b.balance - a.balance);
+
+    if (potentialClubs.length === 0) return;
+
+    const offeringClub = potentialClubs[Math.floor(Math.random() * Math.min(potentialClubs.length, 5))];
+    const offeredBudget = Math.round(offeringClub.balance * (1 + (Math.random() * 0.2))); // Oferece o balanço do clube + até 20%
+
+    // Exibe o modal de proposta de cargo
+    const offerText = `O <strong>${offeringClub.name}</strong> ficou impressionado com o teu trabalho e oferece-te o cargo de Técnico principal com um orçamento de transferências de <strong>R$ ${offeredBudget.toLocaleString('pt-BR')}</strong>!`;
+    document.getElementById('manager-offer-text').innerHTML = offerText;
+
+    // Configura os botões de ação
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.querySelectorAll("#modal-hall-of-fame .tab-btn");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function showHallOfFame() {
+    if (!myTeam || !myTeam.hallOfFame) return;
+
+    const { titles, topScorers, legends } = myTeam.hallOfFame;
+
+    // Galeria de Títulos
+    const titlesContainer = document.getElementById('hof-titles');
+    titlesContainer.innerHTML = '';
+    if (titles.length === 0) {
+        titlesContainer.innerHTML = '<p>Nenhum título conquistado ainda.</p>';
+    } else {
+        titles.sort((a, b) => b.year - a.year).forEach(t => {
+            titlesContainer.innerHTML += `<div class="trophy-item"><span>${t.year}</span> <strong>${t.title}</strong></div>`;
+        });
+    }
+
+    // Maiores Artilheiros
+    const scorersContainer = document.getElementById('hof-scorers');
+    scorersContainer.innerHTML = '';
+    if (topScorers.length === 0) {
+        scorersContainer.innerHTML = '<p>Nenhum artilheiro histórico registrado.</p>';
+    } else {
+        let table = '<table><thead><tr><th>Pos</th><th>Jogador</th><th>Gols</th></tr></thead><tbody>';
+        topScorers.sort((a, b) => b.goals - a.goals).slice(0, 20).forEach((s, i) => {
+            table += `<tr><td>${i + 1}</td><td>${s.name}</td><td>${s.goals}</td></tr>`;
+        });
+        table += '</tbody></table>';
+        scorersContainer.innerHTML = table;
+    }
+
+    // Lendas do Clube
+    const legendsContainer = document.getElementById('hof-legends');
+    legendsContainer.innerHTML = '';
+    if (legends.length === 0) {
+        legendsContainer.innerHTML = '<p>Nenhum jogador atingiu o status de lenda ainda.</p>';
+    } else {
+        legends.forEach(l => {
+            legendsContainer.innerHTML += `<div class="legend-item"><h4>${l.name}</h4><p>${l.reason}</p></div>`;
+        });
+    }
+
+    document.getElementById('modal-hall-of-fame').style.display = 'flex';
+    // Abre a primeira aba por padrão
+    openHallOfFameTab({ currentTarget: document.querySelector('#modal-hall-of-fame .tab-btn') }, 'hof-titles');
+}
+
+function attributeGoalStats(team, matchId = null, minute = null, competition = 'league') {
+    // ... (código existente)
+    // Adiciona ao allTimeStats
+    if (!scorer.allTimeStats) scorer.allTimeStats = { goals: 0, assists: 0, matches: 0 };
+    scorer.allTimeStats.goals = (scorer.allTimeStats.goals || 0) + 1;
+    // ... (código existente para assistências)
+    if (assistant) {
+        if (!assistant.allTimeStats) assistant.allTimeStats = { goals: 0, assists: 0, matches: 0 };
+        assistant.allTimeStats.assists = (assistant.allTimeStats.assists || 0) + 1;
+    }
+    return scorer.name;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+});
 // ============================================================
 // 🏟️ FUNDO DINÂMICO DE ESTÁDIOS
 // Mapeamento e controle de imagem de fundo baseado no time da casa
@@ -4424,4 +6594,268 @@ function renderTacticsSummary() {
         `;
         summaryContainer.appendChild(div);
     });
+}
+
+// --- SISTEMA DE ESCOLA DE FORMAÇÃO (YOUTH ACADEMY) ---
+
+function generateYouthIntake(team) {
+    if (!team) return;
+    if (!team.plantelJuniores) team.plantelJuniores = [];
+    
+    // Gera de 1 a 3 jogadores
+    const amount = Math.floor(Math.random() * 3) + 1;
+    const academyLevel = team.academyLevel || 1;
+    
+    for (let i = 0; i < amount; i++) {
+        let minOvr = 55;
+        let maxOvr = 65;
+        
+        if (academyLevel >= 4 && academyLevel <= 7) {
+            minOvr = 65;
+            maxOvr = 75;
+        } else if (academyLevel >= 8) {
+            minOvr = 75;
+            maxOvr = 82;
+        }
+        
+        const overall = Math.floor(Math.random() * (maxOvr - minOvr + 1)) + minOvr;
+        const age = Math.floor(Math.random() * 3) + 16; // 16 a 18 anos
+        const positions = ['GK', 'DF', 'MD', 'AT'];
+        const position = positions[Math.floor(Math.random() * positions.length)];
+        const name = nameGenerator.generate(team.league);
+        
+        const newPlayer = {
+            id: Date.now() + i + Math.floor(Math.random() * 1000), // Unique ID
+            name: name, // Usa o gerador de nomes fictícios
+            position: position,
+            strength: overall,
+            age: age,
+            energy: 100,
+            morale: 100,
+            matchesPlayed: 0,
+            goals: 0,
+            assists: 0,
+            yellowCards: 0,
+            suspensionRounds: 0,
+            injuryRounds: 0,
+            isYouth: true // Tag para identificar que veio da base
+        };
+        
+        team.plantelJuniores.push(newPlayer);
+    }
+}
+
+function openAcademyModal() {
+    renderAcademyPlayers();
+    document.getElementById('modal-academy').style.display = 'block';
+}
+
+function renderAcademyPlayers() {
+    const list = document.getElementById('academy-players-list');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    if (!myTeam.plantelJuniores || myTeam.plantelJuniores.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color: var(--text-muted);">Não há jovens talentos na base neste momento. Invista na Escola de Formação e aguarde a próxima fornada no fim da época.</p>';
+        return;
+    }
+    
+    myTeam.plantelJuniores.forEach((player, index) => {
+        const item = document.createElement('div');
+        item.className = 'transfer-player-card';
+        item.style.display = 'flex';
+        item.style.justifyContent = 'space-between';
+        item.style.alignItems = 'center';
+        item.style.padding = '10px';
+        item.style.borderBottom = '1px solid var(--border-color)';
+        
+        let positionClass = '';
+        if (player.position === 'GK') positionClass = 'pos-gk';
+        else if (player.position === 'DF') positionClass = 'pos-df';
+        else if (player.position === 'MD') positionClass = 'pos-md';
+        else if (player.position === 'AT') positionClass = 'pos-at';
+
+        item.innerHTML = `
+            <div style="flex: 1;">
+                <h4 style="margin: 0; display:flex; align-items:center; gap:8px;">
+                    ${player.name}
+                    <span class="position-badge ${positionClass}">${player.position}</span>
+                </h4>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px;">
+                    Idade: ${player.age} anos | OVR: <strong>${player.strength}</strong>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="promoteYouthPlayer(${index})" style="background-color: var(--primary-color);">Promover</button>
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function promoteYouthPlayer(index) {
+    if (!myTeam.plantelJuniores || index < 0 || index >= myTeam.plantelJuniores.length) return;
+    
+    const player = myTeam.plantelJuniores[index];
+    
+    // Remove do plantel de juniores
+    myTeam.plantelJuniores.splice(index, 1);
+    
+    // Adiciona ao squad principal
+    delete player.isYouth; // Já não é júnior na base
+    myTeam.squad.push(player);
+    
+    saveGame();
+    renderAcademyPlayers(); // Atualiza a modal
+    
+    // Se a aba jogadores estiver ativa, re-renderiza o campo e o banco
+    renderSquad();
+    
+    alert(`${player.name} foi promovido para a equipa principal!`);
+}
+
+function acceptProposal(playerId, buyerId, offerValue) {
+    const playerIndex = myTeam.squad.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) return;
+
+    const [player] = myTeam.squad.splice(playerIndex, 1);
+    const buyer = allTeams.find(t => t.id === buyerId);
+
+    myTeam.balance += offerValue;
+    if (buyer && buyer.squad) {
+        buyer.squad.push(player);
+    }
+
+    document.getElementById('modal-proposal').style.display = 'none';
+    alert(`Venda Concluída! ${player.name} foi transferido para o ${buyer.name} por R$ ${(offerValue / 1000000).toFixed(1)}M.`);
+    renderSquad();
+    updateDashboardUI();
+    saveGame();
+}
+
+function rejectProposal(playerId) {
+    document.getElementById('modal-proposal').style.display = 'none';
+    const player = myTeam.squad.find(p => p.id === playerId);
+    if (player) handleBlockedTransfer(player);
+}
+
+function acceptNewJob(newTeamId, newBudget) {
+    const newTeam = allTeams.find(t => t.id === newTeamId);
+    if (!newTeam) return;
+
+    // Atualiza o time do usuário
+    myTeam = newTeam;
+    myTeam.balance = newBudget;
+
+    // Atualiza o estado do jogo para refletir a mudança
+    users[currentUser].gameState.myTeamId = newTeamId;
+
+    document.getElementById('modal-manager-offer').style.display = 'none';
+    alert(`Parabéns! Você é o novo técnico do ${myTeam.name}!`);
+    
+    saveGame();
+    location.reload(); // Recarrega o jogo para aplicar todas as mudanças de UI e estado
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = 'none';
+}
+
+// ============================================================
+// 🔭 RELATÓRIO DO OLHEIRO (NOVA FUNCIONALIDADE)
+// ============================================================
+
+function generateScoutReport() {
+    if (!myTeam || !myTeam.squad) return [];
+
+    // 1. Identificar a posição mais carente
+    const starters = myTeam.squad.filter(p => p.isStarter);
+    if (starters.length === 0) return [];
+
+    // Ordena os titulares do mais fraco para o mais forte
+    starters.sort((a, b) => a.strength - b.strength);
+    const weakestPosition = starters[0].position;
+
+    // 2. Buscar jogadores no mercado para essa posição
+    const marketPlayers = [];
+    allTeams.forEach(team => {
+        if (team.id !== myTeam.id && team.squad) {
+            team.squad.forEach(p => {
+                if (p.position === weakestPosition) {
+                    marketPlayers.push({ ...p, teamName: team.name, teamId: team.id });
+                }
+            });
+        }
+    });
+
+    // 3. Filtrar e ordenar os candidatos
+    const candidates = marketPlayers.filter(p => {
+        // O jogador deve ser melhor que o nosso titular mais fraco
+        if (p.strength <= starters[0].strength) return false;
+        
+        // O preço deve ser realista (até 60% do nosso saldo)
+        const price = Math.pow(p.strength, 2) * 14000;
+        if (price > myTeam.balance * 0.6) return false;
+
+        return true;
+    }).sort((a, b) => b.strength - a.strength);
+
+    if (candidates.length < 3) {
+        // Se não encontrar 3, relaxa os critérios e busca qualquer jogador melhor
+        const allBetter = marketPlayers.filter(p => p.strength > starters[0].strength).sort((a,b) => b.strength - a.strength);
+        return allBetter.slice(0, 3);
+    }
+
+    // 4. Selecionar 3 sugestões: um craque, um bom e uma aposta
+    const suggestions = [];
+    // Sugestão 1: O melhor jogador possível
+    if (candidates.length > 0) suggestions.push(candidates[0]);
+    // Sugestão 2: Um jogador intermediário (bom custo-benefício)
+    if (candidates.length > 2) {
+        const midIndex = Math.floor(candidates.length / 2);
+        suggestions.push(candidates[midIndex]);
+    }
+    // Sugestão 3: Um jogador jovem e promissor
+    const youngProspect = candidates.filter(p => p.age <= 23).sort((a, b) => b.strength - a.strength)[0];
+    if (youngProspect && !suggestions.some(s => s.id === youngProspect.id)) {
+        suggestions.push(youngProspect);
+    }
+
+    return suggestions.slice(0, 3);
+}
+
+function showScoutReport() {
+    const suggestions = generateScoutReport();
+    const listEl = document.getElementById('scout-suggestions-list');
+    listEl.innerHTML = '';
+
+    if (suggestions.length === 0) {
+        listEl.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nossos olheiros não encontraram alvos adequados no momento. Tente novamente mais tarde.</p>';
+    } else {
+        suggestions.forEach(player => {
+            const price = Math.pow(player.strength, 2) * 14000;
+            listEl.innerHTML += `
+                <div class="market-item" style="background: rgba(0,0,0,0.2); border-radius: 12px;">
+                    <div class="market-item-top">
+                        <div class="player-info" style="flex: 2;">
+                            <span class="player-pos" style="width: 60px;">${player.position} <span style="font-weight:normal; color: var(--text-muted);">i${player.age}</span></span>
+                            <span class="player-name">${player.name} <span style="font-size: 0.85em; color: var(--text-muted);">(${player.teamName})</span></span>
+                        </div>
+                        <div class="player-stats" style="flex: 1; justify-content: flex-end; flex-direction: column; align-items: flex-end; gap: 4px;">
+                            <span class="stat-str">FOR: ${player.strength}</span>
+                            <span style="color: #4CAF50; font-weight: bold; font-size: 0.95em;">R$ ${(price/1000000).toFixed(1)}M</span>
+                        </div>
+                    </div>
+                    <div class="market-item-actions">
+                        <button class="btn btn-primary btn-swap" onclick="buyPlayer(${player.id}, '${player.teamId}', ${price})">Comprar</button>
+                        <button class="btn btn-secondary btn-swap" onclick="makeOffer(${player.id}, '${player.teamId}', ${price})">Oferta</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    document.getElementById('modal-scout-report').style.display = 'flex';
 }
