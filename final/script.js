@@ -6416,6 +6416,22 @@ function rejectManagerOffer() {
     document.getElementById('modal-manager-offer').style.display = 'none';
 }
 
+function openHallOfFameTab(evt, tabName) {
+    let i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("hof-tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.querySelectorAll("#modal-hall-of-fame .tab-btn");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    if (evt && evt.currentTarget) {
+        evt.currentTarget.className += " active";
+    }
+}
+
 function showHallOfFame() {
     if (!myTeam || !myTeam.hallOfFame) return;
 
