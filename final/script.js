@@ -3917,18 +3917,30 @@ ${p.name} lesionou-se e vai desfalcar a equipa por ${p.injuryRounds} rodada(s)!`
                         if (team.tactics.trainingFocus === 'Recuperacao') energyGain += 15;
                     }
                     p.energy = Math.min(100, (p.energy || 100) + energyGain);
-                    p.morale = Math.max(0, (p.morale || 100) - 5);
-
-                    // --- IDEIA 17: SISTEMA DE FEEDBACK DE INSATISFAÇÃO ---
+                    // --- IDEIA 17: SISTEMA DE PROGRESSÃO DE INSATISFAÇÃO ---
                     if (team.id === myTeam.id) {
-                        p.consecutiveMatchesNotPlayed = (p.consecutiveMatchesNotPlayed || 0) + 1;
-                        if (p.morale < 40 && p.consecutiveMatchesNotPlayed >= 4 && Math.random() < 0.4) {
-                            alert(`💬 MENSAGEM DO JOGADOR
-
-${p.name} enviou uma mensagem: "Mister, estou chateado por não estar a ter minutos em campo. Preciso de jogar!"`);
-                            p.consecutiveMatchesNotPlayed = 0; // Reseta para não spammar
+                        if (!p.suspensionRounds || p.suspensionRounds === 0) {
+                            p.morale = Math.max(0, (p.morale || 100) - 5);
+                            p.consecutiveMatchesNotPlayed = (p.consecutiveMatchesNotPlayed || 0) + 1;
+                            
+                            if (p.consecutiveMatchesNotPlayed === 4) {
+                                p.emoji = '😢';
+                                alert(`💬 MENSAGEM DO JOGADOR\n\n${p.name} enviou uma mensagem: "Mister, estou chateado por não ter minutos em campo. Preciso jogar!"`);
+                            } else if (p.consecutiveMatchesNotPlayed === 7) {
+                                p.emoji = '😡';
+                                alert(`🚨 INSATISFAÇÃO EXTREMA!\n\n${p.name} perdeu a paciência: "Isso é um absurdo! Não vim para ser banco. Ou eu jogo, ou vou embora!"`);
+                            } else if (p.consecutiveMatchesNotPlayed === 10) {
+                                p.emoji = '⛔';
+                                p.morale = 0;
+                                alert(`🚪 JOGADOR PEDIU PARA SAIR!\n\n${p.name} estourou de vez: "Minha paciência acabou! Quero ser negociado imediatamente. Pode me colocar na lista de transferências!"`);
+                            }
+                        } else {
+                            p.consecutiveMatchesNotPlayed = 0; // Suspenso não conta como "barrado"
                         }
+                    } else {
+                        p.morale = Math.max(0, (p.morale || 100) - 5);
                     }
+
                 }
                 delete p.playedInMatch;
                 delete p.startedMatch;
@@ -4566,7 +4578,11 @@ function showPlayerMoodMessage(playerId) {
     let emoji = player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'));
     let msg = "";
 
-    if (emoji === '😡') {
+    if (player.consecutiveMatchesNotPlayed >= 10) {
+        msg = `Minha paciência acabou! Quero ser negociado imediatamente. Pode me colocar na lista de transferências!`;
+    } else if (player.consecutiveMatchesNotPlayed >= 7) {
+        msg = `Isso é um absurdo! Não vim para ser banco. Ou eu jogo, ou vou embora!`;
+    } else if (emoji === '😡') {
         msg = `Acho que pegou pesado comigo chefe, aquela multa que me deu não foi justa.`;
     } else if (emoji === '⛔') {
         msg = `Estou treinando separado e barrado do jogo. Quero voltar a jogar, treinador!`;
