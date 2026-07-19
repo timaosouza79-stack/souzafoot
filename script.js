@@ -444,7 +444,7 @@ let myTeam = null;
 let currentRound = 1;
 let matchSchedule = [];
 let standings = [];
-let allTeams = [,
+let allTeams = [
     {id: "intermiamicf", name: "Inter Miami CF", strength: 78, shield: "https://r2.thesportsdb.com/images/media/team/badge/m4it3e1602103647.png", league: "mls", balance: 60000000, stadium: "Chase Stadium", stadiumImg: "img/estadio.jpg"},
     {id: "columbuscrew", name: "Columbus Crew", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/dzs8cp1629059854.png", league: "mls", balance: 60000000, stadium: "Lower.com Field", stadiumImg: "img/estadio.jpg"},
     {id: "losangelesfc", name: "Los Angeles FC", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/7nbj2a1602103638.png", league: "mls", balance: 60000000, stadium: "BMO Stadium", stadiumImg: "img/estadio.jpg"},
@@ -682,10 +682,7 @@ function saveGame() {
         isIntercontinentalMode
     };
     try {
-        // Se estiver em file://, o localStorage pode falhar. O catch lida com isso.
-        if (window.location.protocol !== 'file:') {
-            localStorage.setItem('brasfoot_users', JSON.stringify(users));
-        }
+        localStorage.setItem('brasfoot_users', JSON.stringify(users));
     } catch (e) {
         console.error("Erro ao salvar no localStorage (espaço insuficiente?):", e);
     }
