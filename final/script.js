@@ -4558,6 +4558,35 @@ const pitchCoordinates = {
     ]
 };
 
+function showPlayerMoodMessage(playerId) {
+    if (!myTeam) return;
+    const player = myTeam.squad.find(p => p.id === playerId);
+    if (!player) return;
+
+    let emoji = player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'));
+    let msg = "";
+
+    if (emoji === '😡') {
+        msg = `Acho que pegou pesado comigo chefe, aquela multa que me deu não foi justa.`;
+    } else if (emoji === '⛔') {
+        msg = `Estou treinando separado e barrado do jogo. Quero voltar a jogar, treinador!`;
+    } else if (emoji === '😢' || (player.morale && player.morale < 50)) {
+        if (player.consecutiveMatchesNotPlayed >= 4) {
+            msg = `Estou chateado. Preciso de minutos em campo, não estou tendo oportunidades para jogar.`;
+        } else if (player.salario < 10000) {
+            msg = `Não estou feliz com o meu salário atual, acho que mereço uma valorização.`;
+        } else {
+            msg = `O clima não está muito bom para mim no time atualmente, as coisas não estão fluindo.`;
+        }
+    } else if (emoji === '😐' || (player.morale && player.morale >= 50 && player.morale < 80)) {
+        msg = `Estou focado, treinador. Sempre buscando melhorar e ajudar a equipe no que for preciso.`;
+    } else {
+        msg = `Estou muito feliz no clube! O ambiente é ótimo e estou pronto para dar o meu melhor em campo! Vamo que vamo!`;
+    }
+
+    alert(`${player.name} diz:\n\n"${msg}"`);
+}
+
 function renderSquad() {
     if (!myTeam) return;
 
@@ -4695,7 +4724,7 @@ function renderSquad() {
                 <div class="pitch-player-name" title="${player.name}${isOutOfPosition ? ' (Fora de Posição: -15%)' : ''}">${player.name}${injuryIcon}${suspIcon}</div>
                 <div style="display: flex; gap: 5px; justify-content: center; margin-top: 1px; align-items: center;">
                     <div class="pitch-player-energy" style="font-size: 0.7rem; color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⚡ ${Math.round(player.energy || 100)}%</div>
-                    <div style="font-size: 0.7rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))} <span style="color: var(--text-muted); font-weight: normal;">i${player.age}</span></div>
+                    <div onclick="event.stopPropagation(); showPlayerMoodMessage(${player.id})" style="cursor: pointer; font-size: 0.7rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'" title="Ver mensagem do jogador">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))} <span style="color: var(--text-muted); font-weight: normal;">i${player.age}</span></div>
                 </div>
                 <button onclick="event.stopPropagation(); trainPlayer(${player.id})" style="margin-top: 3px; padding: 2px 6px; font-size: 0.65rem; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; font-weight: bold; transition: background 0.2s; ${trainButtonStyle}" onmouseover="if(!this.disabled) this.style.background='rgba(76,175,80,0.2)';" onmouseout="if(!this.disabled) this.style.background='rgba(0,0,0,0.4)';" ${trainButtonDisabled}>Treinar</button>
             `;
@@ -4769,7 +4798,7 @@ function renderSquad() {
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span class="reserve-player-energy" style="color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-size: 0.75rem; min-width: 40px; font-weight: bold;">⚡ ${Math.round(player.energy || 100)}%</span>
-                    <span style="font-size: 0.8rem; margin-right: 5px;">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))}</span>
+                    <span onclick="event.stopPropagation(); showPlayerMoodMessage(${player.id})" style="cursor: pointer; font-size: 0.8rem; margin-right: 5px; transition: transform 0.2s; display: inline-block;" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'" title="Ver mensagem do jogador">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))}</span>
                     <span class="reserve-player-str" style="min-width: 50px;">${player.strength} <span style="font-size:0.7rem; color: var(--text-muted); font-weight: normal;">i${player.age}</span></span>
                     <button class="btn btn-train-mini" onclick="event.stopPropagation(); trainPlayer(${player.id})" title="Treino Profissional" style="padding: 2px 6px; font-size: 0.7rem; color: #4CAF50; border: 1px solid #4CAF50; background: transparent; border-radius: 4px; font-weight: bold; margin-right: 2px; transition: background 0.2s; ${player.ultimoAnoTreinado === currentYear ? 'opacity: 0.4; cursor: not-allowed;' : 'cursor: pointer;'}" onmouseover="if(!this.disabled) this.style.backgroundColor='rgba(76,175,80,0.1)';" onmouseout="if(!this.disabled) this.style.backgroundColor='transparent';" ${player.ultimoAnoTreinado === currentYear ? 'disabled' : ''}>Treinar</button>
                     <button class="btn btn-sell-mini" onclick="event.stopPropagation(); sellPlayer(${player.id})" title="Vender Jogador" style="padding: 2px 6px; font-size: 0.7rem; color: #f44336; border-color: #f44336; background: transparent; border-radius: 4px; border: 1px solid var(--border-color);">Vender</button>
