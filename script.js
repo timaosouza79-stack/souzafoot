@@ -743,7 +743,8 @@ function ensureSafeState(team, forceReset = false) {
         team.squad.forEach(p => {
             if (forceReset || isNaN(p.energy) || p.energy == null) p.energy = 100;
             if (forceReset || isNaN(p.morale) || p.morale == null) p.morale = 100;
-            if (forceReset || isNaN(p.age) || p.age == null) p.age = Math.floor(Math.random() * (35 - 20 + 1)) + 20; // Default age 20-35
+            if (forceReset || isNaN(p.age) || p.age == null) p.age = getConsistentAge(p.name);
+            p.salario = calculateSalary(p);
         });
     }
     
@@ -764,6 +765,18 @@ function calculateSalary(player) {
     
     return Math.round((base + strengthFactor) * ageFactor);
 }
+
+// Gera uma idade consistente com base no nome do jogador (seed pseudo-aleatória)
+function getConsistentAge(name) {
+    if (!name) return Math.floor(Math.random() * (35 - 18 + 1)) + 18;
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const seed = Math.abs(hash);
+    return 18 + (seed % 18); // 18 a 35
+}
+
 function emergencyReset() {
     if (confirm("Tem a certeza absoluta? Vai perder os dados das finanças, patrocínios e voltar aos valores base. Os resultados do campeonato manter-se-ão.")) {
         if (myTeam) {
@@ -900,7 +913,7 @@ function loadGame() {
                             strength: Math.round(team.strength - 5 + Math.random() * 10),
                             energy: 100, goals: 0, assists: 0, yellowCards: 0, suspensionRounds: 0, redCardInMatch: false,
                             isStarter: existingPlayers.length + i < 11,
-                            age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                            age: getConsistentAge(`Jogador ${existingPlayers.length + i + 1} ${team.name.split(' ')[0]}`),
                             matchesPlayed: 0
                         });
                     }
@@ -935,7 +948,7 @@ function loadGame() {
                     if (p.suspensionRounds === undefined || p.suspensionRounds === null) p.suspensionRounds = 0;
                     if (p.energy === undefined || p.energy === null) p.energy = 100;
                     if (p.yellowCards === undefined || p.yellowCards === null) p.yellowCards = 0;
-                    if (p.age === undefined || p.age === null) p.age = Math.floor(Math.random() * (35 - 18 + 1)) + 18;
+                    if (p.age === undefined || p.age === null) p.age = getConsistentAge(p.name);
                     if (p.matchesPlayed === undefined || p.matchesPlayed === null) p.matchesPlayed = 0;
                     if (p.salario === undefined || p.salario === null) p.salario = calculateSalary(p);
                 });
@@ -1046,7 +1059,7 @@ function loadGame() {
                     injuryRounds: 0,
                     redCardInMatch: false,
                     isStarter: index < 11,
-                    age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                    age: getConsistentAge(p.name),
                     matchesPlayed: 0,
                     salario: calculateSalary(p)
                 }));
@@ -1069,7 +1082,7 @@ function loadGame() {
                         strength: Math.round(team.strength - 5 + Math.random() * 10), // Strength around team average
                         energy: 100, goals: 0, assists: 0, yellowCards: 0, suspensionRounds: 0, redCardInMatch: false,
                         isStarter: existingPlayers.length + i < 11,
-                        age: Math.floor(Math.random() * (35 - 18 + 1)) + 18,
+                        age: getConsistentAge(`Jogador ${existingPlayers.length + i + 1} ${team.name.split(' ')[0]}`),
                         matchesPlayed: 0
                     });
                 }
