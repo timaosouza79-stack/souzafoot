@@ -444,18 +444,8 @@ let myTeam = null;
 let currentRound = 1;
 let matchSchedule = [];
 let standings = [];
-let allTeams = [
-    {id: "intermiamicf", name: "Inter Miami CF", strength: 78, shield: "https://r2.thesportsdb.com/images/media/team/badge/m4it3e1602103647.png", league: "mls", balance: 60000000, stadium: "Chase Stadium", stadiumImg: "img/estadio.jpg"},
-    {id: "columbuscrew", name: "Columbus Crew", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/dzs8cp1629059854.png", league: "mls", balance: 60000000, stadium: "Lower.com Field", stadiumImg: "img/estadio.jpg"},
-    {id: "losangelesfc", name: "Los Angeles FC", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/7nbj2a1602103638.png", league: "mls", balance: 60000000, stadium: "BMO Stadium", stadiumImg: "img/estadio.jpg"},
-    {id: "lagalaxy", name: "LA Galaxy", strength: 76, shield: "https://r2.thesportsdb.com/images/media/team/badge/ysyysr1420227188.png", league: "mls", balance: 60000000, stadium: "Dignity Health Sports Park", stadiumImg: "img/estadio.jpg"},
-    {id: "nashvillesc", name: "Nashville SC", strength: 73, shield: "https://r2.thesportsdb.com/images/media/team/badge/znrwt71602103062.png", league: "mls", balance: 60000000, stadium: "GEODIS Park", stadiumImg: "img/estadio.jpg"},
-    {id: "charlottefc", name: "Charlotte FC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/b6p4uz1595434047.png", league: "mls", balance: 60000000, stadium: "Bank of America Stadium", stadiumImg: "img/estadio.jpg"},
-    {id: "fccincinnati", name: "FC Cincinnati", strength: 75, shield: "https://r2.thesportsdb.com/images/media/team/badge/vvhsqc1707631046.png", league: "mls", balance: 60000000, stadium: "TQL Stadium", stadiumImg: "img/estadio.jpg"},
-    {id: "seattlesoundersfc", name: "Seattle Sounders FC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/7em1q51580480820.png", league: "mls", balance: 60000000, stadium: "Lumen Field", stadiumImg: "img/estadio.jpg"},
-    {id: "newyorkredbulls", name: "New York Red Bulls", strength: 73, shield: "https://r2.thesportsdb.com/images/media/team/badge/suytvy1473536462.png", league: "mls", balance: 60000000, stadium: "Red Bull Arena", stadiumImg: "img/estadio.jpg"},
-    {id: "orlandocitysc", name: "Orlando City SC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/qyppxw1423832326.png", league: "mls", balance: 60000000, stadium: "Inter&Co Stadium", stadiumImg: "img/estadio.jpg"}
-]; 
+// allTeams é preenchido pelo loadGame() usando teamsData (que contém TODOS os times: Brasil, Europa, MLS, etc.)
+let allTeams = [];
 let cupBracket = []; 
 let isCupMode = false;
 let libertadoresPhase = 'groups'; // 'groups' ou 'knockout'
