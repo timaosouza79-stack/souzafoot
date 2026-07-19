@@ -5684,6 +5684,9 @@ function renderSponsorships() {
     });
 }
 
+// Array temporário para guardar propostas pendentes (evita quebra de onclick por URLs longas)
+window._pendingOffers = [];
+
 function generateSponsorshipOffers(slot) {
     console.log("generateSponsorshipOffers: Buscando ofertas para o slot:", slot);
     if (!myTeam) return;
@@ -5697,8 +5700,8 @@ function generateSponsorshipOffers(slot) {
         if (teamRep >= 50 && teamRep < 100) baseValue = 150000;
         else if (teamRep >= 100) baseValue = 350000;
         
-        if (!sponsorBrands || !Array.isArray(sponsorBrands)) {
-            console.error("sponsorBrands não está definido ou não é um array!");
+        if (!sponsorBrands || typeof sponsorBrands !== 'object') {
+            console.error("sponsorBrands não está definido!");
             return;
         }
         
@@ -5721,11 +5724,17 @@ function generateSponsorshipOffers(slot) {
             return;
         }
         list.innerHTML = '';
+
+        // Salva as ofertas geradas no array global (evita quebra de onclick por URLs com caracteres especiais)
+        window._pendingOffers = [];
         
-        offers.forEach(brand => {
+        offers.forEach((brand, idx) => {
             const value = Math.floor(baseValue * mult * (0.8 + Math.random() * 0.4));
-            const duration = 10 + Math.floor(Math.random() * 20); // 10 to 29 matches
-            const domain = domainMap[brand.brand] || brand.domain || "google.com";
+            const duration = 10 + Math.floor(Math.random() * 20);
+            const domain = brand.domain || "google.com";
+
+            // Guarda os dados da oferta no array global indexado
+            window._pendingOffers.push({ slot, brand: brand.brand, domain, value, duration });
             
             list.innerHTML += `
                 <div class="dashboard-card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05); margin-bottom: 5px;">
@@ -5737,11 +5746,15 @@ function generateSponsorshipOffers(slot) {
                             <div style="color: var(--text-muted); font-size: 0.8rem;">Contrato: ${duration} jogos</div>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="acceptSponsorship('${slot}', '${brand.brand}', '${domain}', ${value}, ${duration})">Assinar</button>
+                    <button class="btn btn-primary" onclick="acceptSponsorshipByIndex(${idx})">Assinar</button>
                 </div>
             `;
         });
         
+        // Atualiza o título do modal com o slot
+        const title = document.getElementById('modal-sponsors-title');
+        if (title) title.innerText = `Propostas para: ${slot}`;
+
         const modal = document.getElementById('modal-sponsors');
         if (modal) {
             modal.style.display = 'flex';
@@ -5751,6 +5764,16 @@ function generateSponsorshipOffers(slot) {
     } catch (err) {
         console.error("Erro em generateSponsorshipOffers:", err);
     }
+}
+
+// Nova função que usa o índice do array global (segura para caracteres especiais)
+function acceptSponsorshipByIndex(idx) {
+    const offer = window._pendingOffers && window._pendingOffers[idx];
+    if (!offer) {
+        console.error("Oferta não encontrada no índice:", idx);
+        return;
+    }
+    acceptSponsorship(offer.slot, offer.brand, offer.domain, offer.value, offer.duration);
 }
 
 function acceptSponsorship(slot, brand, domain, value, duration) {
@@ -5768,6 +5791,7 @@ function acceptSponsorship(slot, brand, domain, value, duration) {
     
     saveGame();
     renderStadium();
+    alert(`✅ Patrocínio com ${brand} assinado para o slot ${slot}!`);
 }
 // ----------------------------
 // VISUALIZAR ELENCO ADVERSÁRIO
