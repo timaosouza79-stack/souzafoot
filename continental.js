@@ -6,11 +6,11 @@ function initSulAmericana(silent = false) {
     let pTeams = [];
     
     const isBrazil = myTeam.league.startsWith('brazil');
-    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(myTeam.league);
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
 
     if (sulAmericanaParticipants.length === 0) {
         if (isEurope) {
-            pTeams = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(t.league))
+            pTeams = allTeams.filter(t => ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(t.league))
                              .sort((a, b) => b.strength - a.strength).slice(32, 64);
         } else {
             // FIX: Mix obrigatório — vagas sul-americanas estrangeiras + vagas brasileiras
@@ -21,7 +21,7 @@ function initSulAmericana(silent = false) {
                 estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_EST_SUL);
             } else {
                 // Fallback: pega os mais fortes da south_america
-                estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id)
+                estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id && !libertadoresParticipants.includes(t.id))
                                        .sort(() => 0.5 - Math.random()).slice(0, VAGAS_EST_SUL);
             }
 
@@ -30,7 +30,7 @@ function initSulAmericana(silent = false) {
             // Pega os qualificadores brasileiros para a Sul-Americana (posicões 7º-12º do Brasileirão)
             const brSulIds = ['fortaleza', 'cruzeiro', 'corinthians', 'internacional', 'bahia', 'athleticopr',
                               'gremio', 'vasco', 'santos', 'sport', 'ceara', 'fluminense', 'bragantino', 'cuiaba'];
-            let brSulQualifiers = allTeams.filter(t => brSulIds.includes(t.id) && !estIds.has(t.id));
+            let brSulQualifiers = allTeams.filter(t => brSulIds.includes(t.id) && !estIds.has(t.id) && !libertadoresParticipants.includes(t.id));
 
             if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brSulQualifiers.find(t => t.id === myTeam.id) && !estIds.has(myTeam.id)) {
                 brSulQualifiers.unshift(myTeam);
@@ -54,7 +54,7 @@ function initSulAmericana(silent = false) {
                 if (typeof getEquipasEstrangeirasSulAmericanas === 'function') {
                     estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_EST_SUL);
                 } else {
-                    estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id)
+                    estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id && !libertadoresParticipants.includes(t.id))
                                            .sort(() => 0.5 - Math.random()).slice(0, VAGAS_EST_SUL);
                 }
                 const estIds = estrangeiros.map(t => t.id);
@@ -67,7 +67,12 @@ function initSulAmericana(silent = false) {
 
     if (pTeams.length < 32) {
         const usedIds = pTeams.map(t => t.id);
-        const fillTeams = allTeams.filter(t => !usedIds.includes(t.id)).sort((a, b) => b.strength - a.strength);
+        const isTeamEurope = (league) => ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].some(l => league === l || league.startsWith(l + '_'));
+        const fillTeams = allTeams.filter(t => {
+            if (usedIds.includes(t.id)) return false;
+            if (libertadoresParticipants.includes(t.id)) return false;
+            return isEurope ? isTeamEurope(t.league) : !isTeamEurope(t.league);
+        }).sort((a, b) => b.strength - a.strength);
         pTeams = [...pTeams, ...fillTeams.slice(0, 32 - pTeams.length)];
     }
     
@@ -78,6 +83,7 @@ function initSulAmericana(silent = false) {
     }
     
     pTeams.sort(() => 0.5 - Math.random());
+    sulAmericanaParticipants = pTeams.map(t => t.id);
 
     sulAmericanaGroups = [];
     sulAmericanaGroupStandings = [];
@@ -161,6 +167,8 @@ function finishSulAmericanaRound() {
             const winnerObj = allTeams.find(t => t.id === winnerId);
             if (winnerObj) winners.push(winnerObj);
             
+            const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
+            const compName = isEurope ? "Europa League" : "Sul-Americana";
             if (m.home === myTeam.id || m.away === myTeam.id) {
                 if (winnerId === myTeam.id) {
                     const prizes = {
@@ -172,10 +180,10 @@ function finishSulAmericanaRound() {
                     const prize = prizes[currentPhase.length] || 0;
                     if (prize > 0) {
                         myTeam.balance += prize;
-                        addCommentaryItem(`🏆 SUL-AMERICANA: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
+                        addCommentaryItem(`🏆 ${compName.toUpperCase()}: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
                     }
                 } else {
-                    addCommentaryItem(`❌ SUL-AMERICANA: O ${myTeam.name} foi eliminado.`, 'info', 90);
+                    addCommentaryItem(`❌ ${compName.toUpperCase()}: O ${myTeam.name} foi eliminado.`, 'info', 90);
                 }
             }
         });
@@ -263,7 +271,7 @@ function renderSulAmericanaBracket() {
     const list = document.getElementById('lib-matches-list');
     list.innerHTML = '';
 
-    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal'].includes(myTeam.league);
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
     const compName = isEurope ? "Europa League" : "Copa Sul-Americana";
 
     if (sulAmericanaPhase === 'groups') {

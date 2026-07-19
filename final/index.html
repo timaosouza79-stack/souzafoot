@@ -96,13 +96,15 @@
                     </div>
                 </div>
                 <div class="manager-actions">
-                    <button class="btn btn-primary" onclick="showScreen('screen-squad'); renderSquad();"><i class="fas fa-tshirt"></i> Escalar Time</button>
-                    <button class="btn btn-secondary" onclick="playRound()"><i class="fas fa-play"></i> Jogar Rodada <span id="btn-round-num">(1/38)</span></button>
+                    <button class="btn btn-secondary" onclick="showScreen('screen-squad'); renderSquad();"><i class="fas fa-tshirt"></i> Escalar Time</button>
+                    <button class="btn btn-primary" id="btn-play-round" onclick="playRound()"><i class="fas fa-play"></i> Jogar Rodada <span id="btn-round-num">(1/38)</span></button>
+                    <button class="btn btn-primary" id="btn-advance-round" onclick="advanceRound()" style="display: none; background-color: #ff9800; border-color: #ff9800;"><i class="fas fa-step-forward"></i> Próxima Rodada</button>
                     <button id="btn-sound-toggle" class="btn btn-secondary" onclick="toggleSound()"><i class="fas fa-volume-up"></i> Som: ON</button>
                     <button id="btn-market" class="btn btn-secondary" onclick="showScreen('screen-market'); renderMarket();"><i class="fas fa-shopping-cart"></i> Mercado</button>
                     <button id="btn-stadium" class="btn btn-primary" style="background-color: #ff9800; border-color: #ff9800;" onclick="showScreen('screen-stadium'); renderStadium();"><i class="fas fa-building"></i> Finanças / Estádio</button>
                     <button class="btn btn-secondary" style="border-color: #ffd700;" onclick="viewCupBracket()"><i class="fas fa-trophy" style="color: #ffd700;"></i> Ver Copa</button>
                     <button id="btn-view-libertadores" class="btn btn-secondary" style="border-color: #3f51b5; display: none;" onclick="viewLibertadoresBracket()"><i class="fas fa-globe-americas" style="color: #3f51b5;"></i> Ver Libertadores</button>
+                    <button class="btn btn-secondary" style="border-color: #c0c0c0;" onclick="startWorldCup()"><i class="fas fa-globe" style="color: #c0c0c0;"></i> Jogar Mundial</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-calendar'); renderCalendar();"><i class="far fa-calendar-alt"></i> Calendário</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-standings'); renderStandings();"><i class="fas fa-list-ol"></i> Ver Classificação</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-stats'); populateStatsCompetitions();"><i class="fas fa-chart-bar"></i> Estatísticas</button>
@@ -217,6 +219,12 @@
                         <div class="form-group">
                             <label for="tactics-captain">Capitão do Time</label>
                             <select id="tactics-captain" class="form-control" onchange="updateTactics()">
+                                <!-- Gerado dinamicamente com os titulares -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tactics-penalty-taker">Batedor de Pênalti</label>
+                            <select id="tactics-penalty-taker" class="form-control" onchange="updateTactics()">
                                 <!-- Gerado dinamicamente com os titulares -->
                             </select>
                         </div>
@@ -671,6 +679,24 @@
 
     <script src="squads.js"></script>
     <script src="script.js?v=2"></script>
+
+    <!-- Scripts do Mundial de Clubes -->
+    <script src="mundial.js"></script>
+    <script src="continental_tournaments.js"></script>
+    <script src="mundial_integration.js"></script>
+    <script>
+        // Função para iniciar o Mundial de Clubes a partir do botão
+        async function startWorldCup() {
+            if (typeof executeWorldCup !== 'function') {
+                alert('Erro: A função do Mundial de Clubes não foi carregada.');
+                return;
+            }
+            alert('Simulando o Mundial de Clubes! O resultado aparecerá no console (F12).');
+            const report = await executeWorldCup(window.allTeams || []);
+            console.log('🏆 Relatório do Mundial de Clubes:', report);
+            alert(`O campeão do Mundial é: ${report.worldChampion.name}!`);
+        }
+    </script>
     <script>
         // Popula o seletor de competições dinamicamente após os scripts carregarem
         function populateStatsCompetitions() {

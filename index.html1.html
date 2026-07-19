@@ -1,3 +1,4 @@
+<!-- DEBUG MODE: MODAL FINANCEIRO GARANTIDO -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -36,15 +37,17 @@
             <div class="login-container">
                 <div class="dashboard-card">
                     <h3 id="login-title">Entrar</h3>
-                    <div class="form-group">
-                        <input type="text" id="login-username" class="form-control" placeholder="Usuário">
-                    </div>
-                    <div class="form-group" style="margin-top: 10px;">
-                        <input type="password" id="login-password" class="form-control" placeholder="Senha">
-                    </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" id="btn-login-action"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <input type="text" id="login-username" class="form-control" placeholder="Usuário">
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <input type="password" id="login-password" class="form-control" placeholder="Senha">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;" id="btn-login-action"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    </form>
                     <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
-                        Não tem conta? <a href="#" onclick="toggleLoginMode()" id="toggle-link" style="color: var(--primary-color);">Criar conta</a>
+                        Não tem conta? <a href="#" onclick="toggleLoginMode(event)" id="toggle-link" style="color: var(--primary-color);">Criar conta</a>
                     </p>
 
                     <div id="user-list-container" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
@@ -76,6 +79,8 @@
                     <option value="italy">Série A - Itália</option>
                     <option value="france">Ligue 1 - França</option>
                     <option value="portugal">Liga Portugal - Portugal</option>
+                    <option value="arabia">Saudi Pro League - Arábia</option>
+                    <option value="mls">Major League Soccer - EUA</option>
                 </select>
             </div>
             
@@ -245,6 +250,12 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="tactics-penalty-taker">Batedor de Pênalti</label>
+                            <select id="tactics-penalty-taker" class="form-control" onchange="updateTactics()">
+                                <!-- Gerado dinamicamente com os titulares -->
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="tactics-freekicks">Cobrador de Faltas</label>
                             <select id="tactics-freekicks" class="form-control" onchange="updateTactics()">
                                 <!-- Gerado dinamicamente com os titulares -->
@@ -399,8 +410,42 @@
                     <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
                 </div>
             </header>
-            <div class="market-search-bar" style="margin: 0 20px 15px 20px;">
-                <input type="text" id="market-search-input" class="form-control" placeholder="🔍 Buscar jogador por nome em todos os clubes..." oninput="renderMarket()">
+            <div class="market-search-bar" style="margin: 0 20px 15px 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="market-search-input" class="form-control" style="flex: 2; min-width: 200px;" placeholder="🔍 Buscar jogador por nome em todos os clubes..." oninput="renderMarket()">
+                
+                <select id="market-filter-league" class="form-control" style="flex: 1; min-width: 150px; background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer;" onchange="onMarketLeagueChange()">
+                    <option value="all">🌍 Todas as Ligas</option>
+                    <option value="brazil_a">🇧🇷 Série A - Brasil</option>
+                    <option value="brazil_b">🇧🇷 Série B - Brasil</option>
+                    <option value="england">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Inglaterra</option>
+                    <option value="spain">🇪🇸 La Liga - Espanha</option>
+                    <option value="germany">🇩🇪 Bundesliga - Alemanha</option>
+                    <option value="italy">🇮🇹 Série A - Itália</option>
+                    <option value="france">🇫🇷 Ligue 1 - França</option>
+                    <option value="portugal">🇵🇹 Liga Portugal</option>
+                    <option value="arabia">🇸🇦 Saudi Pro League - Arábia</option>
+                    <option value="south_america">🌎 Outros da América do Sul</option>
+                </select>
+
+                <select id="market-filter-team" class="form-control" style="flex: 1; min-width: 160px; background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer;" onchange="onMarketTeamChange()">
+                    <option value="all">⚽ Todos os Times</option>
+                </select>
+
+                <select id="market-filter-position" class="form-control" style="flex: 1; min-width: 120px; background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer;" onchange="renderMarket()">
+                    <option value="all">🏃 Todas as Posições</option>
+                    <option value="GOL">🧤 Goleiros (GOL)</option>
+                    <option value="ZAG">🛡️ Zagueiros (ZAG)</option>
+                    <option value="LAT">🏃 Laterais (LAT)</option>
+                    <option value="MEI">🧠 Meias (MEI)</option>
+                    <option value="ATA">⚡ Atacantes (ATA)</option>
+                </select>
+            </div>
+            <!-- Botão "Ver Elenco Completo" aparece quando um time é selecionado -->
+            <div id="market-team-info-bar" style="display:none; margin: 0 20px 10px 20px; padding: 10px 16px; background: rgba(33,150,243,0.13); border: 1px solid var(--primary-color); border-radius: 8px; display: none; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <img id="market-team-shield" src="" alt="" style="width:36px; height:36px; object-fit:contain; border-radius:4px; background:#fff2; padding:2px;">
+                <span id="market-team-label" style="font-weight:bold; font-size:1.05em; color:white;"></span>
+                <span id="market-team-strength" style="color:var(--text-muted); font-size:0.9em;"></span>
+                <button class="btn btn-primary" style="margin-left:auto; padding:6px 16px;" onclick="viewOpponentSquadFromMarket()">👁️ Ver Elenco Completo</button>
             </div>
             <main class="dashboard-card" style="margin: 20px;">
                 <div id="market-list" class="squad-list"></div>
@@ -495,6 +540,31 @@
                                     <i class="fas fa-graduation-cap"></i> Investir na Base (Custo: <span id="academy-upgrade-cost">0</span>)
                                 </button>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Departamento Médico -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">🏥 Departamento Médico <span id="medical-level-badge" style="font-size: 0.8rem; background: #e91e63; padding: 3px 8px; border-radius: 4px; margin-left: 10px;">Nível 1</span></h3>
+                                <p id="medical-bonus-info" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Redução de 0% no tempo de recuperação.</p>
+                            </div>
+                            <button class="btn btn-secondary" style="border-color: #e91e63; color: #e91e63; padding: 10px 20px;" onclick="upgradeMedicalDept()">
+                                <i class="fas fa-plus"></i> Melhorar (R$ <span id="medical-upgrade-cost">5.000.000</span>)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Folha Salarial -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="margin-bottom: 5px;">💼 Folha Salarial</h3>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Total pago por rodada ao plantel.</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span id="payroll-total" style="font-size: 1.4rem; font-weight: bold; color: #f44336;">R$ 0</span>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">/ jogo</div>
                         </div>
                     </div>
                 </div>
@@ -759,31 +829,6 @@
                 </div>
             </div>
         </div>
-    <div id="modal-financial-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9998; backdrop-filter: blur(4px);"></div>
-    <div id="modal-financial-report" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; width: 90%; max-width: 450px;">
-        <div class="dashboard-card" style="padding: 25px; border: 1px solid #4CAF50; border-top: 5px solid #4CAF50; background: var(--bg-card); box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <i class="fas fa-file-invoice-dollar" style="font-size: 2.5rem; color: #4CAF50; margin-bottom: 10px;"></i>
-                <h3 style="margin: 0; color: white;">Balancete da Partida</h3>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Relatório Financeiro do Jogo</p>
-            </div>
-            
-            <div id="financial-report-content" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 1rem; text-align: left;">
-                <p id="texto-publico" style="font-size: 0.95rem; color: #ddd; margin-bottom: 8px;">👥 Público Presente: -- / --</p>
-                <p id="texto-bilheteira" style="font-size: 0.95rem; color: #ddd; margin-bottom: 8px;">🏟️ Bilheteira: R$ 0</p>
-                <p id="texto-comercio" style="font-size: 0.95rem; color: #ddd; margin-bottom: 8px;">🍔 Comércio: R$ 0</p>
-                <p id="texto-patrocinios" style="font-size: 0.95rem; color: #ddd; margin-bottom: 8px;">🤝 Patrocínios: R$ 0</p>
-                <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 12px 0;">
-                <p id="texto-lucro-total" style="font-size: 1.1rem; color: #4CAF50; font-weight: bold; margin-bottom: 0; text-align: center;">💰 LUCRO TOTAL: R$ 0</p>
-            </div>
-            
-            <div style="text-align: center; margin-top: 25px;">
-                <button class="btn btn-primary" onclick="closeFinancialReport()" style="width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase;">
-                    Recolher Lucros
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Modal de Demissão (Game Over) -->
     <div id="modal-sacked" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center;">
@@ -803,7 +848,6 @@
         </div>
     </div>
 
-    </div>
 
     <!-- Modal da Escola de Formação (Regens) -->
     <div id="modal-academy" class="modal">
@@ -820,9 +864,89 @@
         </div>
     </div>
 
+    <!-- Modal para Visualizar Elenco Adversário -->
+    <div id="modal-opponent-squad" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal" onclick="closeModal('modal-opponent-squad')">&times;</span>
+            <header style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
+                <img id="opponent-squad-shield" src="" alt="Escudo" style="width: 60px; height: 60px; object-fit: contain;">
+                <div>
+                    <h2 id="opponent-squad-name" style="margin: 0; color: var(--primary-color);">Nome do Clube</h2>
+                    <p id="opponent-squad-info" style="margin: 5px 0 0 0; font-size: 0.9rem; color: var(--text-muted);">Força: --</p>
+                </div>
+            </header>
+            <div id="opponent-squad-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                <!-- Renderizados via JS -->
+            </div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="closeModal('modal-opponent-squad')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         IDEIA 20 — MODAL DE INDISCIPLINA / NOITADA
+         ===================================================== -->
+    <div id="modal-indisciplina" class="modal" style="z-index: 10000;">
+        <div class="modal-content" style="
+            max-width: 520px;
+            background: linear-gradient(145deg, #1a0a0a 0%, #1e1010 40%, #12121e 100%);
+            border: 1px solid #c0392b;
+            box-shadow: 0 0 40px rgba(192,57,43,0.35), 0 0 80px rgba(192,57,43,0.12);
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+        ">
+            <!-- Cabeçalho dramático -->
+            <div style="background: linear-gradient(135deg, #c0392b 0%, #922b21 60%, #641e16 100%); padding: 20px 24px 16px 24px; display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 2.4rem; line-height: 1;">🌃</span>
+                <div>
+                    <div style="font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 3px;">Evento Extra-Campo</div>
+                    <h2 style="margin: 0; font-size: 1.3rem; color: #fff; font-weight: 700;">⚠️ INDISCIPLINA!</h2>
+                </div>
+            </div>
+            <!-- Corpo do modal -->
+            <div style="padding: 22px 24px;">
+                <!-- Jogador envolvido -->
+                <div style="display: flex; align-items: center; gap: 14px; background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.3); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+                    <span id="indisciplina-emoji" style="font-size: 2rem;">😴</span>
+                    <div>
+                        <div id="indisciplina-player-name" style="font-weight: 700; font-size: 1.1rem; color: #fff;"></div>
+                        <div id="indisciplina-player-info" style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 2px;"></div>
+                    </div>
+                </div>
+                <!-- Texto do evento -->
+                <p id="indisciplina-text" style="font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.65; margin: 0 0 16px 0; padding: 14px 16px; background: rgba(255,255,255,0.04); border-radius: 8px; border-left: 3px solid #c0392b;"></p>
+                <!-- Consequência automática -->
+                <div style="font-size: 0.82rem; color: #e67e22; background: rgba(230,126,34,0.1); border: 1px solid rgba(230,126,34,0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <span>⚡</span>
+                    <span>O jogador está <strong>visivelmente esgotado</strong> — começará com apenas <strong>50% de energia</strong>.</span>
+                </div>
+                <!-- Título das opções -->
+                <div style="font-size: 0.78rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Como o treinador vai reagir?</div>
+                <!-- Botões de decisão -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button onclick="resolveIndisciplina('multa')" style="width:100%; padding:13px 18px; background:linear-gradient(135deg,#c0392b,#a93226); border:none; border-radius:10px; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:1.4rem;">🔴</span>
+                        <div><div>Aplicar Multa</div><div style="font-size:0.78rem;opacity:0.75;font-weight:400;margin-top:2px;">Deduz 20% do salário · valor reverte para o clube · jogador fica com 😡 mas joga</div></div>
+                    </button>
+                    <button onclick="resolveIndisciplina('barrar')" style="width:100%; padding:13px 18px; background:linear-gradient(135deg,#2c3e50,#1a252f); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:1.4rem;">⛔</span>
+                        <div><div>Barrar do Jogo</div><div style="font-size:0.78rem;opacity:0.75;font-weight:400;margin-top:2px;">Jogador suspenso nesta rodada · salário mantido · plantel reduzido</div></div>
+                    </button>
+                    <button onclick="resolveIndisciplina('perdoar')" style="width:100%; padding:13px 18px; background:linear-gradient(135deg,#27ae60,#1e8449); border:none; border-radius:10px; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:1.4rem;">💛</span>
+                        <div><div>Perdoar</div><div style="font-size:0.78rem;opacity:0.75;font-weight:400;margin-top:2px;">Sem punição · jogador fica com 😊 e joga com energia baixa</div></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- FIM MODAL INDISCIPLINA -->
+
     <script src="squads.js"></script>
     <script src="continental.js?v=1"></script>
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=21"></script>
     <script>
         // Popula o seletor de competições dinamicamente após os scripts carregarem
         function populateStatsCompetitions() {
@@ -870,6 +994,11 @@
 
             // Renderiza as stats da opção actualmente seleccionada
             renderStats(sel.value);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
         }
 
         window.addEventListener('load', function() {

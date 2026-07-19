@@ -18243,5 +18243,2416 @@ const realSquads = {
                 "str": 75
             }
         ]
+    },
+    "independiente": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 79
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 79
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 79
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 79
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 79
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 79
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 79
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 79
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 79
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 79
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 79
+            }
+        ]
+    },
+    "velez": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 78
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 78
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 78
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 78
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 78
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 78
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 78
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 78
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 78
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 78
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 78
+            }
+        ]
+    },
+    "emelec": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 76
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 76
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 76
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 76
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 76
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 76
+            }
+        ]
+    },
+    "americadecali": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 76
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 76
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 76
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 76
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 76
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 76
+            }
+        ]
+    },
+    "universitario": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 75
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 75
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 75
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 75
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 75
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 75
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 75
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 75
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 75
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 75
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 75
+            }
+        ]
+    },
+    "tachira": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 72
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 72
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 72
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 72
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 72
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 72
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 72
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 72
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 72
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 72
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 72
+            }
+        ]
+    },
+    "caracas": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 71
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 71
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 71
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 71
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 71
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 71
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 71
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 71
+            }
+        ]
+    },
+    "wilstermann": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Goleiro",
+                "pos": "GOL",
+                "str": 71
+            },
+            {
+                "name": "Zagueiro 1",
+                "pos": "ZAG",
+                "str": 71
+            },
+            {
+                "name": "Zagueiro 2",
+                "pos": "ZAG",
+                "str": 71
+            },
+            {
+                "name": "Lateral Dir",
+                "pos": "LAT",
+                "str": 71
+            },
+            {
+                "name": "Lateral Esq",
+                "pos": "LAT",
+                "str": 71
+            },
+            {
+                "name": "Volante",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Meia 1",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Meia 2",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Ponta Dir",
+                "pos": "ATA",
+                "str": 71
+            },
+            {
+                "name": "Ponta Esq",
+                "pos": "ATA",
+                "str": 71
+            },
+            {
+                "name": "Centroavante",
+                "pos": "ATA",
+                "str": 71
+            }
+        ]
+    },
+    "alhilal": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Yassine Bounou",
+                "pos": "GOL",
+                "str": 86
+            },
+            {
+                "name": "Mohammed Al-Owais",
+                "pos": "GOL",
+                "str": 75
+            },
+            {
+                "name": "Kalidou Koulibaly",
+                "pos": "ZAG",
+                "str": 84
+            },
+            {
+                "name": "Ali Al-Bulaihi",
+                "pos": "ZAG",
+                "str": 79
+            },
+            {
+                "name": "Hassan Al-Tambakti",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "R. Lodi",
+                "pos": "LAT",
+                "str": 81
+            },
+            {
+                "name": "João Cancelo",
+                "pos": "LAT",
+                "str": 85
+            },
+            {
+                "name": "Yasir Al-Shahrani",
+                "pos": "LAT",
+                "str": 77
+            },
+            {
+                "name": "Rúben Neves",
+                "pos": "MEI",
+                "str": 85
+            },
+            {
+                "name": "Sergej Milinković-Savić",
+                "pos": "MEI",
+                "str": 86
+            },
+            {
+                "name": "Salem Al-Dawsari",
+                "pos": "MEI",
+                "str": 82
+            },
+            {
+                "name": "Mohamed Kanno",
+                "pos": "MEI",
+                "str": 78
+            },
+            {
+                "name": "Salman Al-Faraj",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Malcom",
+                "pos": "ATA",
+                "str": 84
+            },
+            {
+                "name": "Neymar Jr.",
+                "pos": "ATA",
+                "str": 88
+            },
+            {
+                "name": "Aleksandar Mitrović",
+                "pos": "ATA",
+                "str": 86
+            },
+            {
+                "name": "Michael Delgado",
+                "pos": "ATA",
+                "str": 80
+            },
+            {
+                "name": "Abdullah Al-Hamdan",
+                "pos": "ATA",
+                "str": 73
+            }
+        ]
+    },
+    "alnassr": {
+        "formation": "4-2-3-1",
+        "players": [
+            {
+                "name": "Bento",
+                "pos": "GOL",
+                "str": 83
+            },
+            {
+                "name": "Nawaf Al-Aqidi",
+                "pos": "GOL",
+                "str": 74
+            },
+            {
+                "name": "Aymeric Laporte",
+                "pos": "ZAG",
+                "str": 85
+            },
+            {
+                "name": "Mohamed Simakan",
+                "pos": "ZAG",
+                "str": 82
+            },
+            {
+                "name": "Abdulelah Al-Amri",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Ali Lajami",
+                "pos": "ZAG",
+                "str": 75
+            },
+            {
+                "name": "A. Telles",
+                "pos": "LAT",
+                "str": 81
+            },
+            {
+                "name": "Sultan Al-Ghannam",
+                "pos": "LAT",
+                "str": 79
+            },
+            {
+                "name": "Marcelo Brozović",
+                "pos": "MEI",
+                "str": 84
+            },
+            {
+                "name": "Otávio Edmilson",
+                "pos": "MEI",
+                "str": 83
+            },
+            {
+                "name": "Anderson Talisca",
+                "pos": "MEI",
+                "str": 84
+            },
+            {
+                "name": "Abdullah Al-Khaibari",
+                "pos": "MEI",
+                "str": 75
+            },
+            {
+                "name": "Sami Al-Najei",
+                "pos": "MEI",
+                "str": 74
+            },
+            {
+                "name": "Sadio Mané",
+                "pos": "ATA",
+                "str": 84
+            },
+            {
+                "name": "Wesley",
+                "pos": "ATA",
+                "str": 78
+            },
+            {
+                "name": "Cristiano Ronaldo",
+                "pos": "ATA",
+                "str": 88
+            },
+            {
+                "name": "Abdulrahman Ghareeb",
+                "pos": "ATA",
+                "str": 77
+            },
+            {
+                "name": "Mohammed Maran",
+                "pos": "ATA",
+                "str": 72
+            }
+        ]
+    },
+    "alittihad": {
+        "formation": "4-2-3-1",
+        "players": [
+            {
+                "name": "Predrag Rajković",
+                "pos": "GOL",
+                "str": 81
+            },
+            {
+                "name": "Abdullah Al-Mayouf",
+                "pos": "GOL",
+                "str": 75
+            },
+            {
+                "name": "Luiz Felipe",
+                "pos": "ZAG",
+                "str": 80
+            },
+            {
+                "name": "Danilo Pereira",
+                "pos": "ZAG",
+                "str": 82
+            },
+            {
+                "name": "Ahmed Hegazi",
+                "pos": "ZAG",
+                "str": 78
+            },
+            {
+                "name": "Mario Mitaj",
+                "pos": "LAT",
+                "str": 78
+            },
+            {
+                "name": "Muhannad Al-Shanqeeti",
+                "pos": "LAT",
+                "str": 75
+            },
+            {
+                "name": "N'Golo Kanté",
+                "pos": "MEI",
+                "str": 85
+            },
+            {
+                "name": "Fabinho",
+                "pos": "MEI",
+                "str": 83
+            },
+            {
+                "name": "Houssem Aouar",
+                "pos": "MEI",
+                "str": 81
+            },
+            {
+                "name": "Awad Al-Nashri",
+                "pos": "MEI",
+                "str": 73
+            },
+            {
+                "name": "Steven Bergwijn",
+                "pos": "ATA",
+                "str": 82
+            },
+            {
+                "name": "Moussa Diaby",
+                "pos": "ATA",
+                "str": 84
+            },
+            {
+                "name": "Karim Benzema",
+                "pos": "ATA",
+                "str": 86
+            },
+            {
+                "name": "Romarinho (SA)",
+                "pos": "ATA",
+                "str": 79
+            },
+            {
+                "name": "Saleh Al-Shehri",
+                "pos": "ATA",
+                "str": 74
+            },
+            {
+                "name": "Jota (SA)",
+                "pos": "ATA",
+                "str": 80
+            },
+            {
+                "name": "S. Al-Sqoor",
+                "pos": "LAT",
+                "str": 76
+            }
+        ]
+    },
+    "alahli": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Édouard Mendy",
+                "pos": "GOL",
+                "str": 83
+            },
+            {
+                "name": "Abdulrahman Al-Sanbi",
+                "pos": "GOL",
+                "str": 72
+            },
+            {
+                "name": "Merih Demiral",
+                "pos": "ZAG",
+                "str": 81
+            },
+            {
+                "name": "Roger Ibañez",
+                "pos": "ZAG",
+                "str": 82
+            },
+            {
+                "name": "Fahad Al-Hamad",
+                "pos": "ZAG",
+                "str": 73
+            },
+            {
+                "name": "Bassam Al-Hurayji",
+                "pos": "LAT",
+                "str": 76
+            },
+            {
+                "name": "Abdullah Al-Ammar",
+                "pos": "LAT",
+                "str": 74
+            },
+            {
+                "name": "Franck Kessié",
+                "pos": "MEI",
+                "str": 84
+            },
+            {
+                "name": "Gabri Veiga",
+                "pos": "MEI",
+                "str": 81
+            },
+            {
+                "name": "Mohammed Al-Majhad",
+                "pos": "MEI",
+                "str": 75
+            },
+            {
+                "name": "Ali Al-Asmari",
+                "pos": "MEI",
+                "str": 74
+            },
+            {
+                "name": "Sumayhan Al-Nabit",
+                "pos": "MEI",
+                "str": 74
+            },
+            {
+                "name": "Riyad Mahrez",
+                "pos": "ATA",
+                "str": 85
+            },
+            {
+                "name": "Roberto Firmino",
+                "pos": "ATA",
+                "str": 83
+            },
+            {
+                "name": "Firas Al-Buraikan",
+                "pos": "ATA",
+                "str": 80
+            },
+            {
+                "name": "Ivan Toney",
+                "pos": "ATA",
+                "str": 84
+            },
+            {
+                "name": "Haidar Asiri",
+                "pos": "ATA",
+                "str": 73
+            },
+            {
+                "name": "Fahad Al-Rashidi",
+                "pos": "ATA",
+                "str": 72
+            }
+        ]
+    },
+    "alshabab": {
+        "formation": "4-2-3-1",
+        "players": [
+            {
+                "name": "Kim Seung-gyu",
+                "pos": "GOL",
+                "str": 78
+            },
+            {
+                "name": "Fawaz Al-Qarni",
+                "pos": "GOL",
+                "str": 73
+            },
+            {
+                "name": "Romain Saïss",
+                "pos": "ZAG",
+                "str": 80
+            },
+            {
+                "name": "Wesley Hoedt",
+                "pos": "ZAG",
+                "str": 78
+            },
+            {
+                "name": "Nader Al-Sharari",
+                "pos": "ZAG",
+                "str": 74
+            },
+            {
+                "name": "Moteb Al-Harbi",
+                "pos": "LAT",
+                "str": 77
+            },
+            {
+                "name": "Hussain Al-Sibyani",
+                "pos": "LAT",
+                "str": 72
+            },
+            {
+                "name": "Gustavo Cuéllar",
+                "pos": "MEI",
+                "str": 79
+            },
+            {
+                "name": "Giacomo Bonaventura",
+                "pos": "MEI",
+                "str": 80
+            },
+            {
+                "name": "Yannick Carrasco",
+                "pos": "MEI",
+                "str": 82
+            },
+            {
+                "name": "Majed Kanabah",
+                "pos": "MEI",
+                "str": 73
+            },
+            {
+                "name": "Nawaf Al-Sadi",
+                "pos": "MEI",
+                "str": 74
+            },
+            {
+                "name": "Daniel Podence",
+                "pos": "ATA",
+                "str": 80
+            },
+            {
+                "name": "Cristian Guanca",
+                "pos": "ATA",
+                "str": 77
+            },
+            {
+                "name": "Abderrazak Hamdallah",
+                "pos": "ATA",
+                "str": 80
+            },
+            {
+                "name": "Fahad Al-Muwallad",
+                "pos": "ATA",
+                "str": 75
+            },
+            {
+                "name": "Haroune Camara",
+                "pos": "ATA",
+                "str": 73
+            },
+            {
+                "name": "Nawaf Al-Abed",
+                "pos": "ATA",
+                "str": 72
+            }
+        ]
+    },
+    "altaawoun": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Mailson",
+                "pos": "GOL",
+                "str": 76
+            },
+            {
+                "name": "Raghed Al-Najjar",
+                "pos": "GOL",
+                "str": 71
+            },
+            {
+                "name": "Andrei Girotto",
+                "pos": "ZAG",
+                "str": 78
+            },
+            {
+                "name": "Waleed Al-Ahmed",
+                "pos": "ZAG",
+                "str": 75
+            },
+            {
+                "name": "Awn Al-Saluli",
+                "pos": "ZAG",
+                "str": 73
+            },
+            {
+                "name": "Fahad Al-Abdulrazzaq",
+                "pos": "LAT",
+                "str": 74
+            },
+            {
+                "name": "Mohammed Al-Ghamdi",
+                "pos": "LAT",
+                "str": 72
+            },
+            {
+                "name": "Flávio",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Aschraf El Mahdioui",
+                "pos": "MEI",
+                "str": 77
+            },
+            {
+                "name": "Tariq Abdullah",
+                "pos": "MEI",
+                "str": 72
+            },
+            {
+                "name": "Mohammed Mahzari",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Musa Barrow",
+                "pos": "ATA",
+                "str": 78
+            },
+            {
+                "name": "Mateus",
+                "pos": "ATA",
+                "str": 76
+            },
+            {
+                "name": "João Pedro (SA)",
+                "pos": "ATA",
+                "str": 77
+            },
+            {
+                "name": "Abdulfattah Adam",
+                "pos": "ATA",
+                "str": 73
+            },
+            {
+                "name": "Ahmed Bahusayn",
+                "pos": "ATA",
+                "str": 70
+            },
+            {
+                "name": "Saad Al-Nasser",
+                "pos": "ATA",
+                "str": 71
+            },
+            {
+                "name": "Rayan Al-Mousa",
+                "pos": "MEI",
+                "str": 74
+            }
+        ]
+    },
+    "alettifaq": {
+        "formation": "4-3-3",
+        "players": [
+            {
+                "name": "Marek Rodák",
+                "pos": "GOL",
+                "str": 77
+            },
+            {
+                "name": "Abdullah Al-Oaisher",
+                "pos": "GOL",
+                "str": 72
+            },
+            {
+                "name": "Jack Hendry",
+                "pos": "ZAG",
+                "str": 78
+            },
+            {
+                "name": "Marcel Tisserand",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Abdullah Khateeb",
+                "pos": "ZAG",
+                "str": 73
+            },
+            {
+                "name": "Radhi Al-Otaibi",
+                "pos": "LAT",
+                "str": 74
+            },
+            {
+                "name": "Mohammed Yousef",
+                "pos": "LAT",
+                "str": 71
+            },
+            {
+                "name": "S. Fofana",
+                "pos": "MEI",
+                "str": 81
+            },
+            {
+                "name": "Georginio Wijnaldum",
+                "pos": "MEI",
+                "str": 81
+            },
+            {
+                "name": "Álvaro Medrán",
+                "pos": "MEI",
+                "str": 77
+            },
+            {
+                "name": "Hamed Al-Ghamdi",
+                "pos": "MEI",
+                "str": 73
+            },
+            {
+                "name": "Ali Hazazi",
+                "pos": "MEI",
+                "str": 72
+            },
+            {
+                "name": "Demarai Gray",
+                "pos": "ATA",
+                "str": 79
+            },
+            {
+                "name": "Karl Toko Ekambi",
+                "pos": "ATA",
+                "str": 78
+            },
+            {
+                "name": "Moussa Dembélé",
+                "pos": "ATA",
+                "str": 80
+            },
+            {
+                "name": "Mohammed Al-Kuwaykibi",
+                "pos": "ATA",
+                "str": 74
+            },
+            {
+                "name": "Thamer Al-Khaibari",
+                "pos": "ATA",
+                "str": 69
+            },
+            {
+                "name": "Vitinho (SA)",
+                "pos": "ATA",
+                "str": 76
+            }
+        ]
+    },
+    "alfateh": {
+        "formation": "4-2-3-1",
+        "players": [
+            {
+                "name": "Péter Szappanos",
+                "pos": "GOL",
+                "str": 75
+            },
+            {
+                "name": "Jacob Rinne",
+                "pos": "GOL",
+                "str": 74
+            },
+            {
+                "name": "Jason Denayer",
+                "pos": "ZAG",
+                "str": 78
+            },
+            {
+                "name": "Marwane Saâdane",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Ammar Al-Daheem",
+                "pos": "ZAG",
+                "str": 72
+            },
+            {
+                "name": "Salem Al-Najdi",
+                "pos": "LAT",
+                "str": 74
+            },
+            {
+                "name": "Tawfiq Buhimed",
+                "pos": "LAT",
+                "str": 73
+            },
+            {
+                "name": "Sofiane Bendebka",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Lucas Zelarayán",
+                "pos": "MEI",
+                "str": 80
+            },
+            {
+                "name": "Abbas Al-Hassan",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Othman Al-Othman",
+                "pos": "MEI",
+                "str": 70
+            },
+            {
+                "name": "Mourad Batna",
+                "pos": "ATA",
+                "str": 78
+            },
+            {
+                "name": "Cristian Tello",
+                "pos": "ATA",
+                "str": 77
+            },
+            {
+                "name": "Djaniny",
+                "pos": "ATA",
+                "str": 76
+            },
+            {
+                "name": "Ali Al-Zaqaan",
+                "pos": "ATA",
+                "str": 72
+            },
+            {
+                "name": "Saad Al-Shorafa",
+                "pos": "ATA",
+                "str": 69
+            },
+            {
+                "name": "Hassan Al-Salis",
+                "pos": "ATA",
+                "str": 70
+            },
+            {
+                "name": "Mukhtar Ali",
+                "pos": "MEI",
+                "str": 75
+            }
+        ]
+    },
+    "alfayha": {
+        "formation": "4-2-3-1",
+        "players": [
+            {
+                "name": "Vladimir Stojković",
+                "pos": "GOL",
+                "str": 75
+            },
+            {
+                "name": "Abdulraouf Al-Duqayl",
+                "pos": "GOL",
+                "str": 71
+            },
+            {
+                "name": "Chris Smalling",
+                "pos": "ZAG",
+                "str": 79
+            },
+            {
+                "name": "Hussain Al-Shuwaish",
+                "pos": "ZAG",
+                "str": 74
+            },
+            {
+                "name": "Makhir Al-Rashidi",
+                "pos": "ZAG",
+                "str": 72
+            },
+            {
+                "name": "Ghislain Konan",
+                "pos": "LAT",
+                "str": 76
+            },
+            {
+                "name": "Mohammed Al-Baqawi",
+                "pos": "LAT",
+                "str": 73
+            },
+            {
+                "name": "Gojko Cimirot",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Victor Ruiz",
+                "pos": "MEI",
+                "str": 75
+            },
+            {
+                "name": "Ricardo Ryller",
+                "pos": "MEI",
+                "str": 74
+            },
+            {
+                "name": "Saud Zidan",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Abdulrahman Al-Safri",
+                "pos": "MEI",
+                "str": 70
+            },
+            {
+                "name": "Henry Onyekuru",
+                "pos": "ATA",
+                "str": 77
+            },
+            {
+                "name": "Fashion Sakala",
+                "pos": "ATA",
+                "str": 78
+            },
+            {
+                "name": "Anthony Nwakaeme",
+                "pos": "ATA",
+                "str": 76
+            },
+            {
+                "name": "Sultan Mandash",
+                "pos": "ATA",
+                "str": 73
+            },
+            {
+                "name": "Malik Al-Abdulmonem",
+                "pos": "ATA",
+                "str": 70
+            },
+            {
+                "name": "Nawaf Al-Harthi",
+                "pos": "ATA",
+                "str": 71
+            }
+        ]
+    },
+    "damac": {
+        "formation": "4-2-3-1",
+        "players": [
+            {
+                "name": "Florin Niță",
+                "pos": "GOL",
+                "str": 76
+            },
+            {
+                "name": "Moustapha Zeghba",
+                "pos": "GOL",
+                "str": 74
+            },
+            {
+                "name": "Farouk Chafaï",
+                "pos": "ZAG",
+                "str": 76
+            },
+            {
+                "name": "Abdelkader Bedrane",
+                "pos": "ZAG",
+                "str": 75
+            },
+            {
+                "name": "Hassan Al-Shamrani",
+                "pos": "ZAG",
+                "str": 72
+            },
+            {
+                "name": "Sultan Al-Hawsawi",
+                "pos": "LAT",
+                "str": 74
+            },
+            {
+                "name": "Abdullah Al-Hawsawi",
+                "pos": "LAT",
+                "str": 71
+            },
+            {
+                "name": "Nicolae Stanciu",
+                "pos": "MEI",
+                "str": 78
+            },
+            {
+                "name": "Domagoj Antolić",
+                "pos": "MEI",
+                "str": 76
+            },
+            {
+                "name": "Tarek Hamed",
+                "pos": "MEI",
+                "str": 77
+            },
+            {
+                "name": "Bader Munshi",
+                "pos": "MEI",
+                "str": 72
+            },
+            {
+                "name": "Abdulaziz Al-Shahrani",
+                "pos": "MEI",
+                "str": 71
+            },
+            {
+                "name": "Georges-Kévin Nkoudou",
+                "pos": "ATA",
+                "str": 79
+            },
+            {
+                "name": "H. Diallo",
+                "pos": "ATA",
+                "str": 77
+            },
+            {
+                "name": "Ramzi Solan",
+                "pos": "ATA",
+                "str": 70
+            },
+            {
+                "name": "Abdulaziz Makin",
+                "pos": "ATA",
+                "str": 69
+            },
+            {
+                "name": "Ahmad Al-Zain",
+                "pos": "ATA",
+                "str": 74
+            },
+            {
+                "name": "Abdulaziz Al-Bishi",
+                "pos": "ATA",
+                "str": 73
+            }
+        ]
     }
+,
+    "intermiamicf": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Drake Callender",
+            "pos": "GOL",
+            "str": 76
+        },
+        {
+            "name": "Óscar Ustari",
+            "pos": "GOL",
+            "str": 70
+        },
+        {
+            "name": "Tomás Avilés",
+            "pos": "ZAG",
+            "str": 74
+        },
+        {
+            "name": "Maximiliano Falcón",
+            "pos": "ZAG",
+            "str": 75
+        },
+        {
+            "name": "Gonzalo Luján",
+            "pos": "ZAG",
+            "str": 74
+        },
+        {
+            "name": "Ian Fray",
+            "pos": "ZAG",
+            "str": 71
+        },
+        {
+            "name": "Noah Allen",
+            "pos": "LAT",
+            "str": 70
+        },
+        {
+            "name": "Sergio Reguilón",
+            "pos": "LAT",
+            "str": 78
+        },
+        {
+            "name": "Facundo Mura",
+            "pos": "LAT",
+            "str": 74
+        },
+        {
+            "name": "Yannick Bright",
+            "pos": "MEI",
+            "str": 72
+        },
+        {
+            "name": "David Ruiz (MLS)",
+            "pos": "MEI",
+            "str": 73
+        },
+        {
+            "name": "Rodrigo De Paul (MLS)",
+            "pos": "MEI",
+            "str": 84
+        },
+        {
+            "name": "Telasco Segovia",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "David Ayala",
+            "pos": "MEI",
+            "str": 71
+        },
+        {
+            "name": "Santiago Morales",
+            "pos": "MEI",
+            "str": 68
+        },
+        {
+            "name": "Lionel Messi",
+            "pos": "ATA",
+            "str": 88
+        },
+        {
+            "name": "Mateo Silvetti",
+            "pos": "ATA",
+            "str": 70
+        },
+        {
+            "name": "Tadeo Allende",
+            "pos": "ATA",
+            "str": 75
+        },
+        {
+            "name": "Germán Berterame",
+            "pos": "ATA",
+            "str": 79
+        },
+        {
+            "name": "Luis Suárez",
+            "pos": "ATA",
+            "str": 80
+        }
+    ]
+},
+    "columbuscrew": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Nicholas Hagen",
+            "pos": "GOL",
+            "str": 72
+        },
+        {
+            "name": "Luke Pruter",
+            "pos": "GOL",
+            "str": 65
+        },
+        {
+            "name": "Rudy Camacho",
+            "pos": "ZAG",
+            "str": 74
+        },
+        {
+            "name": "Eric Bailly (MLS)",
+            "pos": "ZAG",
+            "str": 76
+        },
+        {
+            "name": "Malte Amundsen",
+            "pos": "ZAG",
+            "str": 73
+        },
+        {
+            "name": "Andrés Herrera (MLS)",
+            "pos": "LAT",
+            "str": 74
+        },
+        {
+            "name": "Brooks Lennon",
+            "pos": "LAT",
+            "str": 73
+        },
+        {
+            "name": "Darlington Nagbe",
+            "pos": "MEI",
+            "str": 76
+        },
+        {
+            "name": "Derrick Jones",
+            "pos": "MEI",
+            "str": 70
+        },
+        {
+            "name": "Brais Méndez (MLS)",
+            "pos": "MEI",
+            "str": 82
+        },
+        {
+            "name": "Dylan Chambost (MLS)",
+            "pos": "MEI",
+            "str": 73
+        },
+        {
+            "name": "Max Arfsten",
+            "pos": "MEI",
+            "str": 72
+        },
+        {
+            "name": "Amar Sejdić",
+            "pos": "MEI",
+            "str": 69
+        },
+        {
+            "name": "Zach Zengue",
+            "pos": "MEI",
+            "str": 66
+        },
+        {
+            "name": "Lautaro Giaccone",
+            "pos": "ATA",
+            "str": 73
+        },
+        {
+            "name": "Ibrahim Aliyu",
+            "pos": "ATA",
+            "str": 72
+        },
+        {
+            "name": "Dániel Gazdag",
+            "pos": "MEI",
+            "str": 78
+        },
+        {
+            "name": "Diego Rossi",
+            "pos": "ATA",
+            "str": 79
+        },
+        {
+            "name": "Wessam Abou Ali",
+            "pos": "ATA",
+            "str": 77
+        },
+        {
+            "name": "Jacen Russell-Rowe",
+            "pos": "ATA",
+            "str": 71
+        }
+    ]
+},
+    "losangelesfc": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Hugo Lloris",
+            "pos": "GOL",
+            "str": 79
+        },
+        {
+            "name": "Thomas Hasal",
+            "pos": "GOL",
+            "str": 68
+        },
+        {
+            "name": "Aaron Long",
+            "pos": "ZAG",
+            "str": 75
+        },
+        {
+            "name": "Ryan Porteous",
+            "pos": "ZAG",
+            "str": 75
+        },
+        {
+            "name": "Eddie Segura",
+            "pos": "ZAG",
+            "str": 73
+        },
+        {
+            "name": "Nkosi Tafari",
+            "pos": "ZAG",
+            "str": 73
+        },
+        {
+            "name": "Artem Smolyakov",
+            "pos": "LAT",
+            "str": 70
+        },
+        {
+            "name": "Ryan Hollingshead",
+            "pos": "LAT",
+            "str": 74
+        },
+        {
+            "name": "Sergi Palencia",
+            "pos": "LAT",
+            "str": 74
+        },
+        {
+            "name": "Igor Jesus (MLS)",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Timothy Tillman",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Marco Delgado",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Mathieu Choinière",
+            "pos": "MEI",
+            "str": 73
+        },
+        {
+            "name": "Jacob Shaffelburg",
+            "pos": "ATA",
+            "str": 75
+        },
+        {
+            "name": "Tyler Boyd",
+            "pos": "ATA",
+            "str": 73
+        },
+        {
+            "name": "David Martínez",
+            "pos": "ATA",
+            "str": 71
+        },
+        {
+            "name": "Adrian Wibowo",
+            "pos": "ATA",
+            "str": 67
+        },
+        {
+            "name": "Son Heung-Min (MLS)",
+            "pos": "ATA",
+            "str": 85
+        },
+        {
+            "name": "Denis Bouanga",
+            "pos": "ATA",
+            "str": 81
+        },
+        {
+            "name": "Jeremy Ebobisse",
+            "pos": "ATA",
+            "str": 74
+        }
+    ]
+},
+    "lagalaxy": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "John McCarthy",
+            "pos": "GOL",
+            "str": 73
+        },
+        {
+            "name": "Novak Mićović",
+            "pos": "GOL",
+            "str": 67
+        },
+        {
+            "name": "Maya Yoshida",
+            "pos": "ZAG",
+            "str": 73
+        },
+        {
+            "name": "Jalen Neal",
+            "pos": "ZAG",
+            "str": 71
+        },
+        {
+            "name": "Carlos Emiro Garcés",
+            "pos": "ZAG",
+            "str": 70
+        },
+        {
+            "name": "John Nelson",
+            "pos": "LAT",
+            "str": 68
+        },
+        {
+            "name": "Miki Yamane",
+            "pos": "LAT",
+            "str": 73
+        },
+        {
+            "name": "Edwin Cerrillo",
+            "pos": "MEI",
+            "str": 71
+        },
+        {
+            "name": "Gastón Brugman",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Mark Delgado",
+            "pos": "MEI",
+            "str": 73
+        },
+        {
+            "name": "Riqui Puig",
+            "pos": "MEI",
+            "str": 81
+        },
+        {
+            "name": "Marco Reus (MLS)",
+            "pos": "MEI",
+            "str": 78
+        },
+        {
+            "name": "Diego Fagúndez",
+            "pos": "ATA",
+            "str": 72
+        },
+        {
+            "name": "Joseph Paintsil",
+            "pos": "ATA",
+            "str": 78
+        },
+        {
+            "name": "Gabriel Pec",
+            "pos": "ATA",
+            "str": 79
+        },
+        {
+            "name": "Dejan Joveljić",
+            "pos": "ATA",
+            "str": 77
+        },
+        {
+            "name": "Miguel Berry",
+            "pos": "ATA",
+            "str": 68
+        },
+        {
+            "name": "Reserva 18",
+            "pos": "MEI",
+            "str": 66
+        }
+    ]
+},
+    "nashvillesc": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Joe Willis",
+            "pos": "GOL",
+            "str": 73
+        },
+        {
+            "name": "Elliot Panicco",
+            "pos": "GOL",
+            "str": 68
+        },
+        {
+            "name": "Walker Zimmerman",
+            "pos": "ZAG",
+            "str": 76
+        },
+        {
+            "name": "Jack Maher",
+            "pos": "ZAG",
+            "str": 71
+        },
+        {
+            "name": "Josh Bauer",
+            "pos": "ZAG",
+            "str": 69
+        },
+        {
+            "name": "Daniel Lovitz",
+            "pos": "LAT",
+            "str": 71
+        },
+        {
+            "name": "Taylor Washington",
+            "pos": "LAT",
+            "str": 66
+        },
+        {
+            "name": "Shaq Moore",
+            "pos": "LAT",
+            "str": 73
+        },
+        {
+            "name": "Aníbal Godoy",
+            "pos": "MEI",
+            "str": 72
+        },
+        {
+            "name": "Brian Anunga",
+            "pos": "MEI",
+            "str": 69
+        },
+        {
+            "name": "Sean Davis",
+            "pos": "MEI",
+            "str": 71
+        },
+        {
+            "name": "Patrick Yazbek",
+            "pos": "MEI",
+            "str": 70
+        },
+        {
+            "name": "Hany Mukhtar",
+            "pos": "MEI",
+            "str": 80
+        },
+        {
+            "name": "Randall Leal",
+            "pos": "MEI",
+            "str": 72
+        },
+        {
+            "name": "Jacob Shaffelburg (MLS)",
+            "pos": "ATA",
+            "str": 74
+        },
+        {
+            "name": "Alex Muyl",
+            "pos": "ATA",
+            "str": 70
+        },
+        {
+            "name": "Sam Surridge",
+            "pos": "ATA",
+            "str": 75
+        },
+        {
+            "name": "Teal Bunbury",
+            "pos": "ATA",
+            "str": 67
+        }
+    ]
+},
+    "charlottefc": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Kristijan Kahlina",
+            "pos": "GOL",
+            "str": 75
+        },
+        {
+            "name": "David Bingham",
+            "pos": "GOL",
+            "str": 66
+        },
+        {
+            "name": "Adilson Malanda",
+            "pos": "ZAG",
+            "str": 73
+        },
+        {
+            "name": "Andrew Privett",
+            "pos": "ZAG",
+            "str": 70
+        },
+        {
+            "name": "Tim Ream",
+            "pos": "ZAG",
+            "str": 74
+        },
+        {
+            "name": "Jere Uronen",
+            "pos": "LAT",
+            "str": 71
+        },
+        {
+            "name": "Nathan Byrne",
+            "pos": "LAT",
+            "str": 72
+        },
+        {
+            "name": "Ashley Westwood",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Derrick Jones (MLS)",
+            "pos": "MEI",
+            "str": 69
+        },
+        {
+            "name": "Junior Urso",
+            "pos": "MEI",
+            "str": 70
+        },
+        {
+            "name": "Pep Biel",
+            "pos": "MEI",
+            "str": 75
+        },
+        {
+            "name": "Brandt Bronico",
+            "pos": "MEI",
+            "str": 71
+        },
+        {
+            "name": "Kerwin Vargas",
+            "pos": "ATA",
+            "str": 73
+        },
+        {
+            "name": "Liel Abada",
+            "pos": "ATA",
+            "str": 76
+        },
+        {
+            "name": "Nikola Petković",
+            "pos": "MEI",
+            "str": 69
+        },
+        {
+            "name": "Patrick Agyemang",
+            "pos": "ATA",
+            "str": 72
+        },
+        {
+            "name": "Karol Świderski",
+            "pos": "ATA",
+            "str": 76
+        },
+        {
+            "name": "Reserva 18",
+            "pos": "MEI",
+            "str": 64
+        }
+    ]
+},
+    "fccincinnati": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Roman Celentano",
+            "pos": "GOL",
+            "str": 74
+        },
+        {
+            "name": "Evan Louro",
+            "pos": "GOL",
+            "str": 65
+        },
+        {
+            "name": "Miles Robinson",
+            "pos": "ZAG",
+            "str": 76
+        },
+        {
+            "name": "Matt Miazga",
+            "pos": "ZAG",
+            "str": 74
+        },
+        {
+            "name": "Chidozie Awaziem",
+            "pos": "ZAG",
+            "str": 74
+        },
+        {
+            "name": "Ian Murphy",
+            "pos": "ZAG",
+            "str": 69
+        },
+        {
+            "name": "Yamil Asad",
+            "pos": "LAT",
+            "str": 70
+        },
+        {
+            "name": "DeAndre Yedlin",
+            "pos": "LAT",
+            "str": 73
+        },
+        {
+            "name": "Alvas Powell",
+            "pos": "LAT",
+            "str": 67
+        },
+        {
+            "name": "Pavel Bucha",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Obinna Nwobodo",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Malik Pinto",
+            "pos": "MEI",
+            "str": 65
+        },
+        {
+            "name": "Luciano Acosta",
+            "pos": "MEI",
+            "str": 81
+        },
+        {
+            "name": "Gerardo Valenzuela",
+            "pos": "MEI",
+            "str": 66
+        },
+        {
+            "name": "Luca Orellano",
+            "pos": "ATA",
+            "str": 75
+        },
+        {
+            "name": "Corey Baird",
+            "pos": "ATA",
+            "str": 70
+        },
+        {
+            "name": "Yuya Kubo",
+            "pos": "ATA",
+            "str": 72
+        },
+        {
+            "name": "Kévin Denkey",
+            "pos": "ATA",
+            "str": 77
+        }
+    ]
+},
+    "seattlesoundersfc": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Stefan Frei",
+            "pos": "GOL",
+            "str": 74
+        },
+        {
+            "name": "Andrew Thomas",
+            "pos": "GOL",
+            "str": 67
+        },
+        {
+            "name": "Jackson Ragen",
+            "pos": "ZAG",
+            "str": 73
+        },
+        {
+            "name": "Yeimar Gómez Andrade",
+            "pos": "ZAG",
+            "str": 74
+        },
+        {
+            "name": "Jonathan Bell",
+            "pos": "ZAG",
+            "str": 68
+        },
+        {
+            "name": "Nouhou Tolo",
+            "pos": "LAT",
+            "str": 72
+        },
+        {
+            "name": "Alex Roldan",
+            "pos": "LAT",
+            "str": 72
+        },
+        {
+            "name": "João Paulo (MLS)",
+            "pos": "MEI",
+            "str": 75
+        },
+        {
+            "name": "Obed Vargas",
+            "pos": "MEI",
+            "str": 72
+        },
+        {
+            "name": "Cristian Roldan",
+            "pos": "MEI",
+            "str": 75
+        },
+        {
+            "name": "Josh Atencio",
+            "pos": "MEI",
+            "str": 69
+        },
+        {
+            "name": "Albert Rusnák",
+            "pos": "MEI",
+            "str": 76
+        },
+        {
+            "name": "Pedro de la Vega",
+            "pos": "ATA",
+            "str": 74
+        },
+        {
+            "name": "Paul Rothrock",
+            "pos": "ATA",
+            "str": 68
+        },
+        {
+            "name": "Jordan Morris",
+            "pos": "ATA",
+            "str": 75
+        },
+        {
+            "name": "Raúl Ruidíaz",
+            "pos": "ATA",
+            "str": 73
+        },
+        {
+            "name": "Danny Musovski",
+            "pos": "ATA",
+            "str": 67
+        },
+        {
+            "name": "Reserva 18",
+            "pos": "MEI",
+            "str": 64
+        }
+    ]
+},
+    "newyorkredbulls": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Carlos Coronel (MLS)",
+            "pos": "GOL",
+            "str": 74
+        },
+        {
+            "name": "Ryan Meara",
+            "pos": "GOL",
+            "str": 65
+        },
+        {
+            "name": "Sean Nealis",
+            "pos": "ZAG",
+            "str": 71
+        },
+        {
+            "name": "Noah Eile",
+            "pos": "ZAG",
+            "str": 70
+        },
+        {
+            "name": "Andrés Reyes",
+            "pos": "ZAG",
+            "str": 71
+        },
+        {
+            "name": "John Tolkin",
+            "pos": "LAT",
+            "str": 74
+        },
+        {
+            "name": "Kyle Duncan",
+            "pos": "LAT",
+            "str": 70
+        },
+        {
+            "name": "Dylan Nealis",
+            "pos": "LAT",
+            "str": 68
+        },
+        {
+            "name": "Daniel Edelman",
+            "pos": "MEI",
+            "str": 72
+        },
+        {
+            "name": "Ronald Donkor",
+            "pos": "MEI",
+            "str": 66
+        },
+        {
+            "name": "Felipe Carballo",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Wikelman Carmona",
+            "pos": "MEI",
+            "str": 69
+        },
+        {
+            "name": "Emil Forsberg",
+            "pos": "MEI",
+            "str": 78
+        },
+        {
+            "name": "Lewis Morgan",
+            "pos": "ATA",
+            "str": 76
+        },
+        {
+            "name": "Cameron Harper",
+            "pos": "ATA",
+            "str": 69
+        },
+        {
+            "name": "Dante Vanzeir",
+            "pos": "ATA",
+            "str": 73
+        },
+        {
+            "name": "Elias Manoel",
+            "pos": "ATA",
+            "str": 71
+        },
+        {
+            "name": "Reserva 18",
+            "pos": "MEI",
+            "str": 63
+        }
+    ]
+},
+    "orlandocitysc": {
+    "formation": "4-3-3",
+    "players": [
+        {
+            "name": "Pedro Gallese",
+            "pos": "GOL",
+            "str": 75
+        },
+        {
+            "name": "Javier Otero",
+            "pos": "GOL",
+            "str": 64
+        },
+        {
+            "name": "Robin Jansson",
+            "pos": "ZAG",
+            "str": 73
+        },
+        {
+            "name": "Rodrigo Schlegel",
+            "pos": "ZAG",
+            "str": 71
+        },
+        {
+            "name": "David Brekalo",
+            "pos": "ZAG",
+            "str": 72
+        },
+        {
+            "name": "Rafael Santos (MLS)",
+            "pos": "LAT",
+            "str": 70
+        },
+        {
+            "name": "Dagur Thórhallsson",
+            "pos": "LAT",
+            "str": 71
+        },
+        {
+            "name": "César Araújo",
+            "pos": "MEI",
+            "str": 74
+        },
+        {
+            "name": "Wilder Cartagena",
+            "pos": "MEI",
+            "str": 73
+        },
+        {
+            "name": "Jeorgio Kocevski",
+            "pos": "MEI",
+            "str": 65
+        },
+        {
+            "name": "Martín Ojeda",
+            "pos": "MEI",
+            "str": 75
+        },
+        {
+            "name": "Nicolás Lodeiro",
+            "pos": "MEI",
+            "str": 73
+        },
+        {
+            "name": "Iván Angulo",
+            "pos": "ATA",
+            "str": 73
+        },
+        {
+            "name": "Facundo Torres",
+            "pos": "ATA",
+            "str": 78
+        },
+        {
+            "name": "Luis Muriel",
+            "pos": "ATA",
+            "str": 75
+        },
+        {
+            "name": "Duncan McGuire",
+            "pos": "ATA",
+            "str": 74
+        },
+        {
+            "name": "Reserva 17",
+            "pos": "MEI",
+            "str": 64
+        },
+        {
+            "name": "Reserva 18",
+            "pos": "MEI",
+            "str": 64
+        }
+    ]
+}
 };

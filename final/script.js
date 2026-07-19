@@ -751,6 +751,7 @@ function loadGame() {
                 mentality: (['Palmeiras', 'Flamengo', 'Botafogo', 'Corinthians', 'Manchester City', 'Arsenal', 'Liverpool', 'Real Madrid', 'Bayern de Munique'].includes(team.name)) ? 'Ofensivo' : (['Chapecoense', 'Remo', 'Mirassol', 'Luton Town', 'Sheffield United', 'Darmstadt'].includes(team.name) ? 'Defensivo' : 'Equilibrado'),
                 laterais: 'Defensivos',
                 captain: startersSorted.length > 0 ? startersSorted[0].id : null,
+                penaltyTaker: startersSorted.length > 0 ? startersSorted[0].id : null,
                 freekicks: startersSorted.length > 0 ? startersSorted[0].id : null,
                 corners: startersSorted.length > 0 ? startersSorted[0].id : null
             };
@@ -758,6 +759,7 @@ function loadGame() {
             // Ensure captain/freekicks/corners are valid IDs from the current squad
             const currentSquadIds = new Set(team.squad.map(p => p.id));
             if (!currentSquadIds.has(team.tactics.captain)) team.tactics.captain = startersSorted.length > 0 ? startersSorted[0].id : null;
+            if (!currentSquadIds.has(team.tactics.penaltyTaker)) team.tactics.penaltyTaker = startersSorted.length > 0 ? startersSorted[0].id : null;
             if (!currentSquadIds.has(team.tactics.freekicks)) team.tactics.freekicks = startersSorted.length > 0 ? startersSorted[0].id : null;
             if (!currentSquadIds.has(team.tactics.corners)) team.tactics.corners = startersSorted.length > 0 ? startersSorted[0].id : null;
 
@@ -1251,6 +1253,92 @@ function getRandomPlayerObj(team) {
     return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
+function getPenaltyTaker(team) {
+    if (!team || !team.squad || !team.tactics) return getRandomPlayerObj(team);
+
+    const starters = team.squad.filter(p => p.isStarter);
+    const penaltyTakerId = team.tactics.penaltyTaker;
+    if (penaltyTakerId) {
+        const selected = starters.find(p => p.id === penaltyTakerId) || team.squad.find(p => p.id === penaltyTakerId);
+        if (selected) return selected;
+    }
+
+    return starters.length > 0 ? starters[0] : (team.squad[0] || null);
+}
+
+function getPenaltyChance(player) {
+    if (!player) return 0.58;
+
+    const overall = Math.max(1, Math.min(99, player.strength || 0));
+    const energyFactor = Math.max(0.7, Math.min(1.1, (player.energy || 100) / 100));
+    const moraleFactor = Math.max(0.75, Math.min(1.05, (player.morale || 100) / 100));
+
+    const baseChance = 0.52 + (overall - 50) * 0.006;
+    const chance = baseChance * energyFactor * moraleFactor;
+    return Math.max(0.15, Math.min(0.95, chance));
+}
+
+function attributePenaltyGoalStats(team, penaltyPlayer, matchId = null, minute = null, competition = 'league') {
+    if (!penaltyPlayer) return 'Alguém';
+
+    const scorer = penaltyPlayer;
+    try {
+        const key = `${matchId || 'nogame'}_${minute || 'nomin'}_penalty`;
+        if (!scorer._goalEvents) scorer._goalEvents = new Set();
+        if (!scorer._goalEvents.has(key)) {
+            scorer.goals = (scorer.goals || 0) + 1;
+            if (!scorer.stats) scorer.stats = {};
+            if (!scorer.stats[competition]) scorer.stats[competition] = { goals: 0, assists: 0 };
+            scorer.stats[competition].goals = (scorer.stats[competition].goals || 0) + 1;
+            scorer._goalEvents.add(key);
+        }
+    } catch (e) {
+        scorer.goals = (scorer.goals || 0) + 1;
+        if (!scorer.stats) scorer.stats = {};
+        if (!scorer.stats[competition]) scorer.stats[competition] = { goals: 0, assists: 0 };
+        scorer.stats[competition].goals = (scorer.stats[competition].goals || 0) + 1;
+    }
+
+    return scorer.name;
+}
+
+function simulatePenaltyKick(match, minute, team) {
+    if (!match || !team) return false;
+
+    const taker = getPenaltyTaker(team);
+    const chance = getPenaltyChance(taker);
+    const scored = Math.random() < chance;
+    const takerName = taker ? taker.name : 'Jogador';
+    const teamName = team.name || 'time';
+
+    if (match === userSimMatch) {
+        addCommentaryItem(
+            scored
+                ? `🎯 Pênalti marcado! <strong>${takerName}</strong> do ${teamName} bate e converte com categoria.`
+                : `🎯 Pênalti desperdiçado! <strong>${takerName}</strong> do ${teamName} bate forte, mas o goleiro defende.`,
+            'goal',
+            minute
+        );
+    }
+
+    if (scored) {
+        if (team.id === match.homeTeam?.id) {
+            match.currentHomeGoals++;
+        } else if (team.id === match.awayTeam?.id) {
+            match.currentAwayGoals++;
+        }
+
+        const scorerName = attributePenaltyGoalStats(team, taker, match.id, minute, match.matchType || 'league');
+        if (match === userSimMatch) {
+            addCommentaryItem(`⚽ <strong>GOL DE PÊNALTI!</strong> ${scorerName} marca para o ${teamName}!`, 'goal', minute);
+            flashScoreboard();
+            playSFX('goal');
+        }
+    }
+
+    return scored;
+}
+
 // Adiciona um comentário na lista com efeito de scroll
 function addCommentaryItem(text, type, minute) {
     const listEl = document.getElementById('live-commentary-list');
@@ -1607,6 +1695,11 @@ function tickSimulation() {
             }
         }
 
+        if (Math.random() < 0.008) {
+            const penaltyTeam = Math.random() < 0.5 ? m.homeTeam : m.awayTeam;
+            simulatePenaltyKick(m, simMinute, penaltyTeam);
+        }
+
         updateOtherMatchUI(idx, m);
     });
 
@@ -1923,10 +2016,7 @@ function playRound() {
     document.getElementById('live-progress-bar').style.width = '0%';
     
     document.getElementById('live-commentary-list').innerHTML = '';
-    const othersList = document.getElementById('live-others-list');
-    othersList.innerHTML = '';
-
-    simulatedRoundMatches.forEach((m, idx) => {
+    const othersList = document.getElementById('live-others-list');    othersList.innerHTML = '';    simulatedRoundMatches.forEach((m, idx) => {
         const li = document.createElement('li');
         li.id = `live-other-${idx}`;
         li.className = `live-others-item ${m === userSimMatch ? 'user-match' : ''}`;
@@ -2106,67 +2196,7 @@ function viewCupBracket() {
     renderCupBracket();
 }
 
-// Verifica o fim da temporada e mostra a tela de campeão/resumo
-function checkSeasonEnd() {
-    // Calcula quem vai para a Libertadores da próxima temporada
-    const nextLibParticipants = [];
-    
-    // 1. Brasileiros (7 vagas: Campeão da Copa + G6 do Brasileiro)
-    if (cupWinnerId) nextLibParticipants.push(cupWinnerId);
-    let brCount = nextLibParticipants.length;
-    standings.forEach(t => {
-        if (brCount < 7 && !nextLibParticipants.includes(t.id)) {
-            nextLibParticipants.push(t.id);
-            brCount++;
-        }
-    });
-
-    // 2. Sul-Americanos (25 vagas)
-    const saTeams = allTeams.filter(t => t.league === 'south_america');
-    const saQualifiers = saTeams.sort((a, b) => b.strength - a.strength).slice(0, 25);
-    saQualifiers.forEach(t => nextLibParticipants.push(t.id));
-
-    libertadoresParticipants = nextLibParticipants;
-
-    const champion = standings[0];
-    const isUserChampion = champion.id === myTeam.id;
-    
-    // Premiação em dinheiro (Valores aproximados CBF Série A baseados em performance)
-    const userPos = standings.findIndex(t => t.id === myTeam.id) + 1;
-    let prize = 0;
-    if (myTeam.league === 'brazil_a') {
-        const prizesA = {
-            1: 47800000, 2: 45400000, 3: 43000000, 4: 40600000,
-            5: 38200000, 6: 35800000, 7: 33400000, 8: 31000000,
-            9: 28600000, 10: 26300000, 11: 20300000, 12: 19100000,
-            13: 17900000, 14: 17200000, 15: 16500000, 16: 16000000
-        };
-        prize = prizesA[userPos] || 0;
-    } else if (myTeam.league === 'brazil_b') {
-        // Valores para a Série B (Apenas o G4 recebe bônus de performance significativo)
-        const prizesB = { 1: 2500000, 2: 1500000, 3: 1000000, 4: 500000 };
-        prize = prizesB[userPos] || 0;
-    }
-
-    document.getElementById('champion-name').innerText = champion.name;
-    document.getElementById('champion-shield').src = champion.shield;
-    
-    let msg = isUserChampion 
-        ? `Parabéns! Você levou o ${myTeam.name} ao topo do futebol!` 
-        : `O ${champion.name} é o grande campeão da temporada.`;
-
-    if (prize > 0) {
-        myTeam.balance += prize;
-        msg += `<br><br><span style="color: #4CAF50; font-weight: bold;">💰 Premiação da Liga: R$ ${(prize/1000000).toFixed(1)}M recebidos pelo ${userPos}º lugar!</span>`;
-    }
-    
-    document.getElementById('champion-msg').innerHTML = msg;
-
-    // Prepara o resumo de quem sobe e quem desce
-    processPromotionsAndRelegations();
-    saveGame(); // Salva o novo estado das ligas
-    showScreen('screen-champion');
-}
+// Função `checkSeasonEnd` removida — o sistema usa `endOfSeason()`
 
 // Lógica de troca de times entre as ligas A e B do Brasil
 function processPromotionsAndRelegations() {
@@ -3437,7 +3467,8 @@ function switchSquadTab(tabId) {
 function renderTacticsPanel() {
     if (!myTeam || !myTeam.tactics) return;
     const captainSelect = document.getElementById('tactics-captain');
-    if (!captainSelect) return; // Garante que o DOM carregou
+    const penaltySelect = document.getElementById('tactics-penalty-taker');
+    if (!captainSelect || !penaltySelect) return; // Garante que o DOM carregou
 
     // 1. Preenche os seletores básicos
     document.getElementById('tactics-formation').value = myTeam.tactics.formation;
@@ -3450,7 +3481,7 @@ function renderTacticsPanel() {
     const freekicksSelect = document.getElementById('tactics-freekicks');
     const cornersSelect = document.getElementById('tactics-corners');
 
-    [captainSelect, freekicksSelect, cornersSelect].forEach(select => {
+    [captainSelect, penaltySelect, freekicksSelect, cornersSelect].forEach(select => {
         select.innerHTML = '';
     });
 
@@ -3462,6 +3493,12 @@ function renderTacticsPanel() {
         optCap.textContent = optText;
         if (p.id === myTeam.tactics.captain) optCap.selected = true;
         captainSelect.appendChild(optCap);
+
+        const optPenalty = document.createElement('option');
+        optPenalty.value = p.id;
+        optPenalty.textContent = optText;
+        if (p.id === myTeam.tactics.penaltyTaker) optPenalty.selected = true;
+        penaltySelect.appendChild(optPenalty);
 
         const optFk = document.createElement('option');
         optFk.value = p.id;
@@ -3482,6 +3519,10 @@ function renderTacticsPanel() {
         if (!myTeam.tactics.captain || !starterIds.includes(Number(myTeam.tactics.captain))) {
             myTeam.tactics.captain = starters[0].id;
             captainSelect.value = starters[0].id;
+        }
+        if (!myTeam.tactics.penaltyTaker || !starterIds.includes(Number(myTeam.tactics.penaltyTaker))) {
+            myTeam.tactics.penaltyTaker = starters[0].id;
+            penaltySelect.value = starters[0].id;
         }
         if (!myTeam.tactics.freekicks || !starterIds.includes(Number(myTeam.tactics.freekicks))) {
             myTeam.tactics.freekicks = starters[0].id;
@@ -3504,6 +3545,7 @@ function updateTactics() {
     myTeam.tactics.laterais = document.getElementById('tactics-laterais').value;
 
     myTeam.tactics.captain = Number(document.getElementById('tactics-captain').value);
+    myTeam.tactics.penaltyTaker = Number(document.getElementById('tactics-penalty-taker').value);
     myTeam.tactics.freekicks = Number(document.getElementById('tactics-freekicks').value);
     myTeam.tactics.corners = Number(document.getElementById('tactics-corners').value);
 
