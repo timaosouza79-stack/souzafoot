@@ -6364,15 +6364,56 @@ function checkForManagerOffers() {
     document.getElementById('manager-offer-text').innerHTML = offerText;
 
     // Configura os botões de ação
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-    tablinks = document.querySelectorAll("#modal-hall-of-fame .tab-btn");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
+    const btnAccept = document.getElementById('btn-accept-manager-offer');
+    const btnReject = document.getElementById('btn-reject-manager-offer');
+    if(btnAccept) btnAccept.onclick = () => acceptManagerOffer(offeringClub.id);
+    if(btnReject) btnReject.onclick = () => rejectManagerOffer();
+
+    document.getElementById('modal-manager-offer').style.display = 'flex';
+}
+
+function acceptProposal(playerId, buyerId, offerValue) {
+    const playerIndex = myTeam.squad.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) return;
+
+    const buyerTeam = allTeams.find(t => t.id === buyerId);
+    if (!buyerTeam) return;
+
+    const player = myTeam.squad.splice(playerIndex, 1)[0];
+    buyerTeam.squad.push(player);
+
+    myTeam.balance += offerValue;
+    document.getElementById('modal-proposal').style.display = 'none';
+
+    addCommentaryItem(`💸 Negócio Fechado: ${player.name} foi vendido ao ${buyerTeam.name} por R$ ${(offerValue / 1000000).toFixed(1)}M.`, 'info', 90);
+    renderSquad();
+    renderMarket();
+    renderFinances();
+    saveGame();
+}
+
+function rejectProposal(playerId) {
+    document.getElementById('modal-proposal').style.display = 'none';
+}
+
+function acceptManagerOffer(clubId) {
+    const newTeam = allTeams.find(t => t.id === clubId);
+    if (!newTeam) return;
+
+    // Atualiza time do usuário
+    myTeamId = newTeam.id;
+    myTeam = newTeam;
+    users[currentUser].gameState.myTeamId = newTeam.id;
+
+    document.getElementById('modal-manager-offer').style.display = 'none';
+    alert(`Contrato Assinado! Você agora é o treinador do ${newTeam.name}.`);
+
+    saveGame();
+    location.reload();
+}
+
+function rejectManagerOffer() {
+    document.getElementById('modal-manager-offer').style.display = 'none';
 }
 
 function showHallOfFame() {
