@@ -1,3 +1,4 @@
+<!-- DEBUG MODE: MODAL FINANCEIRO GARANTIDO -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -36,15 +37,17 @@
             <div class="login-container">
                 <div class="dashboard-card">
                     <h3 id="login-title">Entrar</h3>
-                    <div class="form-group">
-                        <input type="text" id="login-username" class="form-control" placeholder="Usuário">
-                    </div>
-                    <div class="form-group" style="margin-top: 10px;">
-                        <input type="password" id="login-password" class="form-control" placeholder="Senha">
-                    </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" id="btn-login-action"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <input type="text" id="login-username" class="form-control" placeholder="Usuário">
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <input type="password" id="login-password" class="form-control" placeholder="Senha">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;" id="btn-login-action"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+                    </form>
                     <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
-                        Não tem conta? <a href="#" onclick="toggleLoginMode()" id="toggle-link" style="color: var(--primary-color);">Criar conta</a>
+                        Não tem conta? <a href="#" onclick="toggleLoginMode(event)" id="toggle-link" style="color: var(--primary-color);">Criar conta</a>
                     </p>
 
                     <div id="user-list-container" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
@@ -76,6 +79,8 @@
                     <option value="italy">Série A - Itália</option>
                     <option value="france">Ligue 1 - França</option>
                     <option value="portugal">Liga Portugal - Portugal</option>
+                    <option value="arabia">Saudi Pro League - Arábia</option>
+                    <option value="mls">Major League Soccer - EUA</option>
                 </select>
             </div>
             
@@ -93,18 +98,23 @@
                         <h2 id="my-team-name">Nome do Time</h2>
                         <p>Força: <span id="my-team-strength">0</span></p>
                         <p style="color: #4CAF50; font-weight: bold;">Saldo: R$ <span id="my-team-balance">0</span></p>
+                        <div style="margin-top: 5px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+                            <span style="color: var(--text-muted);">Confiança da Direção:</span>
+                            <div style="width: 150px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; display: flex;">
+                                <div id="my-team-confidence-bar" style="height: 100%; width: 80%; background: #4CAF50; transition: all 0.3s ease;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="manager-actions">
-                    <button class="btn btn-secondary" onclick="showScreen('screen-squad'); renderSquad();"><i class="fas fa-tshirt"></i> Escalar Time</button>
-                    <button class="btn btn-primary" id="btn-play-round" onclick="playRound()"><i class="fas fa-play"></i> Jogar Rodada <span id="btn-round-num">(1/38)</span></button>
-                    <button class="btn btn-primary" id="btn-advance-round" onclick="advanceRound()" style="display: none; background-color: #ff9800; border-color: #ff9800;"><i class="fas fa-step-forward"></i> Próxima Rodada</button>
+                    <button class="btn btn-primary" onclick="showScreen('screen-squad'); renderSquad();"><i class="fas fa-tshirt"></i> Escalar Time</button>
+                    <button class="btn btn-secondary" onclick="playRound()"><i class="fas fa-play"></i> Jogar Rodada <span id="btn-round-num">(1/38)</span></button>
                     <button id="btn-sound-toggle" class="btn btn-secondary" onclick="toggleSound()"><i class="fas fa-volume-up"></i> Som: ON</button>
                     <button id="btn-market" class="btn btn-secondary" onclick="showScreen('screen-market'); renderMarket();"><i class="fas fa-shopping-cart"></i> Mercado</button>
                     <button id="btn-stadium" class="btn btn-primary" style="background-color: #ff9800; border-color: #ff9800;" onclick="showScreen('screen-stadium'); renderStadium();"><i class="fas fa-building"></i> Finanças / Estádio</button>
                     <button class="btn btn-secondary" style="border-color: #ffd700;" onclick="viewCupBracket()"><i class="fas fa-trophy" style="color: #ffd700;"></i> Ver Copa</button>
                     <button id="btn-view-libertadores" class="btn btn-secondary" style="border-color: #3f51b5; display: none;" onclick="viewLibertadoresBracket()"><i class="fas fa-globe-americas" style="color: #3f51b5;"></i> Ver Libertadores</button>
-                    <button class="btn btn-secondary" style="border-color: #c0c0c0;" onclick="startWorldCup()"><i class="fas fa-globe" style="color: #c0c0c0;"></i> Jogar Mundial</button>
+                    <button id="btn-view-sulamericana" class="btn btn-secondary" style="border-color: #f44336; display: none;" onclick="viewSulAmericanaBracket()"><i class="fas fa-fire" style="color: #f44336;"></i> Ver Sul-Americana</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-calendar'); renderCalendar();"><i class="far fa-calendar-alt"></i> Calendário</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-standings'); renderStandings();"><i class="fas fa-list-ol"></i> Ver Classificação</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-stats'); populateStatsCompetitions();"><i class="fas fa-chart-bar"></i> Estatísticas</button>
@@ -153,6 +163,7 @@
                     </div>
                 </div>
                 <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="openAcademyModal()" style="margin-right: 10px; background-color: #4CAF50; border-color: #4CAF50;"><i class="fas fa-graduation-cap"></i> Ver Escola de Formação</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-main'); updateTeamStrength();"><i class="fas fa-arrow-left"></i> Voltar ao Painel</button>
                 </div>
             </header>
@@ -196,13 +207,19 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="tactics-playstyle">Estilo de Jogo</label>
+                            <select id="tactics-playstyle" class="form-control" onchange="updateTactics()">
+                                <option value="Posse de Bola" selected>Posse de Bola (Tiki-Taka)</option>
+                                <option value="Contra-Ataque">Contra-Ataque (Transições Rápidas)</option>
+                                <option value="Pressão Alta">Pressão Alta (Sufoco)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="tactics-mentality">Mentalidade Tática</label>
                             <select id="tactics-mentality" class="form-control" onchange="updateTactics()">
-                                <option value="Muito Defensivo">Muito Defensivo (Retranca Total)</option>
                                 <option value="Defensivo">Defensivo (Cuidado)</option>
                                 <option value="Equilibrado" selected>Equilibrado (Segurança)</option>
                                 <option value="Ofensivo">Ofensivo (Ataque Contínuo)</option>
-                                <option value="Muito Ofensivo">Muito Ofensivo (Pressão Absoluta)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -210,6 +227,16 @@
                             <select id="tactics-laterais" class="form-control" onchange="updateTactics()">
                                 <option value="Defensivos" selected>Laterais Ficam (Foco Defensivo)</option>
                                 <option value="Apoiando">Laterais Sobem (Apoio Ofensivo)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label for="tactics-training">Foco de Treino Semanal</label>
+                            <select id="tactics-training" class="form-control" onchange="updateTactics()">
+                                <option value="Equilibrado">Equilibrado (Normal)</option>
+                                <option value="Recuperacao">Recuperação Física (+Energia, Menor Risco de Lesão)</option>
+                                <option value="Intenso">Físico Intenso (+Força, -Energia, Alto Risco de Lesão)</option>
+                                <option value="Tecnico">Treino Técnico (+Ataque, Energia Normal)</option>
                             </select>
                         </div>
                     </div>
@@ -383,8 +410,42 @@
                     <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
                 </div>
             </header>
-            <div class="market-search-bar" style="margin: 0 20px 15px 20px;">
-                <input type="text" id="market-search-input" class="form-control" placeholder="🔍 Buscar jogador por nome em todos os clubes..." oninput="renderMarket()">
+            <div class="market-search-bar" style="margin: 0 20px 15px 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="market-search-input" class="form-control" style="flex: 2; min-width: 200px;" placeholder="🔍 Buscar jogador por nome em todos os clubes..." oninput="renderMarket()">
+                
+                <select id="market-filter-league" class="form-control" style="flex: 1; min-width: 150px; background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer;" onchange="onMarketLeagueChange()">
+                    <option value="all">🌍 Todas as Ligas</option>
+                    <option value="brazil_a">🇧🇷 Série A - Brasil</option>
+                    <option value="brazil_b">🇧🇷 Série B - Brasil</option>
+                    <option value="england">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Inglaterra</option>
+                    <option value="spain">🇪🇸 La Liga - Espanha</option>
+                    <option value="germany">🇩🇪 Bundesliga - Alemanha</option>
+                    <option value="italy">🇮🇹 Série A - Itália</option>
+                    <option value="france">🇫🇷 Ligue 1 - França</option>
+                    <option value="portugal">🇵🇹 Liga Portugal</option>
+                    <option value="arabia">🇸🇦 Saudi Pro League - Arábia</option>
+                    <option value="south_america">🌎 Outros da América do Sul</option>
+                </select>
+
+                <select id="market-filter-team" class="form-control" style="flex: 1; min-width: 160px; background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer;" onchange="onMarketTeamChange()">
+                    <option value="all">⚽ Todos os Times</option>
+                </select>
+
+                <select id="market-filter-position" class="form-control" style="flex: 1; min-width: 120px; background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer;" onchange="renderMarket()">
+                    <option value="all">🏃 Todas as Posições</option>
+                    <option value="GOL">🧤 Goleiros (GOL)</option>
+                    <option value="ZAG">🛡️ Zagueiros (ZAG)</option>
+                    <option value="LAT">🏃 Laterais (LAT)</option>
+                    <option value="MEI">🧠 Meias (MEI)</option>
+                    <option value="ATA">⚡ Atacantes (ATA)</option>
+                </select>
+            </div>
+            <!-- Botão "Ver Elenco Completo" aparece quando um time é selecionado -->
+            <div id="market-team-info-bar" style="display:none; margin: 0 20px 10px 20px; padding: 10px 16px; background: rgba(33,150,243,0.13); border: 1px solid var(--primary-color); border-radius: 8px; display: none; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <img id="market-team-shield" src="" alt="" style="width:36px; height:36px; object-fit:contain; border-radius:4px; background:#fff2; padding:2px;">
+                <span id="market-team-label" style="font-weight:bold; font-size:1.05em; color:white;"></span>
+                <span id="market-team-strength" style="color:var(--text-muted); font-size:0.9em;"></span>
+                <button class="btn btn-primary" style="margin-left:auto; padding:6px 16px;" onclick="viewOpponentSquadFromMarket()">👁️ Ver Elenco Completo</button>
             </div>
             <main class="dashboard-card" style="margin: 20px;">
                 <div id="market-list" class="squad-list"></div>
@@ -398,7 +459,8 @@
                     <h2>Estádio e Finanças</h2>
                     <p>Saldo Disponível: <strong style="color: #4CAF50;">R$ <span id="stadium-balance">0</span></strong></p>
                 </div>
-                <div class="manager-actions">
+                <div class="manager-actions" style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn btn-secondary" style="border-color: #f44336; color: #f44336;" onclick="emergencyReset()"><i class="fas fa-exclamation-triangle"></i> Reiniciar Dados do Clube</button>
                     <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
                 </div>
             </header>
@@ -433,6 +495,76 @@
                         
                         <div id="sponsorships-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                             <!-- Sponsors renderizados via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Nova Seção: Comércio e Bares -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <h3 style="margin-bottom: 10px;">Comércio e Bares</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Melhore as infraestruturas para gerar mais receitas em dias de jogos em casa.</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-beer" style="color: #FFC107;"></i> Bar de Bebidas <span id="commerce-bars-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Gera lucro extra por cada adepto.</p>
+                                </div>
+                                <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('bars')">Melhorar (R$ <span id="cost-bars">100.000</span>)</button>
+                            </div>
+                            <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-hamburger" style="color: #FF5722;"></i> Roulote de Bifanas <span id="commerce-food-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Atrai público e aumenta receitas.</p>
+                                </div>
+                                <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('food')">Melhorar (R$ <span id="cost-food">150.000</span>)</button>
+                            </div>
+                            <div class="sponsorship-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <h4 style="color: white; margin-bottom: 5px;"><i class="fas fa-ice-cream" style="color: #E91E63;"></i> Banca de Doces Gourmet <span id="commerce-gourmet-badge" style="font-size: 0.7rem; background: #555; padding: 2px 6px; border-radius: 4px;">Nv. 0</span></h4>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted);">Alta rentabilidade para público premium.</p>
+                                </div>
+                                <button class="btn btn-secondary" style="margin-top: 10px; padding: 5px; font-size: 0.8rem;" onclick="upgradeCommerce('gourmet')">Melhorar (R$ <span id="cost-gourmet">300.000</span>)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nova Seção: Investir na Formação -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">Escola de Formação <span id="academy-level-badge" style="font-size: 0.8rem; background: var(--primary-color); padding: 3px 8px; border-radius: 4px; margin-left: 10px;">Nível 1</span></h3>
+                                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Invista na base para revelar jovens promessas (16-17 anos) no fim da temporada.</p>
+                            </div>
+                            <div>
+                                <button id="btn-upgrade-academy" class="btn btn-secondary" style="border-color: #2196F3; color: #2196F3; padding: 10px 20px;" onclick="upgradeAcademy()">
+                                    <i class="fas fa-graduation-cap"></i> Investir na Base (Custo: <span id="academy-upgrade-cost">0</span>)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departamento Médico -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">🏥 Departamento Médico <span id="medical-level-badge" style="font-size: 0.8rem; background: #e91e63; padding: 3px 8px; border-radius: 4px; margin-left: 10px;">Nível 1</span></h3>
+                                <p id="medical-bonus-info" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;">Redução de 0% no tempo de recuperação.</p>
+                            </div>
+                            <button class="btn btn-secondary" style="border-color: #e91e63; color: #e91e63; padding: 10px 20px;" onclick="upgradeMedicalDept()">
+                                <i class="fas fa-plus"></i> Melhorar (R$ <span id="medical-upgrade-cost">5.000.000</span>)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Folha Salarial -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="margin-bottom: 5px;">💼 Folha Salarial</h3>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Total pago por rodada ao plantel.</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span id="payroll-total" style="font-size: 1.4rem; font-weight: bold; color: #f44336;">R$ 0</span>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">/ jogo</div>
                         </div>
                     </div>
                 </div>
@@ -491,6 +623,7 @@
                             <!-- Outros placares sendo atualizados -->
                         </ul>
                     </div>
+
                 </div>
             </main>
 
@@ -591,6 +724,25 @@
                 <button class="btn btn-primary" style="margin-top: 20px; padding: 15px 40px;" onclick="startNextSeason()">Iniciar Próxima Temporada</button>
             </div>
         </section>
+
+        <!-- Tela de Sala de Troféus -->
+        <section id="screen-trophies" class="screen">
+            <header class="manager-header" style="justify-content: space-between;">
+                <div>
+                    <h2>Sala de Troféus</h2>
+                    <p>O histórico de glórias do clube.</p>
+                </div>
+                <div class="manager-actions">
+                    <button class="btn btn-primary" onclick="showScreen('screen-main')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                </div>
+            </header>
+            <main class="dashboard-card" style="margin: 20px; text-align: center;">
+                <h3 style="margin-bottom: 20px; color: var(--accent-color);">Histórico de Épocas</h3>
+                <div id="trophies-container" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+                    <!-- Histórico renderizado via JS -->
+                </div>
+            </main>
+        </section>
     </div>
 
     <!-- ===== BARRA DE NAVEGAÇÃO MOBILE ===== -->
@@ -647,6 +799,9 @@
                 <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#ffd700;" onclick="closeMobileMore(); viewCupBracket();">
                     <i class="fas fa-trophy" style="font-size:1.2rem; color:#ffd700;"></i> Ver Copa
                 </button>
+                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#FF9800;" onclick="closeMobileMore(); showScreen('screen-trophies'); renderTrophies();">
+                    <i class="fas fa-medal" style="font-size:1.2rem; color:#FF9800;"></i> Sala de Troféus
+                </button>
                 <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#4CAF50;" onclick="closeMobileMore(); manualSave();">
                     <i class="fas fa-save" style="font-size:1.2rem; color:#4CAF50;"></i> Salvar Jogo
                 </button>
@@ -675,28 +830,123 @@
             </div>
         </div>
 
+    <!-- Modal de Demissão (Game Over) -->
+    <div id="modal-sacked" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="dashboard-card" style="width: 90%; max-width: 400px; padding: 30px; border: 1px solid #f44336; border-top: 5px solid #f44336;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <i class="fas fa-user-times" style="font-size: 3rem; color: #f44336; margin-bottom: 15px;"></i>
+                <h3 style="margin: 0; color: white; font-size: 1.5rem;">Fim de Linha!</h3>
+                <p style="color: #f44336; font-weight: bold; margin-top: 10px; font-size: 1.1rem;">Foste Despedido.</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 15px; line-height: 1.5;">A direção perdeu totalmente a confiança no teu trabalho devido aos maus resultados recentes.</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="handleSacking()" style="width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; background: #f44336; border-color: #f44336;">
+                    Assumir Novo Clube <i class="fas fa-sign-in-alt"></i>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <script src="squads.js"></script>
-    <script src="script.js?v=2"></script>
 
-    <!-- Scripts do Mundial de Clubes -->
-    <script src="mundial.js"></script>
-    <script src="continental_tournaments.js"></script>
-    <script src="mundial_integration.js"></script>
-    <script>
-        // Função para iniciar o Mundial de Clubes a partir do botão
-        async function startWorldCup() {
-            if (typeof executeWorldCup !== 'function') {
-                alert('Erro: A função do Mundial de Clubes não foi carregada.');
-                return;
-            }
-            alert('Simulando o Mundial de Clubes! O resultado aparecerá no console (F12).');
-            const report = await executeWorldCup(window.allTeams || []);
-            console.log('🏆 Relatório do Mundial de Clubes:', report);
-            alert(`O campeão do Mundial é: ${report.worldChampion.name}!`);
-        }
-    </script>
+    <!-- Modal da Escola de Formação (Regens) -->
+    <div id="modal-academy" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close-modal" onclick="closeModal('modal-academy')">&times;</span>
+            <h2 style="color: var(--primary-color); margin-top: 0;"><i class="fas fa-graduation-cap"></i> Escola de Formação (Juniores)</h2>
+            <p>Estes são os jovens talentos revelados na base. Promova-os ao plantel principal para os poder escalar e evoluir (menores de 19 anos ganham chance de +1 de OVR a cada jogo).</p>
+            <div id="academy-players-list" style="margin-top: 15px;">
+                <!-- Renderizados via JS -->
+            </div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="closeModal('modal-academy')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Visualizar Elenco Adversário -->
+    <div id="modal-opponent-squad" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal" onclick="closeModal('modal-opponent-squad')">&times;</span>
+            <header style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
+                <img id="opponent-squad-shield" src="" alt="Escudo" style="width: 60px; height: 60px; object-fit: contain;">
+                <div>
+                    <h2 id="opponent-squad-name" style="margin: 0; color: var(--primary-color);">Nome do Clube</h2>
+                    <p id="opponent-squad-info" style="margin: 5px 0 0 0; font-size: 0.9rem; color: var(--text-muted);">Força: --</p>
+                </div>
+            </header>
+            <div id="opponent-squad-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 10px;">
+                <!-- Renderizados via JS -->
+            </div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="btn btn-secondary" onclick="closeModal('modal-opponent-squad')">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         IDEIA 20 — MODAL DE INDISCIPLINA / NOITADA
+         ===================================================== -->
+    <div id="modal-indisciplina" class="modal" style="z-index: 10000;">
+        <div class="modal-content" style="
+            max-width: 520px;
+            background: linear-gradient(145deg, #1a0a0a 0%, #1e1010 40%, #12121e 100%);
+            border: 1px solid #c0392b;
+            box-shadow: 0 0 40px rgba(192,57,43,0.35), 0 0 80px rgba(192,57,43,0.12);
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+        ">
+            <!-- Cabeçalho dramático -->
+            <div style="background: linear-gradient(135deg, #c0392b 0%, #922b21 60%, #641e16 100%); padding: 20px 24px 16px 24px; display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 2.4rem; line-height: 1;">🌃</span>
+                <div>
+                    <div style="font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 3px;">Evento Extra-Campo</div>
+                    <h2 style="margin: 0; font-size: 1.3rem; color: #fff; font-weight: 700;">⚠️ INDISCIPLINA!</h2>
+                </div>
+            </div>
+            <!-- Corpo do modal -->
+            <div style="padding: 22px 24px;">
+                <!-- Jogador envolvido -->
+                <div style="display: flex; align-items: center; gap: 14px; background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.3); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+                    <span id="indisciplina-emoji" style="font-size: 2rem;">😴</span>
+                    <div>
+                        <div id="indisciplina-player-name" style="font-weight: 700; font-size: 1.1rem; color: #fff;"></div>
+                        <div id="indisciplina-player-info" style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 2px;"></div>
+                    </div>
+                </div>
+                <!-- Texto do evento -->
+                <p id="indisciplina-text" style="font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.65; margin: 0 0 16px 0; padding: 14px 16px; background: rgba(255,255,255,0.04); border-radius: 8px; border-left: 3px solid #c0392b;"></p>
+                <!-- Consequência automática -->
+                <div style="font-size: 0.82rem; color: #e67e22; background: rgba(230,126,34,0.1); border: 1px solid rgba(230,126,34,0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <span>⚡</span>
+                    <span>O jogador está <strong>visivelmente esgotado</strong> — começará com apenas <strong>50% de energia</strong>.</span>
+                </div>
+                <!-- Título das opções -->
+                <div style="font-size: 0.78rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 12px;">Como o treinador vai reagir?</div>
+                <!-- Botões de decisão -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button onclick="resolveIndisciplina('multa')" style="width:100%; padding:13px 18px; background:linear-gradient(135deg,#c0392b,#a93226); border:none; border-radius:10px; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:1.4rem;">🔴</span>
+                        <div><div>Aplicar Multa</div><div style="font-size:0.78rem;opacity:0.75;font-weight:400;margin-top:2px;">Deduz 20% do salário · valor reverte para o clube · jogador fica com 😡 mas joga</div></div>
+                    </button>
+                    <button onclick="resolveIndisciplina('barrar')" style="width:100%; padding:13px 18px; background:linear-gradient(135deg,#2c3e50,#1a252f); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:1.4rem;">⛔</span>
+                        <div><div>Barrar do Jogo</div><div style="font-size:0.78rem;opacity:0.75;font-weight:400;margin-top:2px;">Jogador suspenso nesta rodada · salário mantido · plantel reduzido</div></div>
+                    </button>
+                    <button onclick="resolveIndisciplina('perdoar')" style="width:100%; padding:13px 18px; background:linear-gradient(135deg,#27ae60,#1e8449); border:none; border-radius:10px; color:#fff; font-size:0.95rem; font-weight:600; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px;">
+                        <span style="font-size:1.4rem;">💛</span>
+                        <div><div>Perdoar</div><div style="font-size:0.78rem;opacity:0.75;font-weight:400;margin-top:2px;">Sem punição · jogador fica com 😊 e joga com energia baixa</div></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- FIM MODAL INDISCIPLINA -->
+
+    <script src="squads.js"></script>
+    <script src="continental.js?v=1"></script>
+    <script src="script.js?v=21"></script>
     <script>
         // Popula o seletor de competições dinamicamente após os scripts carregarem
         function populateStatsCompetitions() {
@@ -744,6 +994,11 @@
 
             // Renderiza as stats da opção actualmente seleccionada
             renderStats(sel.value);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
         }
 
         window.addEventListener('load', function() {
