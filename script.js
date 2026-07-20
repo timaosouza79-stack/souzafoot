@@ -5435,12 +5435,10 @@ function renderStats(competition) {
     // Decide competição a partir do argumento ou do select
     let comp = competition;
     if (!comp) {
-        const sel = document.getElementById('stats-competition-select');
         comp = sel ? sel.value : (myTeam ? myTeam.league : 'brazil_a');
     }
 
     // Atualiza o select visualmente
-    const sel = document.getElementById('stats-competition-select');
     if (sel && sel.value !== comp) {
         const opt = Array.from(sel.options).find(o => o.value === comp);
         if (opt) sel.value = comp;
