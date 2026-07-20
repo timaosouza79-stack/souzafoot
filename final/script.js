@@ -2096,7 +2096,7 @@ function skipMatch() {
     
     // FIX: Envolve a chamada final em try/catch para garantir que nunca congela
     try {
-        endSimulation(true);
+        endSimulation(false);
     } catch (e) {
         console.error('Erro crítico em skipMatch ao chamar endSimulation:', e);
         window.simulationEnded = true;
@@ -2177,6 +2177,8 @@ function endSimulation(immediate = false) {
             continueBtn.innerHTML = '<i class="fas fa-step-forward"></i> Avançar para Próxima Rodada';
             continueBtn.onclick = finishMatchSimulation;
         }
+        const skipBtn = document.querySelector('button[onclick="skipMatch()"]');
+        if (skipBtn) skipBtn.style.display = 'none';
     }
 }
 
@@ -2903,6 +2905,8 @@ function _continuePlayRoundCore(matchesToSimulate, currentData) {
 
     document.getElementById('btn-live-continue').style.display = 'none';
     document.getElementById('btn-live-continue').onclick = finishMatchSimulation;
+    const skipBtn = document.querySelector('button[onclick="skipMatch()"]');
+    if (skipBtn) skipBtn.style.display = 'inline-block';
     
     const relatorioDiv = document.getElementById('relatorio-fim-de-jogo');
     if (relatorioDiv) relatorioDiv.style.display = 'none';
