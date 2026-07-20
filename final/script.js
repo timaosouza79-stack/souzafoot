@@ -5489,12 +5489,19 @@ function renderStats(competition) {
     }
 
     // Monta lista de jogadores com estatísticas por competição
+    let statsKey = comp;
+    if (comp === 'libertadores' || comp === 'south_america') {
+        statsKey = 'continental';
+    } else if (comp !== 'cup' && comp !== 'intercontinental') {
+        statsKey = 'league';
+    }
+
     allTeams.forEach(team => {
         if (!participantIds.has(team.id)) return;
         (team.squad || []).forEach(p => {
-            const compStats = (p.stats && p.stats[comp]) ? p.stats[comp] : null;
-            const compGoals   = compStats ? (compStats.goals   || 0) : (p.goals   || 0);
-            const compAssists = compStats ? (compStats.assists || 0) : (p.assists || 0);
+            const compStats = (p.stats && p.stats[statsKey]) ? p.stats[statsKey] : null;
+            const compGoals   = compStats ? (compStats.goals || 0) : 0;
+            const compAssists = compStats ? (compStats.assists || 0) : 0;
             leaguePlayers.push({
                 ...p,
                 teamName:   team.name,
