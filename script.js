@@ -1433,6 +1433,14 @@ function selectTeam(teamId) {
     // Initialize the championship only with teams from the same league
     initChampionship(myTeam.league);
 
+    // MODO FINANCEIRO
+    const financeSelect = document.getElementById('finance-mode-select');
+    if (financeSelect && financeSelect.value === 'equal') {
+        allTeams.forEach(t => {
+            t.balance = 150000000;
+        });
+    }
+
     // Calculate the strength of the league teams
     const leagueTeams = allTeams.filter(t => t.league === myTeam.league);
     leagueTeams.forEach(t => {
