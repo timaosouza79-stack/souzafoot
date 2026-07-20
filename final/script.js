@@ -6168,24 +6168,39 @@ function attemptPurchase(playerId, fromTeamId, offerPrice) {
     if (!player) { alert("Erro ao encontrar jogador."); return; }
     const marketPrice = Math.pow(player.strength, 2) * 14000;
 
-    // Chance de sucesso baseada no fator financeiro e importância do jogador
-    const playerImportance = player.strength / fromTeam.strength;
-    const offerFactor = offerPrice / marketPrice;
-    let successChance = 0.30; // Base de 30%
-    
-    if (offerFactor >= 1.5) {
-        successChance = 0.90; // Se pagou muito acima do valor de mercado
-    } else if (offerFactor >= 1.2) {
-        successChance = 0.70; // Oferta generosa
-    } else if (offerFactor >= 1.0) {
-        successChance = 0.45; // Valor de mercado tem menos chance agora
-    } else if (offerFactor >= 0.8) {
-        successChance = 0.20; // Oferta baixa
-    } else {
-        successChance = 0.05; // Quase impossível
+    // Regras de Reputação (Grandeza)
+    const myTeamRep = myTeam.rep || myTeam.reputation || 30;
+    if (player.strength >= 80 && myTeamRep < 75) {
+        alert(`RECUSA DO JOGADOR!\n\nO empresário do ${player.name} foi direto:\n"Com todo o respeito, o meu cliente não está interessado em transferir-se para o vosso clube devido à vossa baixa reputação."`);
+        return;
+    } else if (player.strength >= 75 && myTeamRep < 50) {
+        alert(`RECUSA DO JOGADOR!\n\nO empresário do ${player.name} informou:\n"O jogador acha que o vosso clube não atende às suas ambições de carreira desportiva no momento."`);
+        return;
     }
 
-    if (playerImportance > 1.0) successChance -= 0.20; // Dificulta se for jogador importante pro time
+    const offerFactor = offerPrice / marketPrice;
+
+    // Recusa financeira direta (oferta muito baixa)
+    if (offerFactor < 0.85) {
+        alert(`RECUSA DO CLUBE!\n\nA diretoria do ${fromTeam.name} interrompeu as negociações imediatamente:\n"A sua proposta financeira é um insulto. Exigimos um valor apropriado por este talento!"`);
+        return;
+    }
+
+    // Chance de sucesso baseada no fator financeiro e importância do jogador
+    const playerImportance = player.strength / fromTeam.strength;
+    let successChance = 0.25; // Base reduzida
+    
+    if (offerFactor >= 1.6) {
+        successChance = 0.90; // Pagou muito acima
+    } else if (offerFactor >= 1.3) {
+        successChance = 0.65; // Oferta muito boa
+    } else if (offerFactor >= 1.0) {
+        successChance = 0.35; // Valor de mercado
+    } else { // 0.85 até 1.0
+        successChance = 0.15; // Oferta abaixo da média
+    }
+
+    if (playerImportance > 1.0) successChance -= 0.20; // Dificulta se for jogador importante
     if (!player.isStarter) successChance += 0.20; // Facilita se for reserva
 
     successChance = Math.max(0.01, Math.min(0.95, successChance));
@@ -6193,13 +6208,7 @@ function attemptPurchase(playerId, fromTeamId, offerPrice) {
     if (Math.random() <= successChance) {
         executeTransfer(playerId, fromTeamId, offerPrice);
     } else {
-        let reason = '';
-        if (offerFactor < 0.9) reason = `O ${fromTeam.name} recusou a proposta, considerando o valor financeiro oferecido muito baixo.`;
-        else reason = `A negociação não avançou por detalhes contratuais com o empresário do jogador.`;
-        
-        alert(`TRANSFERÊNCIA FRACASSADA!
-
-${reason}`);
+        alert(`NEGOCIAÇÃO FRACASSADA!\n\nAs conversas com o ${fromTeam.name} ou com o empresário do jogador chegaram a um impasse por detalhes contratuais. Tente melhorar a sua oferta.`);
     }
 }
 
@@ -6258,12 +6267,25 @@ function requestLoan(playerId, fromTeamId, originalPrice) {
     if (!player) { alert("Erro ao encontrar jogador."); return; }
 
 
+    const playerAge = player.age || 25; // fallback
+
+    // Regra de Estrela:
+    if (player.strength > 78) {
+        alert(`EMPRÉSTIMO RECUSADO!\n\nA diretoria do ${fromTeam.name} foi taxativa:\n"O ${player.name} é muito valioso. Nós só aceitamos vender este jogador em definitivo!"`);
+        return;
+    }
+
+    // Regra de Titularidade e Idade:
+    if (playerAge > 23 && player.strength > 72) {
+        alert(`EMPRÉSTIMO RECUSADO!\n\nA diretoria do ${fromTeam.name} recusou:\n"O ${player.name} é considerado um titular importante e experiente no nosso plantel. Não aceitamos emprestar jogadores nestas condições."`);
+        return;
+    }
 
     const playerImportance = player.strength / fromTeam.strength;
-    let successChance = 0.35; // Base reduzida de 0.75 para 0.35 para dificultar
-    if (playerImportance > 1.0) successChance -= 0.20;
-    if (!player.isStarter) successChance += 0.30; // Facilita um pouco mais se for reserva
-    successChance = Math.max(0.05, Math.min(0.85, successChance)); // Máximo 85% e mínimo 5%
+    let successChance = 0.20; // Base reduzida para 20%
+    if (playerImportance > 1.0) successChance -= 0.15;
+    if (!player.isStarter) successChance += 0.15; // Facilita um pouco se for reserva
+    successChance = Math.max(0.05, Math.min(0.60, successChance)); // Máximo 60% e mínimo 5%
 
     if (confirm(`Deseja tentar o empréstimo de ${player.name}?
 
