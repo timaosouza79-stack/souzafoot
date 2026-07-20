@@ -6129,19 +6129,27 @@ function attemptPurchase(playerId, fromTeamId, offerPrice) {
     if (!player) { alert("Erro ao encontrar jogador."); return; }
     const marketPrice = Math.pow(player.strength, 2) * 14000;
 
-    // Chance de sucesso baseada puramente no fator financeiro
+    // Chance de sucesso baseada no fator financeiro e importância do jogador
+    const playerImportance = player.strength / fromTeam.strength;
     const offerFactor = offerPrice / marketPrice;
-    let successChance = 0.50; // Base de 50%
+    let successChance = 0.30; // Base de 30%
     
-    if (offerFactor >= 1.0) {
-        successChance = 1.0; // Se pagou o valor de mercado ou mais, aceita na hora (100% de chance)
-    } else if (offerFactor >= 0.9) {
-        successChance = 0.80; // Se ofereceu perto do valor, 80%
-    } else if (offerFactor >= 0.7) {
-        successChance = 0.40; // Se ofereceu 70%, 40%
+    if (offerFactor >= 1.5) {
+        successChance = 0.90; // Se pagou muito acima do valor de mercado
+    } else if (offerFactor >= 1.2) {
+        successChance = 0.70; // Oferta generosa
+    } else if (offerFactor >= 1.0) {
+        successChance = 0.45; // Valor de mercado tem menos chance agora
+    } else if (offerFactor >= 0.8) {
+        successChance = 0.20; // Oferta baixa
     } else {
-        successChance = 0.05; // Menos de 70%, quase impossível
+        successChance = 0.05; // Quase impossível
     }
+
+    if (playerImportance > 1.0) successChance -= 0.20; // Dificulta se for jogador importante pro time
+    if (!player.isStarter) successChance += 0.20; // Facilita se for reserva
+
+    successChance = Math.max(0.01, Math.min(0.95, successChance));
 
     if (Math.random() <= successChance) {
         executeTransfer(playerId, fromTeamId, offerPrice);
@@ -6213,10 +6221,10 @@ function requestLoan(playerId, fromTeamId, originalPrice) {
 
 
     const playerImportance = player.strength / fromTeam.strength;
-    let successChance = 0.75;
-    if (playerImportance > 1.0) successChance -= 0.40;
-    if (!player.isStarter) successChance += 0.15;
-    successChance = Math.max(0.10, Math.min(0.95, successChance));
+    let successChance = 0.35; // Base reduzida de 0.75 para 0.35 para dificultar
+    if (playerImportance > 1.0) successChance -= 0.20;
+    if (!player.isStarter) successChance += 0.30; // Facilita um pouco mais se for reserva
+    successChance = Math.max(0.05, Math.min(0.85, successChance)); // Máximo 85% e mínimo 5%
 
     if (confirm(`Deseja tentar o empréstimo de ${player.name}?
 
