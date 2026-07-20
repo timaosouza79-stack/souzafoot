@@ -5509,29 +5509,34 @@ function renderStats(competition) {
     assistsBody.innerHTML = '';
 
 
-    // Popula o select se estiver vazio
-    const sel = document.getElementById('stats-competition-select');
-    if (sel && sel.options.length === 0) {
+    // Popula os botões se estiver vazio
+    const btnContainer = document.getElementById('stats-competition-buttons');
+    if (btnContainer && btnContainer.children.length === 0) {
         const LEAGUE_LABELS = {
-            'brazil_a':     '🇧🇷 Série A - Brasil',
-            'brazil_b':     '🇧🇷 Série B - Brasil',
+            'brazil_a':     '🇧🇷 Série A',
+            'brazil_b':     '🇧🇷 Série B',
             'england':      '🏴 Premier League',
             'spain':        '🇪🇸 La Liga',
             'germany':      '🇩🇪 Bundesliga',
-            'italy':        '🇮🇹 Série A - Itália',
+            'italy':        '🇮🇹 Série A (ITA)',
             'france':       '🇫🇷 Ligue 1',
             'portugal':     '🇵🇹 Liga Portugal',
             'arabia':       '🇸🇦 Saudi Pro League',
             'mls':          '🇺🇸 MLS',
             'south_america':'🌎 Sul-América',
             'cup':          '🏆 Copa Nacional',
-            'libertadores': '🌍 Libertadores / Continental'
+            'libertadores': '🌍 Continental'
         };
         for (const [key, label] of Object.entries(LEAGUE_LABELS)) {
-            const opt = document.createElement('option');
-            opt.value = key;
-            opt.innerText = label;
-            sel.appendChild(opt);
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-secondary stats-league-btn';
+            btn.style.padding = '8px 12px';
+            btn.style.fontSize = '0.85rem';
+            btn.style.borderRadius = '20px';
+            btn.dataset.comp = key;
+            btn.innerText = label;
+            btn.onclick = () => renderStats(key);
+            btnContainer.appendChild(btn);
         }
     }
 
@@ -5541,10 +5546,18 @@ function renderStats(competition) {
         comp = sel ? sel.value : (myTeam ? myTeam.league : 'brazil_a');
     }
 
-    // Atualiza o select visualmente
-    if (sel && sel.value !== comp) {
-        const opt = Array.from(sel.options).find(o => o.value === comp);
-        if (opt) sel.value = comp;
+    // Atualiza os botões visualmente
+    window.currentStatsComp = comp;
+    if (btnContainer) {
+        Array.from(btnContainer.children).forEach(btn => {
+            if (btn.dataset.comp === comp) {
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-primary');
+            } else {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+            }
+        });
     }
 
     const LEAGUE_LABELS = {
