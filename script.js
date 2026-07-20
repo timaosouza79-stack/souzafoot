@@ -2492,6 +2492,9 @@ function checkIndisciplineEvent(callback) {
         `${player.position} · FOR ${player.strength} · Idade ${player.age} · Salário R$ ${(player.salario || 0).toLocaleString('pt-BR')}`;
     document.getElementById('indisciplina-text').innerHTML = scenarioFn(player.name);
 
+    // Mensagem do dirigente antes de mostrar o modal com as opções
+    alert(`📱 MENSAGEM DO DIRIGENTE\n\nO Diretor de Futebol enviou uma mensagem: "Mister, temos um problema sério. O ${player.name} foi visto na balada ontem! A imprensa já está em cima. Precisamos decidir o que fazer antes do jogo."`);
+
     // Exibe o modal
     document.getElementById('modal-indisciplina').style.display = 'flex';
 }
