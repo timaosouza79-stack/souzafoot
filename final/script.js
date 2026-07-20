@@ -4961,8 +4961,8 @@ function selectReservePlayer(playerId) {
 
 // Lógica universal de troca (Drag & Drop e Cliques)
 function handlePlayerSwap(id1, id2) {
-    const p1 = myTeam.squad.find(p => p.id === id1);
-    const p2 = myTeam.squad.find(p => p.id === id2);
+    const p1 = myTeam.squad.find(p => p.id === Number(id1));
+    const p2 = myTeam.squad.find(p => p.id === Number(id2));
     if (!p1 || !p2) return;
 
     // Titular com Reserva (ambas direções)
