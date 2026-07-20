@@ -7223,6 +7223,27 @@ function renderAcademyPlayers() {
     });
 }
 
+
+window.investYouthPlayer = function(index) {
+    if (!myTeam.plantelJuniores || index < 0 || index >= myTeam.plantelJuniores.length) return;
+    
+    if (!myTeam.finances) myTeam.finances = { balance: 0 };
+    if (myTeam.finances.balance < 50000) {
+        alert("O clube não tem € 50.000 para investir neste jovem no momento.");
+        return;
+    }
+    
+    myTeam.finances.balance -= 50000;
+    const player = myTeam.plantelJuniores[index];
+    player.strength += 1;
+    
+    alert("Investimento realizado! A força de " + player.name + " subiu para " + player.strength + ".");
+    
+    try { updateDashboardUI(); } catch(e){}
+    renderAcademyPlayers();
+    saveGame();
+};
+
 function promoteYouthPlayer(index) {
     if (!myTeam.plantelJuniores || index < 0 || index >= myTeam.plantelJuniores.length) return;
     
