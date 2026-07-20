@@ -963,6 +963,12 @@ function loadGame() {
         
         myTeam = allTeams.find(t => t.id === state.myTeamId);
 
+    // Gera primeira fornada de base se o time não tiver NENHUM jovem
+    if (myTeam && (!myTeam.plantelJuniores || myTeam.plantelJuniores.length === 0)) {
+        generateYouthIntake(myTeam);
+    }
+
+
         if (!myTeam) {
             users[currentUser].gameState = null;
             loadGame();
@@ -7169,7 +7175,7 @@ function generateYouthIntake(team) {
 
 function openAcademyModal() {
     renderAcademyPlayers();
-    document.getElementById('modal-academy').style.display = 'block';
+    document.getElementById('modal-academy').style.display = 'flex';
 }
 
 function renderAcademyPlayers() {
@@ -7208,8 +7214,9 @@ function renderAcademyPlayers() {
                     Idade: ${player.age} anos | OVR: <strong>${player.strength}</strong>
                 </div>
             </div>
-            <div>
-                <button class="btn btn-primary" onclick="promoteYouthPlayer(${index})" style="background-color: var(--primary-color);">Promover</button>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="btn btn-primary" onclick="promoteYouthPlayer(${index})" style="background-color: var(--primary-color); padding: 5px 10px; font-size:0.8rem;">Promover</button>
+                <button class="btn btn-secondary" onclick="investYouthPlayer(${index})" style="background-color: #ff9800; border-color: #ff9800; padding: 5px 10px; font-size:0.8rem;"><i class="fas fa-coins"></i> Investir (50k)</button>
             </div>
         `;
         list.appendChild(item);
