@@ -40,15 +40,15 @@ const domainMap = {
     "McDonald's":         'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/256px-McDonald%27s_Golden_Arches.svg.png',
     'Burger King':        'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Burger_King_logo_%281999%29.svg/256px-Burger_King_logo_%281999%29.svg.png',
     'Pingo Doce':         'https://upload.wikimedia.org/wikipedia/en/d/de/Pingo_Doce_logo.svg',
-    'Continente':         'https://logodownload.org/wp-content/uploads/2019/10/continente-logo.png',
+    'Continente':         'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Continente_logo.svg/512px-Continente_logo.svg.png',
     'MEO':                'https://upload.wikimedia.org/wikipedia/commons/0/02/Meo_logo.svg',
-    'Penalty':            'https://logodownload.org/wp-content/uploads/2017/05/penalty-logo-1.png',
-    'Topper':             'https://logodownload.org/wp-content/uploads/2017/05/topper-logo.png',
-    'Betano':             'https://logodownload.org/wp-content/uploads/2021/07/betano-logo.png',
-    'Mercado Livre':      'https://logodownload.org/wp-content/uploads/2016/08/Mercado-Livre-logo-1.png',
-    'Itaú':               'https://logodownload.org/wp-content/uploads/2014/05/itau-logo-1.png',
-    'Nubank':             'https://logodownload.org/wp-content/uploads/2019/08/nubank-logo-3.png',
-    'Vivo':               'https://logodownload.org/wp-content/uploads/2014/02/vivo-logo-1.png',
+    'Penalty':            'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Penalty_logo.svg/512px-Penalty_logo.svg.png',
+    'Topper':             'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Topper_logo.svg/512px-Topper_logo.svg.png',
+    'Betano':             'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Betano_Logo.svg/512px-Betano_Logo.svg.png',
+    'Mercado Livre':      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/MercadoLivre.svg/512px-MercadoLivre.svg.png',
+    'Itaú':               'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Ita%C3%BA_Unibanco_logo.svg/512px-Ita%C3%BA_Unibanco_logo.svg.png',
+    'Nubank':             'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Nubank_logo_2021.svg/512px-Nubank_logo_2021.svg.png',
+    'Vivo':               'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Vivo_logo.svg/512px-Vivo_logo.svg.png',
     'Emirates':           'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Emirates_logo.svg/256px-Emirates_logo.svg.png',
     'Spotify':            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Spotify_logo_with_text.svg/256px-Spotify_logo_with_text.svg.png',
     'Red Bull':           'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Red_bull_logo.svg/256px-Red_bull_logo.svg.png',
@@ -59,7 +59,7 @@ const domainMap = {
 function getSponsorLogoUrl(brandName, fallbackDomain) {
     if (!brandName) {
         const domain = fallbackDomain || "google.com";
-        return `https://logo.clearbit.com/${domain}`;
+        return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
     }
     
     // Normaliza o nome da marca para busca tolerante (ex: "Coca-Cola" e "Coca Cola" viram "cocacola")
@@ -78,7 +78,7 @@ function getSponsorLogoUrl(brandName, fallbackDomain) {
     }
     
     const domain = mapped || fallbackDomain || "google.com";
-    return `https://logo.clearbit.com/${domain}`;
+    return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
 }
 const sponsorSlots = ['Master', 'Costas', 'Mangas', 'Calcoes'];
 // ---------------------------------------
