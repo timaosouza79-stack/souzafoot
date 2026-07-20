@@ -5642,7 +5642,7 @@ function renderStats(competition) {
     let topScorers = [...leaguePlayers];
     if (window.statsSort.key) {
         const key = window.statsSort.key;
-        const dirMul = window.statsSort.dir === 'asc' ? 1 : -1;
+        const dirMul = window.statsSort.dir === 'desc' ? 1 : -1;
         topScorers.sort((a, b) => ((b[key] || 0) - (a[key] || 0)) * dirMul);
     } else {
         topScorers.sort((a, b) => {
@@ -5678,7 +5678,7 @@ function renderStats(competition) {
     let topAssists = [...leaguePlayers];
     if (window.statsSort.key) {
         const key = window.statsSort.key;
-        const dirMul = window.statsSort.dir === 'asc' ? 1 : -1;
+        const dirMul = window.statsSort.dir === 'desc' ? 1 : -1;
         topAssists.sort((a, b) => ((b[key] || 0) - (a[key] || 0)) * dirMul);
     } else {
         topAssists.sort((a, b) => {
