@@ -5232,6 +5232,8 @@ function renderCalendar() {
     list.innerHTML = '';
 
     let leagueRd = 0;
+    let cupRoundIdx = 0;
+    let continentalRoundIdx = 0;
     
     matchSchedule.forEach((roundData, index) => {
         if (roundData.type === 'league') leagueRd++;
@@ -5241,14 +5243,72 @@ function renderCalendar() {
         const labelColor = type === 'cup' ? '#ffd700' : (type === 'libertadores' || type === 'continental' ? '#3f51b5' : '#4CAF50');
         
         const roundNum = index + 1;
-        const match = roundData.matches ? roundData.matches.find(m => m.home === myTeam.id || m.away === myTeam.id) : null;
+        
+        let match = null;
+        if (type === 'league') {
+            match = roundData.matches ? roundData.matches.find(m => m.home === myTeam.id || m.away === myTeam.id) : null;
+        } else if (type === 'cup') {
+            if (typeof cupBracket !== 'undefined' && Array.isArray(cupBracket) && cupBracket.length > cupRoundIdx) {
+                match = cupBracket[cupRoundIdx].find(m => m.home === myTeam.id || m.away === myTeam.id);
+            }
+            cupRoundIdx++;
+        } else if (type === 'continental' || type === 'libertadores') {
+            const currentContinentalIdx = continentalRoundIdx;
+            continentalRoundIdx++;
+            
+            // Fase de grupos tem 6 rodadas (0 a 5)
+            if (currentContinentalIdx < 6) {
+                if (typeof libertadoresGroups !== 'undefined' && Array.isArray(libertadoresGroups) && libertadoresGroups.length > 0) {
+                    const myGroup = libertadoresGroups.find(g => g.teams.includes(myTeam.id));
+                    if (myGroup) {
+                        const teams = myGroup.teams;
+                        let m1, m2;
+                        if (currentContinentalIdx === 0) { m1 = {home: teams[0], away: teams[1]}; m2 = {home: teams[2], away: teams[3]}; }
+                        else if (currentContinentalIdx === 1) { m1 = {home: teams[0], away: teams[2]}; m2 = {home: teams[1], away: teams[3]}; }
+                        else if (currentContinentalIdx === 2) { m1 = {home: teams[0], away: teams[3]}; m2 = {home: teams[1], away: teams[2]}; }
+                        else if (currentContinentalIdx === 3) { m1 = {home: teams[1], away: teams[0]}; m2 = {home: teams[3], away: teams[2]}; }
+                        else if (currentContinentalIdx === 4) { m1 = {home: teams[2], away: teams[0]}; m2 = {home: teams[3], away: teams[1]}; }
+                        else if (currentContinentalIdx === 5) { m1 = {home: teams[3], away: teams[0]}; m2 = {home: teams[2], away: teams[1]}; }
+                        
+                        if (m1 && (m1.home === myTeam.id || m1.away === myTeam.id)) match = m1;
+                        else if (m2 && (m2.home === myTeam.id || m2.away === myTeam.id)) match = m2;
+                    }
+                }
+                
+                if (!match && typeof sulAmericanaGroups !== 'undefined' && Array.isArray(sulAmericanaGroups) && sulAmericanaGroups.length > 0) {
+                     const myGroup = sulAmericanaGroups.find(g => g.teams.includes(myTeam.id));
+                     if (myGroup) {
+                        const teams = myGroup.teams;
+                        let m1, m2;
+                        if (currentContinentalIdx === 0) { m1 = {home: teams[0], away: teams[1]}; m2 = {home: teams[2], away: teams[3]}; }
+                        else if (currentContinentalIdx === 1) { m1 = {home: teams[0], away: teams[2]}; m2 = {home: teams[1], away: teams[3]}; }
+                        else if (currentContinentalIdx === 2) { m1 = {home: teams[0], away: teams[3]}; m2 = {home: teams[1], away: teams[2]}; }
+                        else if (currentContinentalIdx === 3) { m1 = {home: teams[1], away: teams[0]}; m2 = {home: teams[3], away: teams[2]}; }
+                        else if (currentContinentalIdx === 4) { m1 = {home: teams[2], away: teams[0]}; m2 = {home: teams[3], away: teams[1]}; }
+                        else if (currentContinentalIdx === 5) { m1 = {home: teams[3], away: teams[0]}; m2 = {home: teams[2], away: teams[1]}; }
+                        
+                        if (m1 && (m1.home === myTeam.id || m1.away === myTeam.id)) match = m1;
+                        else if (m2 && (m2.home === myTeam.id || m2.away === myTeam.id)) match = m2;
+                     }
+                }
+            } else {
+                // Fase mata-mata
+                const knockoutIdx = currentContinentalIdx - 6;
+                if (typeof libertadoresBracket !== 'undefined' && Array.isArray(libertadoresBracket) && libertadoresBracket.length > knockoutIdx) {
+                    match = libertadoresBracket[knockoutIdx].find(m => m.home === myTeam.id || m.away === myTeam.id);
+                }
+                if (!match && typeof sulAmericanaBracket !== 'undefined' && Array.isArray(sulAmericanaBracket) && sulAmericanaBracket.length > knockoutIdx) {
+                    match = sulAmericanaBracket[knockoutIdx].find(m => m.home === myTeam.id || m.away === myTeam.id);
+                }
+            }
+        }
         
         let shouldRender = false;
         
         if (match) {
-            shouldRender = true; // Jogo já sorteado e envolve meu time
+            shouldRender = true; // Jogo sorteado (ou grupo) e envolve meu time
         } else {
-            // Se for uma rodada futura (ou atual não sorteada)
+            // Se for uma rodada futura onde os sorteios ainda não foram feitos
             if (roundNum >= currentRound) {
                 if (type === 'cup' && isAliveInCup(myTeam.id)) {
                     shouldRender = true;
@@ -5278,11 +5338,11 @@ function renderCalendar() {
             let statusHtml = '';
 
             if (match) {
-                const home = allTeams.find(t => t.id === match.home);
-                const away = allTeams.find(t => t.id === match.away);
+                const home = allTeams.find(t => t.id === match.home) || {name: "???"};
+                const away = allTeams.find(t => t.id === match.away) || {name: "???"};
                 const isHome = match.home === myTeam.id;
                 
-                // Jogo já realizado
+                // Jogo já realizado tem placar guardado?
                 if (match.homeScore !== undefined) {
                     const scoreText = `<strong style="font-size: 1.1rem;">${match.homeScore} x ${match.awayScore}</strong>`;
                     
@@ -5308,7 +5368,7 @@ function renderCalendar() {
                     
                     statusHtml = `<div style="font-weight: 900; color: ${resultColor}; font-size: 0.9rem; width: 30px; text-align: center;">[${resultBadge}]</div>`;
                 } else {
-                    // Jogo futuro / atual sorteado
+                    // Jogo futuro / atual sorteado (ou grupo já passado sem placar salvo)
                     matchHtml = `
                         <div style="flex: 1; text-align: right; ${isHome ? 'color: var(--primary-color); font-weight: bold;' : ''}">${home.name}</div>
                         <div style="width: 50px; text-align: center; color: var(--text-muted); font-weight: bold; margin: 0 10px;">VS</div>
