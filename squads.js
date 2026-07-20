@@ -1,4 +1,4 @@
-const realSquads = {
+const realSquads = { // UPDATED FOR 2026 SEASON
     "athleticopr": {
         "formation": "4-3-3",
         "players": [
