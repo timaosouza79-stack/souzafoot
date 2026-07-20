@@ -4261,45 +4261,80 @@ function renderStandings() {
     standings.forEach((team, index) => {
         const tr = document.createElement('tr');
         
-        // Determina as zonas de classificação (Regras CBF)
-        const isLibertadoresG6 = index < 6;
-        const isSulamericana = index >= 6 && index < 12;
-        const isRelegation = index >= standings.length - 4;
+        // Determina as zonas de classificação dinamicamente com base na liga
+        const league = myTeam.league;
+        
+        let isTier1 = false;
+        let isTier2 = false;
+        let isTier3 = false;
+        let isRelegation = false;
+        let isPlayoffs = false;
+
+        let rankText = `${index + 1}`;
+        let rankClass = '';
+
+        if (league === 'portugal') {
+            if (index < 2) { isTier1 = true; rankText += ' (CL)'; }
+            else if (index < 3) { isTier2 = true; rankText += ' (EL)'; }
+            else if (index < 5) { isTier3 = true; rankText += ' (ECL)'; }
+            else if (index >= standings.length - 3) { isRelegation = true; rankText += ' (Des)'; }
+        } else if (['england', 'spain', 'italy', 'germany', 'france'].includes(league)) {
+            if (index < 4) { isTier1 = true; rankText += ' (CL)'; }
+            else if (index < 6) { isTier2 = true; rankText += ' (EL)'; }
+            else if (index < 7) { isTier3 = true; rankText += ' (ECL)'; }
+            else if (index >= standings.length - 3) { 
+                isRelegation = true; 
+                rankText += league === 'france' ? ' (Z4)' : ' (Z3)'; 
+            }
+        } else if (league === 'brazil_a') {
+            if (index < 6) { isTier1 = true; rankText += ' (LIB)'; }
+            else if (index < 12) { isTier2 = true; rankText += ' (SUL)'; }
+            else if (index >= standings.length - 4) { isRelegation = true; rankText += ' (Z4)'; }
+        } else if (league === 'brazil_b') {
+            if (index < 4) { isTier1 = true; rankText += ' (G4)'; }
+            else if (index >= standings.length - 4) { isRelegation = true; rankText += ' (Z4)'; }
+        } else if (league === 'arabia') {
+            if (index < 3) { isTier1 = true; rankText += ' (ACL)'; }
+            else if (index >= standings.length - 3) { isRelegation = true; rankText += ' (Z3)'; }
+        } else if (league === 'mls') {
+            if (index < 1) { isTier1 = true; rankText += ' (CCC)'; }
+            else if (index < 9) { isPlayoffs = true; rankText += ' (PO)'; }
+        } else {
+            // Fallback genérico
+            if (index < 4) { isTier1 = true; rankText += ' (CL)'; }
+            else if (index >= standings.length - 3) { isRelegation = true; rankText += ' (Z3)'; }
+        }
 
         const isLibertadoresCupWinner = team.id === cupWinnerId;
         const isLibertadoresCupRunnerUp = team.id === cupRunnerUpId;
         const isLibertadoresCup = isLibertadoresCupWinner || isLibertadoresCupRunnerUp;
 
-        if (isLibertadoresCup) {
+        // Se houver taça nacional (copa do país)
+        if (isLibertadoresCupWinner) {
+            rankText = `${index + 1} 🏆`;
+            rankClass = 'libertadores-rank';
             tr.classList.add('row-libertadores-cup');
-        } else if (isLibertadoresG6) {
-            tr.classList.add('libertadores-zone');
-        } else if (isSulamericana) {
-            tr.classList.add('sulamericana-zone');
-        } else if (isRelegation) {
-            tr.classList.add('relegation-zone');
+        } else if (isLibertadoresCupRunnerUp) {
+            rankText = `${index + 1} 🥈`;
+            rankClass = 'libertadores-rank';
+            tr.classList.add('row-libertadores-cup');
+        } else {
+            if (isTier1) {
+                rankClass = 'libertadores-rank';
+                tr.classList.add('libertadores-zone');
+            } else if (isTier2) {
+                rankClass = 'sulamericana-rank';
+                tr.classList.add('sulamericana-zone');
+            } else if (isTier3 || isPlayoffs) {
+                rankClass = 'sulamericana-rank';
+                tr.classList.add('sulamericana-zone');
+            } else if (isRelegation) {
+                rankClass = 'relegation-rank';
+                tr.classList.add('relegation-zone');
+            }
         }
 
         if (team.id === myTeam.id) tr.classList.add('row-my-team');
-
-        let rankText = `${index + 1}`;
-        let rankClass = '';
-        if (isLibertadoresCupWinner) {
-            rankText += ' 🏆';
-            rankClass = 'libertadores-rank';
-        } else if (isLibertadoresCupRunnerUp) {
-            rankText += ' 🥈';
-            rankClass = 'libertadores-rank';
-        } else if (isLibertadoresG6) {
-            rankText += ' (Lib)';
-            rankClass = 'libertadores-rank';
-        } else if (isSulamericana) {
-            rankText += ' (Sul)';
-            rankClass = 'sulamericana-rank';
-        } else if (isRelegation) {
-            rankText += ' (Reb)';
-            rankClass = 'relegation-rank';
-        }
 
         tr.innerHTML = `
             <td class="${rankClass}">${rankText}</td>
