@@ -1,43 +1,52 @@
-import os
 import urllib.request
-import time
+import os
 
-teams = {
-    'athleticopr': 679,
-    'atleticogo': 6049,
-    'atleticomg': 330,
-    'bahia': 10010,
-    'botafogo': 537,
-    'bragantino': 8793,
-    'corinthians': 199,
-    'criciuma': 908,
-    'cruzeiro': 1131,
-    'cuiaba': 28022,
-    'flamengo': 614,
-    'fluminense': 2462,
-    'fortaleza': 1087,
-    'gremio': 210,
-    'internacional': 6600,
-    'juventude': 10492,
-    'palmeiras': 1023,
-    'saopaulo': 585,
-    'vasco': 975,
-    'vitoria': 2125
+domainMap = {
+    'Coca-Cola': 'coca-cola.com',
+    'Guaraná Antarctica': 'guaranaantarctica.com.br',
+    'Nike': 'nike.com',
+    'Adidas': 'adidas.com',
+    'Puma': 'puma.com',
+    'New Balance': 'newbalance.com',
+    "McDonald's": 'mcdonalds.com',
+    'Burger King': 'burgerking.com',
+    'Pingo Doce': 'pingodoce.pt',
+    'Continente': 'continente.pt',
+    'MEO': 'meo.pt',
+    'Penalty': 'penalty.com.br',
+    'Topper': 'topper.com.ar',
+    'Betano': 'betano.com',
+    'Mercado Livre': 'mercadolivre.com.br',
+    'Itaú': 'itau.com.br',
+    'Nubank': 'nubank.com.br',
+    'Vivo': 'vivo.com.br',
+    'Emirates': 'emirates.com',
+    'Spotify': 'spotify.com',
+    'Red Bull': 'redbull.com',
+    'Samsung': 'samsung.com',
+    'Mastercard': 'mastercard.com'
 }
 
-os.makedirs('img', exist_ok=True)
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-
-for team_name, tm_id in teams.items():
-    url = f'https://tmssl.akamaized.net/images/wappen/head/{tm_id}.png'
-    filepath = os.path.join('img', f'{team_name}_v3.png')
-    print(f'Downloading {team_name} from {url}')
+for brand, domain in domainMap.items():
+    safe_brand = brand.replace(' ', '_').replace("'", "").replace('á', 'a').replace('ú', 'u')
+    path = f"img/sponsors/{safe_brand}.png"
+    if os.path.exists(path):
+        continue
+    url = f"https://logo.clearbit.com/{domain}"
     try:
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req) as response, open(filepath, 'wb') as out_file:
-            data = response.read()
-            out_file.write(data)
-        time.sleep(0.5)
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response, open(path, 'wb') as out_file:
+            out_file.write(response.read())
+        print(f"Downloaded {brand}")
     except Exception as e:
-        print(f'Failed {team_name}: {e}')
-print("Done!")
+        print(f"Failed {brand}: {e}")
+        # Try google favicon if clearbit fails
+        try:
+            url2 = f"https://www.google.com/s2/favicons?domain={domain}&sz=128"
+            req2 = urllib.request.Request(url2, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req2) as response, open(path, 'wb') as out_file:
+                out_file.write(response.read())
+            print(f"Downloaded {brand} from Google")
+        except Exception as e2:
+            print(f"Failed completely {brand}: {e2}")
+

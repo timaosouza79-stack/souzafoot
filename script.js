@@ -294,6 +294,10 @@ const teamsData = [
     {id: "orlandocitysc", name: "Orlando City SC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/qyppxw1423832326.png", league: "mls", balance: 60000000, stadium: "Inter&Co Stadium", stadiumImg: "img/estadio.jpg"}
 ];
 
+if (typeof restWorldTeams !== 'undefined') {
+    teamsData.push(...restWorldTeams);
+}
+
 // --- Sistema de Som ---
 // Usa crossOrigin quando possível e pré-carrega com fallback
 const sfx = {
@@ -1403,7 +1407,9 @@ function renderTeams(league = 'brazil_a') {
     const grid = document.getElementById('teams-grid');
     grid.innerHTML = '';
 
-    const filteredTeams = allTeams.filter(t => t.league === league);
+    const filteredTeams = allTeams.filter(t => 
+        league === 'rest_world' ? (t.league && t.league.startsWith('rest_world')) : t.league === league
+    );
 
     filteredTeams.forEach(team => {
         const card = document.createElement('div');
@@ -6068,7 +6074,7 @@ function renderMarket() {
                 // Filtro de Busca por Nome
                 const matchesSearch = searchVal === "" || p.name.toLowerCase().includes(searchVal);
                 // Filtro de Liga
-                const matchesLeague = filterLeague === "all" || team.league === filterLeague;
+                const matchesLeague = filterLeague === "all" || team.league === filterLeague || (filterLeague === "rest_world" && team.league && team.league.startsWith("rest_world"));
                 // Filtro de Posição
                 const matchesPosition = filterPosition === "all" || p.position === filterPosition;
                 // Filtro de Time

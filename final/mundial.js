@@ -107,11 +107,11 @@ class ContinentalTournament {
      */
     getLeaguesForConfederation() {
         const leagueMaps = {
-            'UEFA': ['england', 'spain', 'italy', 'france', 'portugal', 'germany'],
-            'CONMEBOL': ['south_america'],
-            'CONCACAF': ['north_america', 'central_america', 'mexico'],
-            'CAF': ['africa', 'egypt', 'cameroon', 'southafrica'],
-            'AFC': ['asia', 'japan', 'southkorea', 'saudi_arabia', 'china'],
+            'UEFA': ['england', 'spain', 'italy', 'france', 'portugal', 'germany', 'rest_world_europe'],
+            'CONMEBOL': ['south_america', 'rest_world_conmebol'],
+            'CONCACAF': ['north_america', 'central_america', 'mexico', 'rest_world_concacaf'],
+            'CAF': ['africa', 'egypt', 'cameroon', 'southafrica', 'rest_world_africa'],
+            'AFC': ['asia', 'japan', 'southkorea', 'saudi_arabia', 'china', 'rest_world_asia'],
             'OFC': ['oceania', 'australia', 'newzealand']
         };
         
@@ -159,17 +159,17 @@ class MundialDeClubes {
         console.log('🏆 Buscando campeões continentais...');
 
         // UEFA: Busca o time mais forte da Europa que seja Champions
-        this.qualifiers.uefa = this.findStrongestTeam(['england', 'spain', 'italy', 'france', 'portugal', 'germany']);
+        this.qualifiers.uefa = this.findStrongestTeam(['england', 'spain', 'italy', 'france', 'portugal', 'germany', 'rest_world_europe']);
         
         // LIBERTADORES: Busca o mais forte da América do Sul
-        this.qualifiers.libertadores = this.findStrongestTeam(['south_america']);
+        this.qualifiers.libertadores = this.findStrongestTeam(['south_america', 'rest_world_conmebol']);
         
         // CONCACAF: Busca o mais forte da América do Norte/Central
-        this.qualifiers.concacaf = this.findStrongestTeam(['north_america', 'central_america', 'mexico']) 
+        this.qualifiers.concacaf = this.findStrongestTeam(['north_america', 'central_america', 'mexico', 'rest_world_concacaf']) 
             || this.teamsData.find(t => t.id === 'rcdsapraia'); // Fallback para time forte
         
         // CAF: Busca o mais forte da África
-        this.qualifiers.caf = this.findStrongestTeam(['africa', 'egypt', 'cameroon', 'southafrica']);
+        this.qualifiers.caf = this.findStrongestTeam(['africa', 'egypt', 'cameroon', 'southafrica', 'rest_world_africa']);
         
         // AFC: Simula Champions League da Ásia
         if (!this.qualifiers.afc) {
