@@ -5761,9 +5761,33 @@ function generateSponsorshipOffers(slot) {
         if (!myTeam.sponsorships) myTeam.sponsorships = { Master: null, Costas: null, Mangas: null, Calcoes: null, propostas: [] };
         
         const teamRep = myTeam.rep || myTeam.reputation || 10;
-        let baseValue = 50000;
-        if (teamRep >= 50 && teamRep < 100) baseValue = 150000;
-        else if (teamRep >= 100) baseValue = 350000;
+        const teamStrength = myTeam.strength || 50;
+        
+        // 1. Grandeza do time (Reputação)
+        let greatnessMultiplier = 1.0;
+        if (teamRep >= 30 && teamRep < 70) greatnessMultiplier = 1.5;
+        else if (teamRep >= 70 && teamRep < 100) greatnessMultiplier = 2.5;
+        else if (teamRep >= 100) greatnessMultiplier = 4.0;
+        
+        // 2. Overall do time (Força)
+        const strengthBonus = Math.max(0.5, teamStrength / 55); 
+        
+        // 3. Posição no campeonato
+        let posBonus = 1.0;
+        if (typeof standings !== 'undefined' && standings.length > 0) {
+            const index = standings.findIndex(t => t.id === myTeam.id);
+            if (index !== -1) {
+                // 1º = 1.5, Último (ex: 20º) = 0.8
+                posBonus = 1.5 - ((index / Math.max(1, standings.length - 1)) * 0.7);
+            }
+        }
+        
+        // 4. Números de torcida (baseado em capacidade do estádio e engajamento)
+        const capacity = myTeam.stadiumCapacity || 10000;
+        const fanBonus = 1.0 + (capacity / 50000); // Ex: 10k capacity -> 1.2x, 50k -> 2.0x
+        
+        // Cálculo final da baseValue
+        let baseValue = 20000 * greatnessMultiplier * strengthBonus * posBonus * fanBonus;
         
         if (!sponsorBrands || typeof sponsorBrands !== 'object') {
             console.error("sponsorBrands não está definido!");
