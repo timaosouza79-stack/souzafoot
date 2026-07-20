@@ -1983,7 +1983,10 @@ function setSimSpeed(speed) {
 
 // Função para escolher quem fez o gol e quem deu a assistência
 function attributeGoalStats(team, matchId = null, minute = null, competition = 'league') {
-    const starters = (team && team.squad) ? team.squad.filter(p => p.isStarter) : [];
+    let starters = (team && team.squad) ? team.squad.filter(p => p.isStarter) : [];
+    if (starters.length === 0) {
+        starters = (team && team.squad) ? team.squad : []; // Fallback for background sim
+    }
     if (starters.length === 0) return "Alguém";
 
     // Peso para gols: Atacantes > Meias > Laterais > Zagueiros
@@ -1997,6 +2000,8 @@ function attributeGoalStats(team, matchId = null, minute = null, competition = '
         if (!scorer._goalEvents.has(key)) {
             // Global count
             scorer.goals = (scorer.goals || 0) + 1;
+            if (!scorer.allTimeStats) scorer.allTimeStats = { goals: 0, assists: 0, matches: 0 };
+            scorer.allTimeStats.goals = (scorer.allTimeStats.goals || 0) + 1;
             // Per-competition count
             if (!scorer.stats) scorer.stats = {};
             if (!scorer.stats[competition]) scorer.stats[competition] = { goals: 0, assists: 0 };
@@ -2021,6 +2026,8 @@ function attributeGoalStats(team, matchId = null, minute = null, competition = '
                     if (!assistant._assistEvents) assistant._assistEvents = new Set();
                     if (!assistant._assistEvents.has(keyA)) {
                         assistant.assists = (assistant.assists || 0) + 1;
+                        if (!assistant.allTimeStats) assistant.allTimeStats = { goals: 0, assists: 0, matches: 0 };
+                        assistant.allTimeStats.assists = (assistant.allTimeStats.assists || 0) + 1;
                         if (!assistant.stats) assistant.stats = {};
                         if (!assistant.stats[competition]) assistant.stats[competition] = { goals: 0, assists: 0 };
                         assistant.stats[competition].assists = (assistant.stats[competition].assists || 0) + 1;
@@ -6875,18 +6882,7 @@ function showHallOfFame() {
     openHallOfFameTab({ currentTarget: document.querySelector('#modal-hall-of-fame .tab-btn') }, 'hof-titles');
 }
 
-function attributeGoalStats(team, matchId = null, minute = null, competition = 'league') {
-    // ... (código existente)
-    // Adiciona ao allTimeStats
-    if (!scorer.allTimeStats) scorer.allTimeStats = { goals: 0, assists: 0, matches: 0 };
-    scorer.allTimeStats.goals = (scorer.allTimeStats.goals || 0) + 1;
-    // ... (código existente para assistências)
-    if (assistant) {
-        if (!assistant.allTimeStats) assistant.allTimeStats = { goals: 0, assists: 0, matches: 0 };
-        assistant.allTimeStats.assists = (assistant.allTimeStats.assists || 0) + 1;
-    }
-    return scorer.name;
-}
+
 
 document.addEventListener('DOMContentLoaded', () => {
 });
