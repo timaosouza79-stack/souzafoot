@@ -5199,6 +5199,31 @@ function updateTactics() {
     saveGame();
 }
 
+// Auxiliares para verificar se o time ainda está vivo nas copas
+function isAliveInCup(teamId) {
+    if (cupFinished) return false;
+    if (!cupBracket || cupBracket.length === 0) return true; // Copa ainda não começou (considera vivo para exibir placeholder)
+    const currentPhase = cupBracket[cupBracket.length - 1];
+    return currentPhase.some(m => m.home === teamId || m.away === teamId);
+}
+
+function isAliveInContinental(teamId) {
+    if (typeof libertadoresFinished !== 'undefined' && libertadoresFinished) return false;
+    
+    // Verifica se a fase eliminatória está ativa
+    if (typeof libertadoresBracket !== 'undefined' && Array.isArray(libertadoresBracket) && libertadoresBracket.length > 0) {
+        const currentPhase = libertadoresBracket[libertadoresBracket.length - 1];
+        return currentPhase.some(m => m.home === teamId || m.away === teamId);
+    }
+    
+    // Verifica se a fase de grupos está ativa
+    if (typeof libertadoresGroups !== 'undefined' && Array.isArray(libertadoresGroups) && libertadoresGroups.length > 0) {
+        return libertadoresGroups.some(g => g.teams.includes(teamId));
+    }
+    
+    return true; // Continental ainda não começou, assume vivo por precaução
+}
+
 // Renderiza o calendário completo da temporada para o time do usuário
 function renderCalendar() {
     if (!myTeam) return;
@@ -5207,52 +5232,106 @@ function renderCalendar() {
     list.innerHTML = '';
 
     let leagueRd = 0;
+    
     matchSchedule.forEach((roundData, index) => {
         if (roundData.type === 'league') leagueRd++;
         const type = roundData.type;
         const compNames = getCompetitionNames(myTeam.league);
-        const label = type === 'cup' ? compNames.cup : (type === 'libertadores' ? compNames.continental : `${compNames.league} - RD ${leagueRd}`);
-        const labelColor = type === 'cup' ? '#ffd700' : (type === 'libertadores' ? '#3f51b5' : '#4CAF50');
+        const label = type === 'cup' ? compNames.cup : (type === 'libertadores' || type === 'continental' ? compNames.continental : `${compNames.league} - RD ${leagueRd}`);
+        const labelColor = type === 'cup' ? '#ffd700' : (type === 'libertadores' || type === 'continental' ? '#3f51b5' : '#4CAF50');
         
-        const roundNum = index + 1; // Define roundNum here
+        const roundNum = index + 1;
         const match = roundData.matches ? roundData.matches.find(m => m.home === myTeam.id || m.away === myTeam.id) : null;
         
-        // Only render if there's a match for the user or it's a cup/libertadores round (even if user isn't in it yet)
-        if (match || type === 'cup' || type === 'libertadores') {
+        let shouldRender = false;
+        
+        if (match) {
+            shouldRender = true; // Jogo já sorteado e envolve meu time
+        } else {
+            // Se for uma rodada futura (ou atual não sorteada)
+            if (roundNum >= currentRound) {
+                if (type === 'cup' && isAliveInCup(myTeam.id)) {
+                    shouldRender = true;
+                } else if ((type === 'continental' || type === 'libertadores') && isAliveInContinental(myTeam.id)) {
+                    shouldRender = true;
+                } else if (type === 'intercontinental' && typeof libertadoresWinnerId !== 'undefined' && myTeam.id === libertadoresWinnerId) {
+                    shouldRender = true;
+                }
+            }
+        }
+
+        if (shouldRender) {
             const li = document.createElement('li');
             li.style.display = 'flex';
             li.style.alignItems = 'center';
             li.style.padding = '12px 15px';
             
+            // Destaque para o "Próximo Jogo" (rodada atual)
             if (roundNum === currentRound) {
-                li.style.backgroundColor = "rgba(255, 152, 0, 0.1)";
+                li.style.backgroundColor = "rgba(255, 152, 0, 0.15)";
                 li.style.borderLeft = "4px solid var(--accent-color)";
+            } else if (roundNum < currentRound) {
+                li.style.opacity = "0.7"; // Jogos passados ficam mais apagados
             }
             
             let matchHtml = '';
-            if (match) { // 'match' is now defined in this scope
+            let statusHtml = '';
+
+            if (match) {
                 const home = allTeams.find(t => t.id === match.home);
                 const away = allTeams.find(t => t.id === match.away);
                 const isHome = match.home === myTeam.id;
                 
-                const scoreText = (match.homeScore !== undefined) 
-                    ? `<strong style="font-size: 1.1rem;">${match.homeScore} x ${match.awayScore}</strong>` 
-                    : `<span style="color: var(--text-muted); font-weight: bold;">VS</span>`;
+                // Jogo já realizado
+                if (match.homeScore !== undefined) {
+                    const scoreText = `<strong style="font-size: 1.1rem;">${match.homeScore} x ${match.awayScore}</strong>`;
+                    
+                    let resultBadge = '';
+                    let resultColor = '';
+                    
+                    if ((isHome && match.homeScore > match.awayScore) || (!isHome && match.awayScore > match.homeScore)) {
+                        resultBadge = 'V';
+                        resultColor = '#4CAF50';
+                    } else if (match.homeScore === match.awayScore) {
+                        resultBadge = 'E';
+                        resultColor = '#9e9e9e';
+                    } else {
+                        resultBadge = 'D';
+                        resultColor = '#f44336';
+                    }
 
-                matchHtml = `
-                    <div style="flex: 1; text-align: right; ${isHome ? 'color: var(--primary-color); font-weight: bold;' : ''}">${home.name}</div>
-                    <div style="width: 70px; text-align: center; background: rgba(255,255,255,0.05); border-radius: 4px; padding: 2px 0;">${scoreText}</div>
-                    <div style="flex: 1; text-align: left; ${!isHome ? 'color: var(--primary-color); font-weight: bold;' : ''}">${away.name}</div>
-                `;
+                    matchHtml = `
+                        <div style="flex: 1; text-align: right; ${isHome ? 'color: var(--primary-color); font-weight: bold;' : ''}">${home.name}</div>
+                        <div style="width: 70px; text-align: center; background: rgba(255,255,255,0.05); border-radius: 4px; padding: 2px 0; margin: 0 10px;">${scoreText}</div>
+                        <div style="flex: 1; text-align: left; ${!isHome ? 'color: var(--primary-color); font-weight: bold;' : ''}">${away.name}</div>
+                    `;
+                    
+                    statusHtml = `<div style="font-weight: 900; color: ${resultColor}; font-size: 0.9rem; width: 30px; text-align: center;">[${resultBadge}]</div>`;
+                } else {
+                    // Jogo futuro / atual sorteado
+                    matchHtml = `
+                        <div style="flex: 1; text-align: right; ${isHome ? 'color: var(--primary-color); font-weight: bold;' : ''}">${home.name}</div>
+                        <div style="width: 50px; text-align: center; color: var(--text-muted); font-weight: bold; margin: 0 10px;">VS</div>
+                        <div style="flex: 1; text-align: left; ${!isHome ? 'color: var(--primary-color); font-weight: bold;' : ''}">${away.name}</div>
+                    `;
+                    
+                    if (roundNum === currentRound) {
+                        statusHtml = `<div style="font-size: 0.75rem; font-weight: bold; color: var(--accent-color); background: rgba(255,152,0,0.2); padding: 3px 6px; border-radius: 4px;">PRÓXIMO</div>`;
+                    } else {
+                        statusHtml = `<div style="width: 30px;"></div>`;
+                    }
+                }
             } else {
-                matchHtml = `<div style="flex: 1; text-align: center; color: var(--text-muted); font-style: italic; font-size: 0.85rem;">Confronto a definir (Avançar de Fase na ${type === 'cup' ? 'Copa' : 'Libertadores'})</div>`;
+                matchHtml = `<div style="flex: 1; text-align: center; color: var(--text-muted); font-style: italic; font-size: 0.85rem;">Confronto a definir (Avançar de Fase)</div>`;
+                statusHtml = `<div style="width: 30px;"></div>`;
             }
 
             li.innerHTML = `
                 <div style="width: 140px; font-weight: 800; color: ${labelColor}; font-size: 0.7rem; text-transform: uppercase;">${label}</div>
-                <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
                     ${matchHtml}
                 </div>
+                ${statusHtml}
             `;
             list.appendChild(li);
         }
