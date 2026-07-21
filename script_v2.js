@@ -6556,7 +6556,7 @@ function openTransferModal(playerId, fromTeamId, marketPrice) {
 
         document.getElementById('btn-submit-transfer-offer').onclick = submitTransferOffer;
 
-        document.getElementById('modal-transfer-offer').style.display = 'flex';
+        document.getElementById('modal-transfer-offer').style.display = 'flex'; alert('A janela (modal) foi ativada. Se você não está vendo, é um problema de tela!');
     } catch(e) {
         alert("Erro ao abrir modal: " + e.message);
     }
