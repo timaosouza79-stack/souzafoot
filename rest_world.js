@@ -103,11 +103,20 @@ restWorldTeams.forEach(team => {
             return {
                 id: `${team.id}_p${playerIndex++}`,
                 name: p.name,
-                pos: p.pos,
+                position: p.pos,
                 strength: p.str,
+                energy: 100,
+                goals: 0,
+                assists: 0,
+                yellowCards: 0,
+                suspensionRounds: 0,
+                injuryRounds: 0,
+                redCardInMatch: false,
                 age: 18 + Math.floor(Math.random() * 16), // Idade aleatória coerente (18 a 34)
                 isStarter: playerIndex <= 12, // 11 primeiros são titulares
-                isLoaned: false
+                isLoaned: false,
+                matchesPlayed: 0,
+                salario: Math.round((Math.pow(p.str, 2) * 12) + (p.str * 100))
             };
         });
     }

@@ -955,6 +955,42 @@
     </div>
     <!-- FIM MODAL INDISCIPLINA -->
 
+    <!-- MODAL FAZER PROPOSTA (MERCADO) -->
+    <div id="modal-transfer-offer" class="modal" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 500px; background: var(--bg-card); color: var(--text-color); padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0; color: var(--accent-color);">Negociar Transferência</h2>
+                <button class="close-btn" onclick="document.getElementById('modal-transfer-offer').style.display='none'">&times;</button>
+            </div>
+            
+            <div id="transfer-offer-info" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.95em;">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Valor da Transferência (pago ao clube):</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="input-transfer-fee" placeholder="Ex: 5000000" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-color); font-size: 1rem;">
+                        <button class="btn btn-secondary" id="btn-pay-clause" style="white-space: nowrap;">Pagar Multa</button>
+                    </div>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Proposta de Salário (oferecido ao jogador):</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="input-transfer-salary" placeholder="Ex: 100000" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-color); font-size: 1rem;">
+                        <button class="btn btn-secondary" id="btn-offer-expected-salary" style="white-space: nowrap;">Salário Exigido</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="document.getElementById('modal-transfer-offer').style.display='none'">Cancelar</button>
+                <button class="btn btn-primary" id="btn-submit-transfer-offer">Enviar Proposta</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PROPOSTA DE TRANSFERÊNCIA -->
     <div id="modal-proposal" class="modal" style="z-index: 10000;">
         <div class="modal-content" style="max-width: 450px; text-align: center; background: #fff; color: #333; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">

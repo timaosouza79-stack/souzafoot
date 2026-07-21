@@ -6455,13 +6455,12 @@ function renderMarket() {
                 </div>
                 <div class="player-stats" style="flex: 1; justify-content: flex-end; flex-direction: column; align-items: flex-end; gap: 4px;">
                     <span class="stat-str">FOR: ${player.strength}</span>
-                    <span style="color: #4CAF50; font-weight: bold; font-size: 0.95em;" title="Salário: R$ ${player.salario.toLocaleString('pt-BR')}">R$ ${(price/1000000).toFixed(1)}M</span>
+                    <span style="color: #4CAF50; font-weight: bold; font-size: 0.95em;" title="Salário: R$ ${player.salario ? player.salario.toLocaleString('pt-BR') : '0'}">R$ ${(price/1000000).toFixed(1)}M</span>
                 </div>
             </div>
             <div class="market-item-actions">
-                <button class="btn btn-primary btn-swap" onclick="buyPlayer(${player.id}, '${player.teamId}', ${price})">Comprar</button>
-                <button class="btn btn-secondary btn-swap" onclick="makeOffer(${player.id}, '${player.teamId}', ${price})">Oferta</button>
-                <button class="btn btn-secondary btn-swap" onclick="requestLoan(${player.id}, '${player.teamId}', ${price})">Emprést.</button>
+                <button class="btn btn-primary btn-swap" onclick="openTransferModal('${player.id}', '${player.teamId}', ${price})">Fazer Proposta</button>
+                <button class="btn btn-secondary btn-swap" onclick="requestLoan('${player.id}', '${player.teamId}', ${price})">Emprést.</button>
             </div>
         `;
         list.appendChild(item);
@@ -6469,13 +6468,17 @@ function renderMarket() {
 }
 
 // Função que executa a transferência de fato após sucesso na negociação
-function executeTransfer(playerId, fromTeamId, price) {
+function executeTransfer(playerId, fromTeamId, price, newSalary) {
     const fromTeam = allTeams.find(t => String(t.id) === String(fromTeamId));
     const pIdx = fromTeam.squad.findIndex(p => String(p.id) === String(playerId));
     const player = fromTeam.squad[pIdx];
 
     myTeam.balance -= price;
     fromTeam.balance += price; // Clube vendedor recebe o dinheiro
+
+    if (newSalary) {
+        player.salario = newSalary;
+    }
 
     player.isStarter = false;
     myTeam.squad.push(player);
@@ -6496,102 +6499,148 @@ function executeTransfer(playerId, fromTeamId, price) {
     saveGame();
 }
 
-// Lógica de probabilidade para tentar uma compra
-function attemptPurchase(playerId, fromTeamId, offerPrice) {
-    if (myTeam.balance < offerPrice) {
-        alert("Seu clube não tem dinheiro suficiente para esta oferta!");
+let currentTransferNegotiation = null;
+
+function openTransferModal(playerId, fromTeamId, marketPrice) {
+    const fromTeam = allTeams.find(t => String(t.id) === String(fromTeamId));
+    if (!fromTeam) return;
+    const player = fromTeam.squad.find(p => String(p.id) === String(playerId));
+    if (!player) return;
+
+    const releaseClause = marketPrice * 2;
+    const expectedSalary = player.salario || calculateSalary(player);
+    // Clubes grandes pagam mais, então se o time é de liga forte, o jogador quer um pouco mais (ex: 10%)
+    let demandedSalary = expectedSalary;
+    if (player.strength > 75) demandedSalary = Math.round(expectedSalary * 1.15);
+
+    currentTransferNegotiation = {
+        playerId,
+        fromTeamId,
+        player,
+        fromTeam,
+        marketPrice,
+        releaseClause,
+        demandedSalary
+    };
+
+    const infoDiv = document.getElementById('transfer-offer-info');
+    infoDiv.innerHTML = `
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong style="font-size: 1.2rem; color: var(--accent-color);">${player.name}</strong>
+            <span class="player-pos">${player.position}</span>
+        </div>
+        <div style="display:flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div><strong>Clube Atual:</strong> ${fromTeam.name}</div>
+            <div><strong>OVR:</strong> ${player.strength}</div>
+            <div><strong>Idade:</strong> ${player.age}</div>
+            <div><strong>Valor de Mercado:</strong> R$ ${(marketPrice/1000000).toFixed(1)}M</div>
+            <div><strong>Multa Rescisória:</strong> R$ ${(releaseClause/1000000).toFixed(1)}M</div>
+            <div><strong>Salário Atual:</strong> R$ ${(player.salario||expectedSalary).toLocaleString('pt-BR')}</div>
+        </div>
+    `;
+
+    document.getElementById('input-transfer-fee').value = marketPrice;
+    document.getElementById('input-transfer-salary').value = demandedSalary;
+
+    document.getElementById('btn-pay-clause').onclick = () => {
+        document.getElementById('input-transfer-fee').value = releaseClause;
+    };
+    document.getElementById('btn-offer-expected-salary').onclick = () => {
+        document.getElementById('input-transfer-salary').value = demandedSalary;
+    };
+
+    document.getElementById('btn-submit-transfer-offer').onclick = submitTransferOffer;
+
+    document.getElementById('modal-transfer-offer').style.display = 'flex';
+}
+
+function submitTransferOffer() {
+    if (!currentTransferNegotiation) return;
+    
+    const { playerId, fromTeamId, player, fromTeam, marketPrice, releaseClause, demandedSalary } = currentTransferNegotiation;
+    
+    const transferFee = parseInt(document.getElementById('input-transfer-fee').value);
+    const salaryOffer = parseInt(document.getElementById('input-transfer-salary').value);
+
+    if (isNaN(transferFee) || transferFee <= 0 || isNaN(salaryOffer) || salaryOffer <= 0) {
+        alert("Valores inválidos para a proposta!");
         return;
     }
 
-    const fromTeam = allTeams.find(t => String(t.id) === String(fromTeamId));
-    if (!fromTeam) { alert("Erro ao encontrar clube adversário."); return; }
-    const player = fromTeam.squad.find(p => String(p.id) === String(playerId));
-    if (!player) { alert("Erro ao encontrar jogador."); return; }
-    const marketPrice = Math.pow(player.strength, 2) * 14000;
+    if (myTeam.balance < transferFee) {
+        alert("Seu clube não tem dinheiro suficiente para esta transferência!");
+        return;
+    }
 
     // Regras de Reputação (Grandeza)
     const myTeamRep = myTeam.rep || myTeam.reputation || 30;
     if (player.strength >= 80 && myTeamRep < 75) {
-        alert(`RECUSA DO JOGADOR!\n\nO empresário do ${player.name} foi direto:\n"Com todo o respeito, o meu cliente não está interessado em transferir-se para o vosso clube devido à vossa baixa reputação."`);
+        alert(`RECUSA DO JOGADOR!\n\nO empresário de ${player.name} foi direto:\n"Com todo o respeito, o meu cliente não está interessado em transferir-se para o vosso clube devido à vossa baixa reputação."`);
+        document.getElementById('modal-transfer-offer').style.display = 'none';
         return;
     } else if (player.strength >= 75 && myTeamRep < 50) {
-        alert(`RECUSA DO JOGADOR!\n\nO empresário do ${player.name} informou:\n"O jogador acha que o vosso clube não atende às suas ambições de carreira desportiva no momento."`);
+        alert(`RECUSA DO JOGADOR!\n\nO empresário de ${player.name} informou:\n"O jogador acha que o vosso clube não atende às suas ambições de carreira desportiva no momento."`);
+        document.getElementById('modal-transfer-offer').style.display = 'none';
         return;
     }
 
-    const offerFactor = offerPrice / marketPrice;
-
-    // Recusa financeira direta (oferta muito baixa)
-    if (offerFactor < 0.85) {
-        alert(`RECUSA DO CLUBE!\n\nA diretoria do ${fromTeam.name} interrompeu as negociações imediatamente:\n"A sua proposta financeira é um insulto. Exigimos um valor apropriado por este talento!"`);
-        return;
-    }
-
-    // Chance de sucesso baseada no fator financeiro e importância do jogador
-    const playerImportance = player.strength / fromTeam.strength;
-    let successChance = 0.25; // Base reduzida
+    const paidReleaseClause = transferFee >= releaseClause;
     
-    if (offerFactor >= 1.6) {
-        successChance = 0.90; // Pagou muito acima
-    } else if (offerFactor >= 1.3) {
-        successChance = 0.65; // Oferta muito boa
-    } else if (offerFactor >= 1.0) {
-        successChance = 0.35; // Valor de mercado
-    } else { // 0.85 até 1.0
-        successChance = 0.15; // Oferta abaixo da média
-    }
+    if (!paidReleaseClause) {
+        const offerFactor = transferFee / marketPrice;
 
-    if (playerImportance > 1.0) successChance -= 0.20; // Dificulta se for jogador importante
-    if (!player.isStarter) successChance += 0.20; // Facilita se for reserva
+        // Recusa financeira direta (oferta muito baixa)
+        if (offerFactor < 0.85) {
+            alert(`RECUSA DO CLUBE!\n\nA diretoria do ${fromTeam.name} interrompeu as negociações imediatamente:\n"A sua proposta financeira é um insulto. Exigimos um valor apropriado por este talento!"`);
+            document.getElementById('modal-transfer-offer').style.display = 'none';
+            return;
+        }
 
-    successChance = Math.max(0.01, Math.min(0.95, successChance));
+        // Chance de sucesso baseada no fator financeiro e importância do jogador
+        const playerImportance = player.strength / fromTeam.strength;
+        let successChance = 0.25; 
+        
+        if (offerFactor >= 1.6) successChance = 0.90;
+        else if (offerFactor >= 1.3) successChance = 0.65;
+        else if (offerFactor >= 1.0) successChance = 0.35;
+        else successChance = 0.15;
 
-    if (Math.random() <= successChance) {
-        executeTransfer(playerId, fromTeamId, offerPrice);
-    } else {
-        alert(`NEGOCIAÇÃO FRACASSADA!\n\nAs conversas com o ${fromTeam.name} ou com o empresário do jogador chegaram a um impasse por detalhes contratuais. Tente melhorar a sua oferta.`);
-    }
-}
+        if (playerImportance > 1.0) successChance -= 0.20; 
+        if (!player.isStarter) successChance += 0.20; 
 
-function handleBlockedTransfer(player) {
-    player.morale = Math.max(0, (player.morale || 100) - 30);
-    alert(`💬 MENSAGEM DO JOGADOR
+        successChance = Math.max(0.01, Math.min(0.95, successChance));
 
-${player.name} enviou uma mensagem: "Fiquei muito triste por ter bloqueado a minha transferência. Era a oportunidade da minha vida."`);
-}
-
-// Botão "Comprar" agora tenta a compra pelo valor de mercado
-function buyPlayer(playerId, fromTeamId, price) {
-    attemptPurchase(playerId, fromTeamId, price);
-}
-
-// Botão "Oferta" permite um valor customizado
-function makeOffer(playerId, fromTeamId, originalPrice) {
-    const offerStr = prompt(`O valor de mercado do jogador é R$ ${(originalPrice/1000000).toFixed(1)}M.
-
-Qual sua oferta? (Você pode usar o atalho M, ex: 5M ou 5.5M, ou digitar o valor inteiro)`);
-    if (!offerStr) return;
-    
-    let offerVal = 0;
-    const cleanStr = offerStr.trim().toLowerCase();
-    if (cleanStr.endsWith('m')) {
-        const numPart = cleanStr.slice(0, -1).trim();
-        const parsed = Number(numPart);
-        if (!isNaN(parsed) && parsed > 0) {
-            offerVal = Math.round(parsed * 1000000);
-        } else {
-            offerVal = NaN;
+        if (Math.random() > successChance) {
+            alert(`RECUSA DO CLUBE!\n\nAs conversas com o ${fromTeam.name} chegaram a um impasse por detalhes financeiros. Eles querem mais dinheiro.`);
+            document.getElementById('modal-transfer-offer').style.display = 'none';
+            return;
         }
     } else {
-        offerVal = Number(offerStr);
+        alert(`CLÁUSULA DE RESCISÃO ACIONADA!\n\nO ${myTeam.name} pagou a multa rescisória ao ${fromTeam.name}, que não pode recusar a transferência.`);
     }
 
-    if (isNaN(offerVal) || offerVal <= 0) {
-        alert("Valor da oferta inválido.");
+    // Validação Salarial
+    const salaryRatio = salaryOffer / demandedSalary;
+    if (salaryRatio < 0.8) {
+        alert(`RECUSA DO JOGADOR!\n\nO empresário de ${player.name} informou:\n"O salário oferecido é muito abaixo das exigências do jogador. Ele recusa assinar o contrato nestas condições!"`);
+        document.getElementById('modal-transfer-offer').style.display = 'none';
         return;
     }
-    
-    attemptPurchase(playerId, fromTeamId, offerVal);
+
+    let salaryAcceptanceChance = 1.0;
+    if (salaryRatio < 1.0) {
+        // Ex: Se ofereceu 90% do salário exigido (salaryRatio = 0.9), chance cai
+        salaryAcceptanceChance = (salaryRatio - 0.8) * 5; // Mapeia 0.8-1.0 para 0.0-1.0
+        if (Math.random() > salaryAcceptanceChance) {
+            alert(`RECUSA DO JOGADOR!\n\nO jogador ${player.name} recusou a proposta salarial! Ele exige condições melhores para o seu futuro.`);
+            document.getElementById('modal-transfer-offer').style.display = 'none';
+            return;
+        }
+    }
+
+    // Se chegou aqui, transferência é aprovada!
+    document.getElementById('modal-transfer-offer').style.display = 'none';
+    executeTransfer(playerId, fromTeamId, transferFee, salaryOffer);
 }
 
 // Botão "Empréstimo" com lógica de probabilidade
@@ -7399,8 +7448,7 @@ function showScoutReport() {
                         </div>
                     </div>
                     <div class="market-item-actions">
-                        <button class="btn btn-primary btn-swap" onclick="buyPlayer(${player.id}, '${player.teamId}', ${price})">Comprar</button>
-                        <button class="btn btn-secondary btn-swap" onclick="makeOffer(${player.id}, '${player.teamId}', ${price})">Oferta</button>
+                        <button class="btn btn-primary btn-swap" onclick="openTransferModal('${player.id}', '${player.teamId}', ${price})">Fazer Proposta</button>
                     </div>
                 </div>
             `;
