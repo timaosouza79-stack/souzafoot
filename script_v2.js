@@ -6502,6 +6502,10 @@ function executeTransfer(playerId, fromTeamId, price, newSalary) {
 let currentTransferNegotiation = null;
 
 function openTransferModal(playerId, fromTeamId, marketPrice) {
+    if (typeof openMasterNegotiation === 'function') {
+        openMasterNegotiation(playerId, fromTeamId);
+        return;
+    }
     try {
         document.body.insertAdjacentHTML('afterbegin', '<div id="debug-log" style="position:fixed;top:0;left:0;z-index:999999;background:red;color:white;padding:20px;font-size:20px;width:100%;">DEBUG START</div>');
         
@@ -7377,4 +7381,10 @@ function showScoutReport() {
     }
 
     document.getElementById('modal-scout-report').style.display = 'flex';
+}
+
+function makeOffer(playerId, fromTeamId, originalPrice) {
+    if (typeof openMasterNegotiation === 'function') {
+        openMasterNegotiation(playerId, fromTeamId);
+    }
 }

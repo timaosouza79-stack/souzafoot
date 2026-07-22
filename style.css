@@ -1900,3 +1900,33 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 .modal-content {
     animation: scaleUp 0.3s ease forwards;
 }
+
+/* ==========================================================================
+   MASTER LEAGUE NEGOTIATION MODAL STYLES
+   ========================================================================== */
+.negotiation-master-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.neg-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #4a4e69;
+    border-radius: 3px;
+    outline: none;
+}
+.neg-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e94560;
+    cursor: pointer;
+}
+.neg-input-group {
+    background: rgba(255,255,255,0.03);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #2a2e49;
+}
