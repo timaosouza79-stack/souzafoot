@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Modal</title>
+</head>
+<body>
+    <div id="modal-negotiation-master" style="display: none;"></div>
+    <span id="neg-budget-transfer"></span>
+    <span id="neg-player-pos"></span>
+    <span id="neg-player-name"></span>
+    <span id="neg-player-str"></span>
+    <span id="neg-club-name"></span>
+    <span id="neg-player-age"></span>
+    <span id="neg-market-value"></span>
+    <input id="neg-transfer-range" type="range">
+    <input id="neg-transfer-input" type="number">
+    <input id="neg-wage-range" type="range">
+    <input id="neg-wage-input" type="number">
+    <input id="neg-bonus-sign" type="number">
+    <input id="neg-bonus-goal" type="number">
+    <select id="neg-contract-years"></select>
+    <input id="neg-sellon" type="number">
+    <span id="neg-release-value"></span>
+    <div id="neg-patience-bar"></div>
+    <div id="neg-player-list"></div>
+    <div id="neg-dialogue-box"></div>
+    <span id="neg-prob-text"></span>
+    
+    <script>
+        // Mock global game variables
+        window.myTeam = { balance: 100000000, rep: 80 };
+        window.allTeams = [
+            { id: "team1", name: "Team 1", squad: [ { id: 1, name: "Player 1", strength: 80, position: "ATA", age: 25, salario: 5000000 } ] }
+        ];
+        window.currentRound = 1;
+    </script>
+    <script src="final/negotiation.js"></script>
+    <script>
+        try {
+            openMasterNegotiation(1, "team1");
+            console.log("SUCCESS");
+        } catch(e) {
+            console.error("ERROR:", e);
+        }
+    </script>
+</body>
+</html>

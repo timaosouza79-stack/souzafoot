@@ -198,6 +198,7 @@ function finishSulAmericanaRound() {
             sulAmericanaBracket.push(nextPhase);
         } else if (winners.length === 1) {
             const champion = winners[0];
+            sulamericanaWinnerId = champion.id;
             if (champion.id === myTeam.id) {
                 alert(`🏆 SENSACIONAL! O ${champion.name} é o Campeão da Sul-Americana!`);
             }

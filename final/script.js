@@ -472,6 +472,8 @@ let intercontinentalBracket = [];
 let isIntercontinentalMode = false;
 let cupWinnerId = null;
 let cupRunnerUpId = null;
+let libertadoresWinnerId = null;
+let sulamericanaWinnerId = null;
 let cupFinished = false;
 let databaseVersion = "2026-07-12-v1";
 let currentYear = 2026;
@@ -665,6 +667,8 @@ function saveGame() {
         cupFinished,
         cupWinnerId,
         cupRunnerUpId,
+        libertadoresWinnerId,
+        sulamericanaWinnerId,
         libertadoresPhase,
         libertadoresBracket,
         libertadoresGroups,
@@ -1049,6 +1053,8 @@ function loadGame() {
 
         cupWinnerId = state.cupWinnerId || null;
         cupRunnerUpId = state.cupRunnerUpId || null;
+        libertadoresWinnerId = state.libertadoresWinnerId || null;
+        sulamericanaWinnerId = state.sulamericanaWinnerId || null;
         cupFinished = state.cupFinished || false;
         console.log("loadGame: Exibindo screen-main.");
         ensureShields();
@@ -1079,6 +1085,8 @@ function loadGame() {
         isIntercontinentalMode = false;
         cupWinnerId = null; // Reset cup winner for new season
         cupRunnerUpId = null; // Reset cup runner-up for new season
+        libertadoresWinnerId = null; // Reset lib winner for new season
+        sulamericanaWinnerId = null; // Reset sula winner for new season
         databaseVersion = "2026-07-19-v3";
         
         allTeams = JSON.parse(JSON.stringify(teamsData)); 
@@ -3355,6 +3363,8 @@ function endOfSeason() {
         const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(baseLeague);
 
         if (cupWinnerId) nextLibParticipants.push(cupWinnerId);
+        if (libertadoresWinnerId && !nextLibParticipants.includes(libertadoresWinnerId)) nextLibParticipants.push(libertadoresWinnerId);
+        if (sulamericanaWinnerId && !nextLibParticipants.includes(sulamericanaWinnerId)) nextLibParticipants.push(sulamericanaWinnerId);
         let localLibCount = nextLibParticipants.length;
         let localSulCount = 0;
 
@@ -4508,6 +4518,7 @@ function finishLibertadoresRound() {
             libertadoresBracket.push(nextPhase);
         } else if (winners.length === 1 && winners[0]) {
             alert(`GLÓRIA ETERNA! O ${winners[0].name} conquistou a América!`);
+            libertadoresWinnerId = winners[0].id;
             libertadoresBracket = [];
             isLibertadoresMode = false;
         }
