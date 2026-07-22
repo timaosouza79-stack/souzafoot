@@ -2068,7 +2068,8 @@ function attributeGoalStats(team, matchId = null, minute = null, competition = '
 function weightedRandom(players, weights) {
     let pool = [];
     players.forEach(p => {
-        let entries = Math.max(1, Math.round((weights[p.position] || 1) * (p.strength / 10)));
+        // Peso exponencial baseado na Força do jogador para concentrar golos nas estrelas da equipa
+        let entries = Math.max(1, Math.round((weights[p.position] || 1) * (Math.pow(p.strength, 3) / 10000)));
         for (let i = 0; i < entries; i++) pool.push(p);
     });
     return pool[Math.floor(Math.random() * pool.length)];
@@ -2076,29 +2077,38 @@ function weightedRandom(players, weights) {
 
 // Função auxiliar para calcular a probabilidade de gol em um minuto
 function getGoalProbabilities(match) {
-    const strengthA = match.homeTeam.strength;
-    const strengthB = match.awayTeam.strength;
+    // 75% Titulares + 25% Força Base do Clube
+    const actualStrA = calculateTeamStrength(match.homeTeam);
+    const actualStrB = calculateTeamStrength(match.awayTeam);
+    const strengthA = (actualStrA * 0.75) + (match.homeTeam.strength * 0.25);
+    const strengthB = (actualStrB * 0.75) + (match.awayTeam.strength * 0.25);
 
     let modA = getTeamTacticalModifiers(match.homeTeam);
     const modB = getTeamTacticalModifiers(match.awayTeam);
     
-    // --- GESTÃO DE ESTÁDIO: Bónus de Adeptos ---
+    // --- GESTÃO DE ESTÁDIO: Bónus Direto de Vantagem Casa (+7.5%) ---
+    // Aplica-se incondicionalmente à equipa da casa
+    modA.attackMod *= 1.075;
+    modA.defenseMod *= 1.075;
+    
+    // Bónus extra de lotação
     if (match.attendanceRate > 0.85) {
-        modA.attackMod *= 1.05;
-        modA.defenseMod *= 1.05;
+        modA.attackMod *= 1.025;
+        modA.defenseMod *= 1.025;
     }
     // ------------------------------------------
 
     const effectiveStrengthA = strengthA * modA.attackMod * modB.defenseMod;
     const effectiveStrengthB = strengthB * modB.attackMod * modA.defenseMod;
 
-    const ratioA = effectiveStrengthA / effectiveStrengthB;
-    const ratioB = effectiveStrengthB / effectiveStrengthA;
+    // Exponenciação para forçar domínio das equipas mais fortes
+    const ratioA = Math.pow(effectiveStrengthA / effectiveStrengthB, 1.5);
+    const ratioB = Math.pow(effectiveStrengthB / effectiveStrengthA, 1.5);
 
     const baseProb = 0.014;
     return {
-        probA: Math.max(0.002, Math.min(0.06, baseProb * Math.sqrt(ratioA))),
-        probB: Math.max(0.002, Math.min(0.06, baseProb * Math.sqrt(ratioB)))
+        probA: Math.max(0.002, Math.min(0.08, baseProb * ratioA)),
+        probB: Math.max(0.002, Math.min(0.08, baseProb * ratioB))
     };
 }
 
@@ -4558,8 +4568,11 @@ function getTeamTacticalModifiers(team) {
 
 // Função de cálculo dos gols
 function calculateGoals(teamA, teamB, match = null) {
-    const strengthA = teamA.strength;
-    const strengthB = teamB.strength;
+    // 75% Titulares + 25% Força Base do Clube
+    const actualStrA = calculateTeamStrength(teamA);
+    const actualStrB = calculateTeamStrength(teamB);
+    const strengthA = (actualStrA * 0.75) + (teamA.strength * 0.25);
+    const strengthB = (actualStrB * 0.75) + (teamB.strength * 0.25);
     
     // Obter modificadores táticos
     let modA = getTeamTacticalModifiers(teamA);
@@ -4569,9 +4582,13 @@ function calculateGoals(teamA, teamB, match = null) {
     // Em simulateMatch/fast-forward, teamA é home quando a função é chamada na primeira linha
     // e teamA é away na segunda linha (m.awayTeam, m.homeTeam). Portanto, apenas aplicamos
     // o bónus se houver a match reference passada e formos explicitamente a homeTeam.
-    if (match && match.attendanceRate > 0.85 && match.homeTeam.id === teamA.id) {
-        modA.attackMod *= 1.05;
-        modA.defenseMod *= 1.05;
+    if (match && match.homeTeam && match.homeTeam.id === teamA.id) {
+        modA.attackMod *= 1.075;
+        modA.defenseMod *= 1.075;
+        if (match.attendanceRate > 0.85) {
+            modA.attackMod *= 1.025;
+            modA.defenseMod *= 1.025;
+        }
     }
     // ------------------------------------------
     
@@ -4603,18 +4620,20 @@ function calculateGoals(teamA, teamB, match = null) {
     }
     // --------------------------------------------
     
-    // Diferença de força
-    const ratio = effectiveStrengthA / effectiveStrengthB;
+    // Exponenciação para forçar domínio das equipas mais fortes
+    const ratio = Math.pow(effectiveStrengthA / effectiveStrengthB, 1.5);
     
     // Sorte (0.0 até 1.0)
     const luck = Math.random();
     
-    // Cálculo base
-    let expectedGoals = (ratio * 1.5) + (luck * 2) - 1;
+    // Cálculo base - mais agressivo para quem é superior
+    let expectedGoals = (ratio * 1.8) + (luck * 2.2) - 1.2;
     
-    // Pequeno bônus para o time mais forte
-    if (effectiveStrengthA > effectiveStrengthB) {
-        expectedGoals += 0.5;
+    // Bônus expresivo se jogar em casa E for superior
+    if (effectiveStrengthA > effectiveStrengthB && match && match.homeTeam && match.homeTeam.id === teamA.id) {
+        expectedGoals += 0.8;
+    } else if (effectiveStrengthA > effectiveStrengthB) {
+        expectedGoals += 0.4;
     }
     
     // Arredonda e impede placares negativos
