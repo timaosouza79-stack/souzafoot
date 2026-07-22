@@ -297,6 +297,9 @@ const teamsData = [
 if (typeof restWorldTeams !== 'undefined') {
     teamsData.push(...restWorldTeams);
 }
+if (typeof realSquads !== 'undefined' && typeof restWorldRealSquads !== 'undefined') {
+    Object.assign(realSquads, restWorldRealSquads);
+}
 
 // --- Sistema de Som ---
 // Usa crossOrigin quando possível e pré-carrega com fallback
@@ -802,7 +805,7 @@ function loadGame() {
         
         // Verifica a versão da base de dados local. Se for antiga (legacy) ou incompatível, força atualização dos elencos da CPU e restaura clubes ausentes
         const savedDbVersion = state.databaseVersion || "legacy";
-        const targetDbVersion = "2026-07-19-v3";
+        const targetDbVersion = "2026-07-22-v4";
         
         databaseVersion = targetDbVersion; // Atualiza a variável global
         currentYear = state.currentYear || 2026; // Carrega o ano ou 2026 como default
