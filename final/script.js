@@ -1071,6 +1071,19 @@ function loadGame() {
         libertadoresWinnerId = state.libertadoresWinnerId || null;
         sulamericanaWinnerId = state.sulamericanaWinnerId || null;
         cupFinished = state.cupFinished || false;
+        
+        // FIX: Limpa resíduos de estado de partida (jogadores que "ficaram presos" como substituídos)
+        allTeams.forEach(team => {
+            if (team.squad) {
+                team.squad.forEach(p => {
+                    delete p.hasLeftMatch;
+                    delete p.playedInMatch;
+                    delete p.startedMatch;
+                    p.redCardInMatch = false;
+                });
+            }
+        });
+
         console.log("loadGame: Exibindo screen-main.");
         ensureShields();
         showScreen('screen-main');
