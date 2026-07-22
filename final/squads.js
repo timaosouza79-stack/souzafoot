@@ -20654,7 +20654,7 @@ const realSquads = {
             "str": 64
         }
     ]
-}
+},
 
     "racingclub": {
         "formation": "4-3-3",

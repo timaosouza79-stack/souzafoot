@@ -896,10 +896,11 @@ function loadGame() {
                     if (typeof realSquads !== 'undefined' && realSquads[team.id]) {
                         let playerIdCounter = 10000 + Math.floor(Math.random() * 10000);
                         const uniqueCpu = [];
+                        const teamPlayerNames = new Set();
                         realSquads[team.id].players.forEach(p => {
                             const normalized = p.name.trim().toLowerCase();
-                            if (!migrationPlayerNames.has(normalized)) {
-                                migrationPlayerNames.add(normalized);
+                            if (!teamPlayerNames.has(normalized)) {
+                                teamPlayerNames.add(normalized);
                                 uniqueCpu.push(p);
                             }
                         });
@@ -915,8 +916,8 @@ function loadGame() {
                             suspensionRounds: 0,
                             injuryRounds: 0,
                             redCardInMatch: false,
-                    isStarter: index < 11,
-                    allTimeStats: { goals: 0, assists: 0, matches: 0 }
+                            isStarter: index < 11,
+                            allTimeStats: { goals: 0, assists: 0, matches: 0 }
                         }));
                         team.formation = realSquads[team.id].formation;
                     }
@@ -925,7 +926,8 @@ function loadGame() {
 
             // Garante que nenhum time CPU fique sem elenco mínimo de 18 jogadores
             allTeams.forEach(team => {
-                if (team.id !== myTeam.id && (!team.squad || team.squad.length < 18)) {
+                const hasRealSquad = typeof realSquads !== 'undefined' && realSquads[team.id];
+                if (team.id !== myTeam.id && !hasRealSquad && (!team.squad || team.squad.length < 18)) {
                     const existingPlayers = team.squad || [];
                     const neededPlayers = 18 - existingPlayers.length;
                     const genericPositions = ['GOL', 'ZAG', 'ZAG', 'LAT', 'LAT', 'MEI', 'MEI', 'MEI', 'ATA', 'ATA', 'ATA', 'GOL', 'ZAG', 'LAT', 'MEI', 'MEI', 'ATA', 'ATA'];
@@ -1134,8 +1136,9 @@ function loadGame() {
                 team.formation = realSquads[team.id].formation;
             }
             
-            // Ensure all teams have a full squad (at least 18 players: 11 starters + 7 reserves) and proper tactics
-            if (!team.squad || team.squad.length < 18) {
+            // Ensure all teams have a full squad (at least 18 players) IF they don't have a real squad
+            const hasRealSquad = typeof realSquads !== 'undefined' && realSquads[team.id];
+            if (!hasRealSquad && (!team.squad || team.squad.length < 18)) {
                 const existingPlayers = team.squad || [];
                 const neededPlayers = 18 - existingPlayers.length;
                 // Posições genéricas para preencher o elenco
