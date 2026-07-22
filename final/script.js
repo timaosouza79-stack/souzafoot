@@ -824,7 +824,7 @@ function loadGame() {
         
         // Verifica a versão da base de dados local. Se for antiga (legacy) ou incompatível, força atualização dos elencos da CPU e restaura clubes ausentes
         const savedDbVersion = state.databaseVersion || "legacy";
-        const targetDbVersion = "2026-07-22-v4";
+        const targetDbVersion = "2026-07-22-v5";
         
         databaseVersion = targetDbVersion; // Atualiza a variável global
         currentYear = state.currentYear || 2026; // Carrega o ano ou 2026 como default
