@@ -6327,7 +6327,7 @@ function populateMarketTeamFilter(leagueFilter) {
     sel.innerHTML = '<option value="all">⚽ Todos os Times</option>';
     let teams = allTeams.filter(t => String(t.id) !== String(myTeam.id));
     if (leagueFilter && leagueFilter !== 'all') {
-        teams = teams.filter(t => t.league === leagueFilter);
+        teams = teams.filter(t => t.league === leagueFilter || (leagueFilter === 'rest_world' && t.league && t.league.startsWith('rest_world')));
     }
     // Ordena por nome
     teams.sort((a, b) => a.name.localeCompare(b.name));
