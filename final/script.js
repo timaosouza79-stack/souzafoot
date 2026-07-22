@@ -1559,6 +1559,18 @@ document.getElementById('league-select').addEventListener('change', function() {
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
+
+    // Correção: Esconder interface vazada na tela de login
+    if (screenId === 'screen-login' || screenId === 'screen-team-selection') {
+        document.body.classList.add('login-active');
+        // Fecha qualquer modal aberto caso tenha ficado preso no logout
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        document.querySelectorAll('.live-match-modal').forEach(m => m.style.display = 'none');
+        const mobileMore = document.getElementById('mobile-more-modal');
+        if (mobileMore) mobileMore.style.display = 'none';
+    } else {
+        document.body.classList.remove('login-active');
+    }
 }
 
 function getCompetitionNames(leagueId) {
@@ -2520,7 +2532,7 @@ function checkIndisciplineEvent(callback) {
     // Probabilidade de 4% por rodada
     const CHANCE = 0.04;
 
-    if (!myTeam || !myTeam.squad || myTeam.squad.length === 0 || Math.random() > CHANCE) {
+    if (!currentUser || document.body.classList.contains('login-active') || !myTeam || !myTeam.squad || myTeam.squad.length === 0 || Math.random() > CHANCE) {
         callback();
         return;
     }

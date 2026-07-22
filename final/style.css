@@ -1936,3 +1936,12 @@ h1, h2, h3, h4, h5, h6, .brand-font {
         align-items: flex-start;
     }
 }
+
+/* Correção: Ocultar interface de jogo e modais quando estiver na tela de Login/Cadastro */
+body.login-active .modal,
+body.login-active .live-match-modal,
+body.login-active .manager-header,
+body.login-active #mobile-more-modal,
+body.login-active .mobile-nav {
+    display: none !important;
+}
