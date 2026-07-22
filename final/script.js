@@ -1270,8 +1270,8 @@ function initLibertadores(silent = false) {
                              .sort((a, b) => b.strength - a.strength).slice(0, 32);
         } else {
             // FIX: Mix obrigatório — vagas brasileiras + vagas de clubes estrangeiros sul-americanos
-            // 8 vagas para times estrangeiros CONMEBOL clássicos
-            const VAGAS_ESTRANGEIROS_LIB = 8;
+            // 24 vagas para times estrangeiros CONMEBOL (na vida real o Brasil tem ~7 ou 8 vagas diretas na fase de grupos)
+            const VAGAS_ESTRANGEIROS_LIB = 24;
             const estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_ESTRANGEIROS_LIB);
 
             // IDs dos estrangeiros já escolhidos (para não duplicar)
@@ -1281,12 +1281,12 @@ function initLibertadores(silent = false) {
             const brIds = ['flamengo', 'palmeiras', 'botafogo', 'atleticomg', 'saopaulo', 'fluminense', 'fortaleza', 'cruzeiro', 'corinthians', 'internacional', 'bahia', 'athleticopr', 'gremio', 'vasco'];
             let brQualifiers = allTeams.filter(t => brIds.includes(t.id) && !estrangeirosIds.includes(t.id));
 
-            // Garante que o time do jogador participe
-            if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brQualifiers.find(t => t.id === myTeam.id) && !estrangeirosIds.includes(myTeam.id)) {
+            // Garante que o time do jogador participe se ele estiver no Brasil ou América do Sul
+            if ((myTeam.league.startsWith('brazil') || myTeam.league === 'south_america') && !brQualifiers.find(t => t.id === myTeam.id) && !estrangeirosIds.includes(myTeam.id)) {
                 brQualifiers.unshift(myTeam);
             }
 
-            // Ordena brasileiros por força e pega os melhores para completar 32
+            // Ordena brasileiros por força e pega os melhores para completar as vagas (32 - 24 = 8 vagas BR)
             brQualifiers.sort((a, b) => b.strength - a.strength);
             const vagasBrasil = 32 - estrangeiros.length;
             const brSelecionados = brQualifiers.slice(0, vagasBrasil);
@@ -1298,13 +1298,22 @@ function initLibertadores(silent = false) {
 
         // FIX: Se os participants vieram APENAS de times brasileiros, injeta estrangeiros
         if (!isEurope) {
-            const temEstrangeiro = pTeams.some(t => t.league === 'south_america');
-            if (!temEstrangeiro) {
-                const VAGAS_ESTRANGEIROS_LIB = 8;
+            // Se houver menos de 24 times estrangeiros, ajusta a proporção
+            const numEstrangeiros = pTeams.filter(t => t.league === 'south_america').length;
+            if (numEstrangeiros < 20) {
+                const VAGAS_ESTRANGEIROS_LIB = 24;
                 const estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_ESTRANGEIROS_LIB);
                 const estIds = estrangeiros.map(t => t.id);
+                // Mantém o time do jogador se for BR
+                const myTeamInPTeams = pTeams.find(t => t.id === myTeam.id);
                 // Remove alguns times brasileiros para abrir vagas e injeta estrangeiros
-                pTeams = pTeams.filter(t => !estIds.includes(t.id));
+                pTeams = pTeams.filter(t => !estIds.includes(t.id) && t.league !== 'south_america');
+                
+                // Se o time do jogador for BR e não estiver no pTeams, temos de o manter
+                if (myTeamInPTeams && !pTeams.find(t => t.id === myTeam.id)) {
+                    pTeams.unshift(myTeamInPTeams);
+                }
+
                 pTeams = pTeams.slice(0, 32 - estrangeiros.length);
                 pTeams = [...estrangeiros, ...pTeams];
             }
