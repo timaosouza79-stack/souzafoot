@@ -1492,9 +1492,32 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     .mobile-nav-bar { display: flex; }
     .fab-play { display: flex; }
 
-    /* ---- Ocultar botões do painel que ficam na nav bar ---- */
-    #screen-main .manager-actions { display: none; }
-
+    /* ---- Mostrar botões do painel numa grelha responsiva no mobile ---- */
+    #screen-main .manager-actions { 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 10px; 
+        width: 100%; 
+        margin-top: 20px;
+        flex: none;
+    }
+    
+    #screen-main .manager-actions .btn {
+        width: 100%;
+        padding: 12px 8px;
+        font-size: 0.85rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 6px;
+    }
+    
+    #screen-main .manager-actions .btn i {
+        font-size: 1.2rem;
+        margin-bottom: 2px;
+    }
     /* ---- Header do manager ---- */
     .manager-header {
         padding: 14px 16px;
