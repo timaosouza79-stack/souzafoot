@@ -448,6 +448,7 @@ window.addEventListener('resize', () => scaleAppContainer());
 window.addEventListener('load', () => scaleAppContainer());
 
 let myTeam = null;
+let lastRoundResults = [];
 let currentRound = 1;
 let matchSchedule = [];
 let standings = [];
@@ -655,6 +656,7 @@ function saveGame() {
         currentYear,
         myTeamId: myTeam ? myTeam.id : null,
         currentRound,
+        lastRoundResults,
         matchSchedule,
         standings,
         allTeams,
@@ -979,6 +981,7 @@ function loadGame() {
         }
 
         currentRound = state.currentRound;
+        lastRoundResults = state.lastRoundResults || [];
         matchSchedule = state.matchSchedule;
         standings = state.standings;
         isCupMode = state.isCupMode || false;
@@ -1592,6 +1595,47 @@ function getCompetitionNames(leagueId) {
     return names[leagueId] || { league: 'LIGA NACIONAL', cup: 'COPA NACIONAL', continental: 'TORNEIO CONTINENTAL' };
 }
 
+function updateRoundResultsUI() {
+    const list = document.getElementById('results-list');
+    if (!list) return;
+    
+    if (!lastRoundResults || lastRoundResults.length === 0) {
+        list.innerHTML = '<li>Ainda não há resultados. Jogue a primeira rodada!</li>';
+        return;
+    }
+    
+    list.innerHTML = '';
+    
+    // Sort so user's match is at the top
+    const sortedResults = [...lastRoundResults].sort((a, b) => {
+        const aIsUser = myTeam && (a.homeId === myTeam.id || a.awayId === myTeam.id);
+        const bIsUser = myTeam && (b.homeId === myTeam.id || b.awayId === myTeam.id);
+        if (aIsUser && !bIsUser) return -1;
+        if (!aIsUser && bIsUser) return 1;
+        return 0;
+    });
+
+    sortedResults.forEach(res => {
+        const li = document.createElement('li');
+        li.style.padding = "6px 0";
+        li.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
+        li.style.display = "flex";
+        li.style.justifyContent = "space-between";
+        li.style.alignItems = "center";
+        
+        let text = `<span>${res.homeName} <strong>${res.homeGoals}</strong> x <strong>${res.awayGoals}</strong> ${res.awayName}</span>`;
+        
+        if (myTeam && (res.homeId === myTeam.id || res.awayId === myTeam.id)) {
+            li.style.color = "#bb86fc";
+            li.style.fontWeight = "bold";
+            text += `<span style="font-size:0.8rem; background:rgba(187,134,252,0.2); padding:2px 6px; border-radius:4px; margin-left:10px;">[Seu Jogo]</span>`;
+        }
+        
+        li.innerHTML = text;
+        list.appendChild(li);
+    });
+}
+
 function updateDashboardUI() {
     // FIX: Previne a execução na tela de login, onde os elementos do dashboard não existem.
     // Isso evita que o script quebre e congele a tela inicial.
@@ -1600,6 +1644,8 @@ function updateDashboardUI() {
     }
 
     if (!myTeam || !matchSchedule) return;
+
+    updateRoundResultsUI();
 
     const totalDates = matchSchedule.length;
     if (totalDates === 0) return;
@@ -4128,6 +4174,18 @@ ${p.name} lesionou-se e vai desfalcar a equipa por ${p.injuryRounds} rodada(s)!`
         window.finishMatchRunning = false;
         window.simulationEnded = false;
         
+        // Guardar resultados da rodada atual para exibição no painel
+        if (simulatedRoundMatches && simulatedRoundMatches.length > 0) {
+            lastRoundResults = simulatedRoundMatches.map(m => ({
+                homeName: m.homeTeam ? m.homeTeam.name : m.home,
+                awayName: m.awayTeam ? m.awayTeam.name : m.away,
+                homeId: m.home,
+                awayId: m.away,
+                homeGoals: m.currentHomeGoals || 0,
+                awayGoals: m.currentAwayGoals || 0
+            }));
+        }
+
         currentRound++;
 
         // IDEIA 19: Verifica se deve checar por propostas de outros clubes
