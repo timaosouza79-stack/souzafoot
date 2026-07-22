@@ -427,6 +427,7 @@
                     <option value="all">🌍 Todas as Ligas</option>
                     <option value="brazil_a">🇧🇷 Série A - Brasil</option>
                     <option value="brazil_b">🇧🇷 Série B - Brasil</option>
+                    <option value="argentina">🇦🇷 Liga Profesional - Argentina</option>
                     <option value="england">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Inglaterra</option>
                     <option value="spain">🇪🇸 La Liga - Espanha</option>
                     <option value="germany">🇩🇪 Bundesliga - Alemanha</option>
@@ -1153,6 +1154,7 @@
             const LEAGUE_LABELS = {
                 'brazil_a':    '🇧🇷 Série A - Brasil',
                 'brazil_b':    '🇧🇷 Série B - Brasil',
+                'argentina':   '🇦🇷 Liga Profesional - Argentina',
                 'england':     '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League - Inglaterra',
                 'spain':       '🇪🇸 La Liga - Espanha',
                 'germany':     '🇩🇪 Bundesliga - Alemanha',
@@ -1168,7 +1170,7 @@
             const presentLeagues = new Set((window.allTeams || []).map(t => t.league).filter(Boolean));
 
             // Adiciona opções em ordem
-            const order = ['brazil_a','brazil_b','england','spain','germany','italy','france','portugal','south_america','cup','libertadores'];
+            const order = ['brazil_a','brazil_b','argentina','england','spain','germany','italy','france','portugal','south_america','cup','libertadores'];
             order.forEach(key => {
                 // Para ligas de times, só mostra se existir ao menos 1 time
                 if (key === 'cup' || key === 'libertadores') {
