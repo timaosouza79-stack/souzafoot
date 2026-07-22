@@ -1884,3 +1884,55 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 
     .app-container { padding-bottom: 70px; }
 }
+
+/* ============================================================
+   MASTER LEAGUE NEGOTIATION MODAL STYLES
+   ============================================================ */
+
+.negotiation-master-container {
+    font-family: 'Outfit', sans-serif;
+}
+
+.negotiation-master-container .neg-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    background: #0f3460;
+    height: 8px;
+    border-radius: 4px;
+    outline: none;
+}
+.negotiation-master-container .neg-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e94560;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+}
+
+.negotiation-master-container .neg-sidebar div:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+@media (max-width: 768px) {
+    .neg-body {
+        flex-direction: column;
+        height: auto !important;
+        max-height: 80vh;
+    }
+    .neg-sidebar {
+        width: 100% !important;
+        max-height: 150px;
+        border-right: none !important;
+        border-bottom: 1px solid #4a4e69;
+    }
+    .neg-main {
+        overflow-y: auto;
+    }
+    .negotiation-master-container .neg-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+}

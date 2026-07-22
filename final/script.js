@@ -6560,38 +6560,41 @@ function handleBlockedTransfer(player) {
 ${player.name} enviou uma mensagem: "Fiquei muito triste por ter bloqueado a minha transferência. Era a oportunidade da minha vida."`);
 }
 
-// Botão "Comprar" agora tenta a compra pelo valor de mercado
+// Botão "Comprar" agora abre o painel Master League
 function buyPlayer(playerId, fromTeamId, price) {
-    attemptPurchase(playerId, fromTeamId, price);
+    if (typeof openMasterNegotiation === 'function') {
+        openMasterNegotiation(playerId, fromTeamId);
+    } else {
+        attemptPurchase(playerId, fromTeamId, price);
+    }
 }
 
-// Botão "Oferta" permite um valor customizado
+// Botão "Oferta" também abre o mesmo painel
 function makeOffer(playerId, fromTeamId, originalPrice) {
-    const offerStr = prompt(`O valor de mercado do jogador é R$ ${(originalPrice/1000000).toFixed(1)}M.
-
-Qual sua oferta? (Você pode usar o atalho M, ex: 5M ou 5.5M, ou digitar o valor inteiro)`);
-    if (!offerStr) return;
-    
-    let offerVal = 0;
-    const cleanStr = offerStr.trim().toLowerCase();
-    if (cleanStr.endsWith('m')) {
-        const numPart = cleanStr.slice(0, -1).trim();
-        const parsed = Number(numPart);
-        if (!isNaN(parsed) && parsed > 0) {
-            offerVal = Math.round(parsed * 1000000);
-        } else {
-            offerVal = NaN;
-        }
+    if (typeof openMasterNegotiation === 'function') {
+        openMasterNegotiation(playerId, fromTeamId);
     } else {
-        offerVal = Number(offerStr);
-    }
+        const offerStr = prompt(`O valor de mercado do jogador é R$ ${(originalPrice/1000000).toFixed(1)}M.\n\nQual sua oferta? (Você pode usar o atalho M, ex: 5M ou 5.5M)`);
+        if (!offerStr) return;
+        
+        let offerVal = 0;
+        const cleanStr = offerStr.trim().toLowerCase();
+        if (cleanStr.endsWith('m')) {
+            const numPart = cleanStr.slice(0, -1).trim();
+            const parsed = Number(numPart);
+            if (!isNaN(parsed) && parsed > 0) offerVal = Math.round(parsed * 1000000);
+            else offerVal = NaN;
+        } else {
+            offerVal = Number(offerStr);
+        }
 
-    if (isNaN(offerVal) || offerVal <= 0) {
-        alert("Valor da oferta inválido.");
-        return;
+        if (isNaN(offerVal) || offerVal <= 0) {
+            alert("Valor da oferta inválido.");
+            return;
+        }
+        
+        attemptPurchase(playerId, fromTeamId, offerVal);
     }
-    
-    attemptPurchase(playerId, fromTeamId, offerVal);
 }
 
 // Botão "Empréstimo" com lógica de probabilidade
