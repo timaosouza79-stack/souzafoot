@@ -4189,6 +4189,8 @@ ${p.name} lesionou-se e vai desfalcar a equipa por ${p.injuryRounds} rodada(s)!`
                 delete p.playedInMatch;
                 delete p.startedMatch;
                 delete p.matchYellowCards;
+                delete p.hasLeftMatch;
+                p.redCardInMatch = false;
             });
         });
 
