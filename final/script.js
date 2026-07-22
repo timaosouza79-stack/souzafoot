@@ -1314,10 +1314,10 @@ function initLibertadores(silent = false) {
     // GARANTIA: Se houver menos de 32 times, preenche com os mais fortes disponíveis no jogo
     if (pTeams.length < 32) {
         const usedIds = pTeams.map(t => t.id);
-        const isTeamEurope = (league) => ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].some(l => league === l || league.startsWith(l + '_'));
+        const isTeamSouthAmerica = (league) => league === 'south_america' || league.startsWith('brazil_');
         const fillTeams = allTeams.filter(t => {
             if (usedIds.includes(t.id)) return false;
-            return isEurope ? isTeamEurope(t.league) : !isTeamEurope(t.league);
+            return isEurope ? !isTeamSouthAmerica(t.league) : isTeamSouthAmerica(t.league);
         }).sort((a, b) => b.strength - a.strength);
         pTeams = [...pTeams, ...fillTeams.slice(0, 32 - pTeams.length)];
     }
