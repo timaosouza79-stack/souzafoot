@@ -4191,8 +4191,8 @@ ${p.name} lesionou-se e vai desfalcar a equipa por ${p.injuryRounds} rodada(s)!`
         // IDEIA 19: Verifica se deve checar por propostas de outros clubes
         if (isTransferWindowOpen()) {
             setTimeout(checkForIncomingBids, 1000); // Pequeno delay para não sobrepor alertas
-            setTimeout(checkForManagerOffers, 1500); // Verifica propostas para o técnico
         }
+        setTimeout(checkForManagerOffers, 1500); // Verifica propostas para o técnico
         isCupMode = false;
         isLibertadoresMode = false;
 
@@ -4228,29 +4228,121 @@ ${p.name} lesionou-se e vai desfalcar a equipa por ${p.injuryRounds} rodada(s)!`
 }
 
 
-function handleSacking() {
+// Variável global para armazenar oferta espontânea temporária
+let pendingSpontaneousOffer = null;
+
+function showJobMarket() {
     const modal = document.getElementById('modal-sacked');
     if (modal) modal.style.display = 'none';
     
+    // Devolve o clube atual à gestão da IA (opcional: resetar confianca)
     if (myTeam) {
-        // Zera finanças e infraestrutura
-        ensureSafeState(myTeam, true);
-        myTeam.boardConfidence = 80;
+        myTeam.boardConfidence = 80; 
+    }
+    
+    showScreen('screen-job-market');
+    generateJobOffers();
+}
+
+function generateJobOffers() {
+    const container = document.getElementById('job-offers-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Sortear equipas
+    // Filtramos para não oferecer o próprio clube que acabou de o despedir, e separar por força
+    let validTeams = allTeams.filter(t => String(t.id) !== String(myTeam.id));
+    
+    // Separa equipas fracas (overall < 74) e medias (75-80)
+    let weakTeams = validTeams.filter(t => t.strength < 75);
+    let midTeams = validTeams.filter(t => t.strength >= 75 && t.strength <= 81);
+    
+    // Se por acaso as listas estiverem vazias, usamos tudo
+    if (weakTeams.length === 0) weakTeams = validTeams;
+    if (midTeams.length === 0) midTeams = validTeams;
+    
+    // Sorteia 2 fracos e 1 médio
+    const offers = [];
+    
+    // Helper para extrair aleatório e remover do array
+    const popRandom = (arr) => {
+        if (arr.length === 0) return null;
+        const idx = Math.floor(Math.random() * arr.length);
+        return arr.splice(idx, 1)[0];
+    };
+    
+    const w1 = popRandom(weakTeams);
+    if (w1) offers.push(w1);
+    const w2 = popRandom(weakTeams);
+    if (w2) offers.push(w2);
+    
+    const m1 = popRandom(midTeams);
+    if (m1) offers.push(m1);
+    
+    // Renderiza
+    offers.forEach(team => {
+        const div = document.createElement('div');
+        div.style.background = 'rgba(255,255,255,0.05)';
+        div.style.borderRadius = '8px';
+        div.style.padding = '20px';
+        div.style.display = 'flex';
+        div.style.flexDirection = 'column';
+        div.style.alignItems = 'center';
+        div.style.border = '1px solid rgba(255,255,255,0.1)';
         
-        // Downgrade do plantel para a equipa base original
-        if (typeof squads !== 'undefined') {
-            const originalTeam = squads.find(t => t.id === myTeam.id);
-            if (originalTeam && originalTeam.squad) {
-                myTeam.squad = JSON.parse(JSON.stringify(originalTeam.squad));
-                myTeam.squad.forEach(p => {
-                    p.energy = 100;
-                    p.morale = 100;
-                });
-            }
-        }
-        
+        div.innerHTML = `
+            <img src="${team.logo}" alt="${team.name}" style="width:60px; height:60px; object-fit:contain; margin-bottom:10px;">
+            <h4 style="margin:0 0 5px 0;">${team.name}</h4>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">
+                Overall: ${team.strength} <br>
+                Orçamento: R$ ${((team.balance || 1000000) / 1000000).toFixed(1)}M
+            </div>
+            <button class="btn btn-primary" onclick="acceptJobOffer('${team.id}')" style="width:100%; margin-top:auto;">
+                Assinar Contrato
+            </button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function acceptJobOffer(teamId) {
+    const newTeam = allTeams.find(t => String(t.id) === String(teamId));
+    if (!newTeam) return;
+    
+    myTeam = newTeam;
+    myTeam.boardConfidence = 80;
+    
+    // Garante que o estado do novo clube está ok
+    ensureSafeState(myTeam, false);
+    
+    // Muda de ecrã para o principal e atualiza o dashboard, mantendo a rodada
+    showScreen('screen-main');
+    updateDashboardUI();
+    saveGame();
+    
+    alert(`Contrato Assinado!\n\nBem-vindo ao ${myTeam.name}. A direção conta contigo para salvar a época!`);
+}
+
+function acceptSpontaneousJobOffer() {
+    if (!pendingSpontaneousOffer) return;
+    
+    const modal = document.getElementById('modal-job-offer');
+    if (modal) modal.style.display = 'none';
+    
+    acceptJobOffer(pendingSpontaneousOffer.id);
+    pendingSpontaneousOffer = null;
+}
+
+function rejectSpontaneousJobOffer() {
+    const modal = document.getElementById('modal-job-offer');
+    if (modal) modal.style.display = 'none';
+    pendingSpontaneousOffer = null;
+    
+    // Bónus de lealdade: A direção adora a sua recusa de propostas rivais
+    if (myTeam) {
+        myTeam.boardConfidence = Math.min(100, myTeam.boardConfidence + 5);
         saveGame();
-        location.reload();
     }
 }
 
@@ -6842,39 +6934,27 @@ function checkForIncomingBids() {
 }
 
 function checkForManagerOffers() {
-    if (!isTransferWindowOpen() || Math.random() > 0.25) { // 25% de chance de receber proposta por rodada na janela
+    // 2.5% de chance de receber proposta se a confianca for alta e passou de 10 rodadas
+    if (Math.random() > 0.025 || !myTeam || myTeam.boardConfidence < 85 || currentRound <= 10) { 
         return;
     }
 
-    // Condição de sucesso: estar no top 4 da liga após 10 rodadas ou ter ganho a copa
-    const myTeamStanding = standings.find(t => t.id === myTeam.id);
-    const myTeamRank = standings.indexOf(myTeamStanding) + 1;
-    const isSuccessful = (myTeamRank <= 4 && currentRound > 10) || (cupWinnerId === myTeam.id);
-
-    if (!isSuccessful) return;
-
-    // Clubes com maior reputação/orçamento que o seu são potenciais interessados
+    // Clubes com maior força que o seu (ou top clubs)
     const potentialClubs = allTeams.filter(t => 
         t.id !== myTeam.id && 
-        (t.balance > myTeam.balance * 1.2 || t.strength > myTeam.strength + 2)
-    ).sort((a, b) => b.balance - a.balance);
+        (t.strength > myTeam.strength + 3 || t.strength >= 83)
+    );
 
     if (potentialClubs.length === 0) return;
 
-    const offeringClub = potentialClubs[Math.floor(Math.random() * Math.min(potentialClubs.length, 5))];
-    const offeredBudget = Math.round(offeringClub.balance * (1 + (Math.random() * 0.2))); // Oferece o balanço do clube + até 20%
+    const offeringClub = potentialClubs[Math.floor(Math.random() * potentialClubs.length)];
+    pendingSpontaneousOffer = offeringClub;
 
     // Exibe o modal de proposta de cargo
-    const offerText = `O <strong>${offeringClub.name}</strong> ficou impressionado com o teu trabalho e oferece-te o cargo de Técnico principal com um orçamento de transferências de <strong>R$ ${offeredBudget.toLocaleString('pt-BR')}</strong>!`;
-    document.getElementById('manager-offer-text').innerHTML = offerText;
+    const offerText = `O <strong>${offeringClub.name}</strong> ficou impressionado com a sua campanha fantástica e oferece-lhe o cargo de Treinador principal!<br><br>Orçamento disponível: <strong>R$ ${((offeringClub.balance || 1000000) / 1000000).toFixed(1)}M</strong>`;
+    document.getElementById('job-offer-details').innerHTML = offerText;
 
-    // Configura os botões de ação
-    const btnAccept = document.getElementById('btn-accept-manager-offer');
-    const btnReject = document.getElementById('btn-reject-manager-offer');
-    if(btnAccept) btnAccept.onclick = () => acceptManagerOffer(offeringClub.id);
-    if(btnReject) btnReject.onclick = () => rejectManagerOffer();
-
-    document.getElementById('modal-manager-offer').style.display = 'flex';
+    document.getElementById('modal-job-offer').style.display = 'flex';
 }
 
 function acceptProposal(playerId, buyerId, offerValue) {
@@ -6899,26 +6979,6 @@ function acceptProposal(playerId, buyerId, offerValue) {
 
 function rejectProposal(playerId) {
     document.getElementById('modal-proposal').style.display = 'none';
-}
-
-function acceptManagerOffer(clubId) {
-    const newTeam = allTeams.find(t => t.id === clubId);
-    if (!newTeam) return;
-
-    // Atualiza time do usuário
-    myTeamId = newTeam.id;
-    myTeam = newTeam;
-    users[currentUser].gameState.myTeamId = newTeam.id;
-
-    document.getElementById('modal-manager-offer').style.display = 'none';
-    alert(`Contrato Assinado! Você agora é o treinador do ${newTeam.name}.`);
-
-    saveGame();
-    location.reload();
-}
-
-function rejectManagerOffer() {
-    document.getElementById('modal-manager-offer').style.display = 'none';
 }
 
 function openHallOfFameTab(evt, tabName) {

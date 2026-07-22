@@ -842,7 +842,24 @@
             </div>
         </div>
 
-    <!-- Modal de Demissão (Game Over) -->
+    <!-- Secção: Mercado de Empregos (Treinador Sem Clube) -->
+    <section id="screen-job-market" class="screen">
+        <header class="app-header">
+            <h2><i class="fas fa-briefcase"></i> Mercado de Treinadores</h2>
+        </header>
+        <main class="app-content">
+            <div class="dashboard-card" style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: var(--primary-color);">Procurando um novo clube...</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Estas são as diretorias que demonstraram interesse no teu trabalho após a tua saída do último clube. Escolhe o teu próximo destino.</p>
+            </div>
+            
+            <div id="job-offers-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+                <!-- Preenchido via JavaScript -->
+            </div>
+        </main>
+    </section>
+
+    <!-- Modal de Demissão -->
     <div id="modal-sacked" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center;">
         <div class="dashboard-card" style="width: 90%; max-width: 400px; padding: 30px; border: 1px solid #f44336; border-top: 5px solid #f44336;">
             <div style="text-align: center; margin-bottom: 25px;">
@@ -853,8 +870,33 @@
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
-                <button class="btn btn-primary" onclick="handleSacking()" style="width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; background: #f44336; border-color: #f44336;">
-                    Assumir Novo Clube <i class="fas fa-sign-in-alt"></i>
+                <button class="btn btn-primary" onclick="showJobMarket()" style="width: 100%; padding: 15px; font-size: 1.1rem; font-weight: bold; background: #f44336; border-color: #f44336;">
+                    Procurar Novo Emprego <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Proposta de Emprego Espontânea (Sucesso) -->
+    <div id="modal-job-offer" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="dashboard-card" style="width: 90%; max-width: 400px; padding: 30px; border: 1px solid var(--primary-color); border-top: 5px solid var(--primary-color);">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <i class="fas fa-envelope-open-text" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 15px;"></i>
+                <h3 style="margin: 0; color: white; font-size: 1.4rem;">Proposta Irrecusável!</h3>
+                <p style="color: var(--primary-color); font-weight: bold; margin-top: 10px; font-size: 1rem;">Tens um novo pretendente!</p>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 10px; line-height: 1.5;">O teu excelente trabalho chamou a atenção de um grande clube. Estão dispostos a pagar a tua cláusula de rescisão imediata.</p>
+            </div>
+            
+            <div id="job-offer-details" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                <!-- Preenchido via JS -->
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="rejectSpontaneousJobOffer()" style="flex: 1; padding: 12px; font-weight: bold;">
+                    <i class="fas fa-times"></i> Rejeitar
+                </button>
+                <button class="btn btn-primary" onclick="acceptSpontaneousJobOffer()" style="flex: 1; padding: 12px; font-weight: bold;">
+                    <i class="fas fa-check"></i> Aceitar
                 </button>
             </div>
         </div>
@@ -970,17 +1012,6 @@
     </div>
 
     <!-- MODAL PROPOSTA PARA TÉCNICO -->
-    <div id="modal-manager-offer" class="modal" style="z-index: 10000;">
-        <div class="modal-content" style="max-width: 450px; text-align: center; background: #fff; color: #333; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            <div style="font-size: 2.5rem; margin-bottom: 10px;">👔</div>
-            <h2 style="margin: 0 0 15px 0; font-size: 1.5rem; font-weight: bold; color: #f39c12;">Convite de Trabalho!</h2>
-            <p id="manager-offer-text" style="font-size: 1.05rem; line-height: 1.5; margin-bottom: 25px; color: #555;"></p>
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="btn-accept-manager-offer" style="flex: 1; padding: 12px; background: #f39c12; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Assinar Contrato</button>
-                <button id="btn-reject-manager-offer" style="flex: 1; padding: 12px; background: #95a5a6; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Ficar no Clube</button>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL NEGOCIAÇÃO MASTER LEAGUE -->
     <div id="modal-negotiation-master" class="modal" style="display: none; z-index: 10000; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); position: fixed; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
