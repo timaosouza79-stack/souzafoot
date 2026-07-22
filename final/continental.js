@@ -21,7 +21,7 @@ function initSulAmericana(silent = false) {
                 estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_EST_SUL);
             } else {
                 // Fallback: pega os mais fortes da south_america
-                estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id && !libertadoresParticipants.includes(t.id))
+                estrangeiros = allTeams.filter(t => ['south_america', 'argentina'].includes(t.league) && t.id !== myTeam.id && !libertadoresParticipants.includes(t.id))
                                        .sort(() => 0.5 - Math.random()).slice(0, VAGAS_EST_SUL);
             }
 
@@ -32,7 +32,7 @@ function initSulAmericana(silent = false) {
                               'gremio', 'vasco', 'santos', 'sport', 'ceara', 'fluminense', 'bragantino', 'cuiaba'];
             let brSulQualifiers = allTeams.filter(t => brSulIds.includes(t.id) && !estIds.has(t.id) && !libertadoresParticipants.includes(t.id));
 
-            if ((myTeam.league === 'brazil_a' || myTeam.league === 'south_america') && !brSulQualifiers.find(t => t.id === myTeam.id) && !estIds.has(myTeam.id)) {
+            if ((myTeam.league === 'brazil_a' || ['south_america', 'argentina'].includes(myTeam.league)) && !brSulQualifiers.find(t => t.id === myTeam.id) && !estIds.has(myTeam.id)) {
                 brSulQualifiers.unshift(myTeam);
             }
 
@@ -47,14 +47,14 @@ function initSulAmericana(silent = false) {
 
         // FIX: Se os participants vieram apenas de times brasileiros, injeta estrangeiros
         if (!isEurope) {
-            const temEstrangeiro = pTeams.some(t => t.league === 'south_america');
+            const temEstrangeiro = pTeams.some(t => ['south_america', 'argentina'].includes(t.league));
             if (!temEstrangeiro) {
                 const VAGAS_EST_SUL = 8;
                 let estrangeiros = [];
                 if (typeof getEquipasEstrangeirasSulAmericanas === 'function') {
                     estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_EST_SUL);
                 } else {
-                    estrangeiros = allTeams.filter(t => t.league === 'south_america' && t.id !== myTeam.id && !libertadoresParticipants.includes(t.id))
+                    estrangeiros = allTeams.filter(t => ['south_america', 'argentina'].includes(t.league) && t.id !== myTeam.id && !libertadoresParticipants.includes(t.id))
                                            .sort(() => 0.5 - Math.random()).slice(0, VAGAS_EST_SUL);
                 }
                 const estIds = estrangeiros.map(t => t.id);

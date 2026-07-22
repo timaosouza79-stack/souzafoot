@@ -239,9 +239,6 @@ const teamsData = [
     {"id": "tondela", "name": "Tondela", "strength": 72, "shield": "https://r2.thesportsdb.com/images/media/team/badge/o7nqff1628856081.png", "league": "portugal", "balance": 35000000, "stadium": "João Cardoso", "stadiumImg": "https://loremflickr.com/600/200/stadium"},
     {"id": "alverca", "name": "Alverca", "strength": 71, "shield": "https://r2.thesportsdb.com/images/media/team/badge/6ljryf1691990098.png", "league": "portugal", "balance": 30000000, "stadium": "FC Alverca", "stadiumImg": "https://loremflickr.com/600/200/stadium"},
     {"id": "avs", "name": "AVS", "strength": 72, "shield": "https://r2.thesportsdb.com/images/media/team/badge/xp8oqb1688676544.png", "league": "portugal", "balance": 38000000, "stadium": "CD das Aves", "stadiumImg": "https://loremflickr.com/600/200/stadium"},
-    {"id": "riverplate", "name": "River Plate", "strength": 85, "shield": "img/riverplate_v3.png", "league": "south_america", "balance": 60000000, "stadium": "Monumental de Núñez", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Estadio_Monumental_River_Plate_2023.jpg/600px-Estadio_Monumental_River_Plate_2023.jpg"},
-    {"id": "bocajuniors", "name": "Boca Juniors", "strength": 83, "shield": "img/bocajuniors_v3.png", "league": "south_america", "balance": 56000000, "stadium": "La Bombonera", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/La_Bombonera_interior.jpg/600px-La_Bombonera_interior.jpg"},
-    {"id": "racing", "name": "Racing Club", "strength": 80, "shield": "img/racing_v3.png", "league": "south_america", "balance": 30000000, "stadium": "El Cilindro", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Estadio_Presidente_Per%C3%B3n_-_Racing_Club.jpg/600px-Estadio_Presidente_Per%C3%B3n_-_Racing_Club.jpg"},
     {"id": "penarol", "name": "Peñarol", "strength": 78, "shield": "img/penarol_v3.png", "league": "south_america", "balance": 20000000, "stadium": "Campeón del Siglo", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Estadio_Campe%C3%B3n_del_Siglo_interior.jpg/600px-Estadio_Campe%C3%B3n_del_Siglo_interior.jpg"},
     {"id": "nacional", "name": "Nacional", "strength": 77, "shield": "img/nacional_v3.png", "league": "south_america", "balance": 18000000, "stadium": "Gran Parque Central", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Gran_Parque_Central_2021.jpg/600px-Gran_Parque_Central_2021.jpg"},
     {"id": "colocolo", "name": "Colo-Colo", "strength": 76, "shield": "img/colocolo_v3.png", "league": "south_america", "balance": 16000000, "stadium": "Monumental David Arellano", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Estadio_Monumental_David_Arellano.jpg/600px-Estadio_Monumental_David_Arellano.jpg"},
@@ -250,7 +247,6 @@ const teamsData = [
     {"id": "olimpia", "name": "Olimpia", "strength": 75, "shield": "img/olimpia_v3.png", "league": "south_america", "balance": 12000000, "stadium": "Defensores del Chaco", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Estadio_Defensores_del_Chaco.jpg/600px-Estadio_Defensores_del_Chaco.jpg"},
     {"id": "atleticonacional", "name": "Atlético Nacional", "strength": 76, "shield": "img/atleticonacional_v3.png", "league": "south_america", "balance": 15000000, "stadium": "Atanasio Girardot", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Estadio_Atanasio_Girardot_panoramica.jpg/600px-Estadio_Atanasio_Girardot_panoramica.jpg"},
     {"id": "talleres", "name": "Talleres", "strength": 79, "shield": "img/talleres_v3.png", "league": "south_america", "balance": 24000000, "stadium": "Mario Alberto Kempes", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Estadio_Mario_Alberto_Kempes_interior.jpg/600px-Estadio_Mario_Alberto_Kempes_interior.jpg"},
-    {"id": "estudiantes", "name": "Estudiantes", "strength": 78, "shield": "img/estudiantes_v3.png", "league": "south_america", "balance": 20000000, "stadium": "Jorge Luis Hirschi", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Estadio_Jorge_Luis_Hirschi_interior.jpg/600px-Estadio_Jorge_Luis_Hirschi_interior.jpg"},
     {"id": "cerroporteno", "name": "Cerro Porteño", "strength": 75, "shield": "img/cerroporteno_v3.png", "league": "south_america", "balance": 16000000, "stadium": "General Pablo Rojas", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Estadio_General_Pablo_Rojas_Olla_Azulgrana.jpg/600px-Estadio_General_Pablo_Rojas_Olla_Azulgrana.jpg"},
     {"id": "libertad", "name": "Libertad", "strength": 76, "shield": "img/libertad_v3.png", "league": "south_america", "balance": 17000000, "stadium": "Tigo La Huerta", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Estadio_Dr._Nicol%C3%A1s_Leoz.jpg/600px-Estadio_Dr._Nicol%C3%A1s_Leoz.jpg"},
     {"id": "millonarios", "name": "Millonarios", "strength": 75, "shield": "img/millonarios_v3.png", "league": "south_america", "balance": 14000000, "stadium": "El Campín", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Estadio_El_Camp%C3%ADn_interior.jpg/600px-Estadio_El_Camp%C3%ADn_interior.jpg"},
@@ -261,11 +257,7 @@ const teamsData = [
     {"id": "sportingcristal", "name": "Sporting Cristal", "strength": 73, "shield": "img/sportingcristal_v3.png", "league": "south_america", "balance": 10000000, "stadium": "Alberto Gallardo", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Estadio_Alberto_Gallardo.jpg/600px-Estadio_Alberto_Gallardo.jpg"},
     {"id": "bolivar", "name": "Bolívar", "strength": 72, "shield": "img/bolivar_v3.png", "league": "south_america", "balance": 8000000, "stadium": "Hernando Siles", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Estadio_Hernando_Siles_La_Paz.jpg/600px-Estadio_Hernando_Siles_La_Paz.jpg"},
     {"id": "thestrongest", "name": "The Strongest", "strength": 71, "shield": "img/thestrongest_v3.png", "league": "south_america", "balance": 7000000, "stadium": "Hernando Siles", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Estadio_Hernando_Siles_La_Paz.jpg/600px-Estadio_Hernando_Siles_La_Paz.jpg"},
-    {"id": "rosariocentral", "name": "Rosario Central", "strength": 77, "shield": "img/rosariocentral_v3.png", "league": "south_america", "balance": 18000000, "stadium": "Gigante de Arroyito", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Estadio_Gigante_de_Arroyito.jpg/600px-Estadio_Gigante_de_Arroyito.jpg"},
-    {"id": "sanlorenzo", "name": "San Lorenzo", "strength": 78, "shield": "img/sanlorenzo_v3.png", "league": "south_america", "balance": 22000000, "stadium": "Nuevo Gasómetro", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Estadio_Pedro_Bidegain_interior.jpg/600px-Estadio_Pedro_Bidegain_interior.jpg"},
     {"id": "ucatolica", "name": "Univ. Católica", "strength": 75, "shield": "img/ucatolica_v3.png", "league": "south_america", "balance": 15000000, "stadium": "San Carlos de Apoquindo", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Estadio_San_Carlos_de_Apoquindo.jpg/600px-Estadio_San_Carlos_de_Apoquindo.jpg"},
-    {"id": "independiente", "name": "Independiente", "strength": 79, "shield": "https://upload.wikimedia.org/wikipedia/commons/d/db/Escudo_del_Club_Atl%C3%A9tico_Independiente.svg", "league": "south_america", "balance": 25000000, "stadium": "Libertadores de América", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Estadio_Libertadores_de_Am%C3%A9rica_-_Ricardo_Enrique_Bochini.jpg/600px-Estadio_Libertadores_de_Am%C3%A9rica_-_Ricardo_Enrique_Bochini.jpg"},
-    {"id": "velez", "name": "Vélez Sarsfield", "strength": 78, "shield": "https://upload.wikimedia.org/wikipedia/commons/9/91/Club_Atl%C3%A9tico_V%C3%A9lez_Sarsfield_logo.svg", "league": "south_america", "balance": 20000000, "stadium": "José Amalfitani", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Estadio_Jos%C3%A9_Amalfitani.jpg/600px-Estadio_Jos%C3%A9_Amalfitani.jpg"},
     {"id": "emelec", "name": "Emelec", "strength": 76, "shield": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Escudo_de_Emelec.svg", "league": "south_america", "balance": 15000000, "stadium": "George Capwell", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Estadio_George_Capwell_-_Emelec.jpg/600px-Estadio_George_Capwell_-_Emelec.jpg"},
     {"id": "americadecali", "name": "América de Cali", "strength": 76, "shield": "https://upload.wikimedia.org/wikipedia/commons/4/41/Escudo_de_Am%C3%A9rica_de_Cali.svg", "league": "south_america", "balance": 14000000, "stadium": "Pascual Guerrero", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Estadio_Pascual_Guerrero.jpg/600px-Estadio_Pascual_Guerrero.jpg"},
     {"id": "universitario", "name": "Universitario", "strength": 75, "shield": "https://upload.wikimedia.org/wikipedia/commons/5/5a/Universitario_de_Deportes_logo.svg", "league": "south_america", "balance": 12000000, "stadium": "Monumental U", "stadiumImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Estadio_Monumental_U.jpg/600px-Estadio_Monumental_U.jpg"},
@@ -292,6 +284,27 @@ const teamsData = [
     {id: "seattlesoundersfc", name: "Seattle Sounders FC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/7em1q51580480820.png", league: "mls", balance: 60000000, stadium: "Lumen Field", stadiumImg: "img/estadio.jpg"},
     {id: "newyorkredbulls", name: "New York Red Bulls", strength: 73, shield: "https://r2.thesportsdb.com/images/media/team/badge/suytvy1473536462.png", league: "mls", balance: 60000000, stadium: "Red Bull Arena", stadiumImg: "img/estadio.jpg"},
     {id: "orlandocitysc", name: "Orlando City SC", strength: 74, shield: "https://r2.thesportsdb.com/images/media/team/badge/qyppxw1423832326.png", league: "mls", balance: 60000000, stadium: "Inter&Co Stadium", stadiumImg: "img/estadio.jpg"}
+,
+    {"id":"bocajuniors","name":"Boca Juniors","strength":84,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Boca_Juniors_logo18.svg/200px-Boca_Juniors_logo18.svg.png","league":"argentina","balance":120000000,"stadium":"La Bombonera","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Estadio_Boca_Juniors.jpg/600px-Estadio_Boca_Juniors.jpg"},
+    {"id":"riverplate","name":"River Plate","strength":85,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/River_Plate_logo.svg/200px-River_Plate_logo.svg.png","league":"argentina","balance":150000000,"stadium":"Más Monumental","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/River_Plate_stadium.jpg/600px-River_Plate_stadium.jpg"},
+    {"id":"racingclub","name":"Racing Club","strength":82,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Racing_Club_logo.svg/200px-Racing_Club_logo.svg.png","league":"argentina","balance":90000000,"stadium":"El Cilindro","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/El_Cilindro_de_Avellaneda.jpg/600px-El_Cilindro_de_Avellaneda.jpg"},
+    {"id":"independiente","name":"Independiente","strength":80,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Club_Atl%C3%A9tico_Independiente_logo.svg/200px-Club_Atl%C3%A9tico_Independiente_logo.svg.png","league":"argentina","balance":85000000,"stadium":"Libertadores de América","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Estadio_Libertadores_de_America_2016.jpg/600px-Estadio_Libertadores_de_America_2016.jpg"},
+    {"id":"sanlorenzo","name":"San Lorenzo","strength":79,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/San_Lorenzo_de_Almagro_logo.svg/200px-San_Lorenzo_de_Almagro_logo.svg.png","league":"argentina","balance":80000000,"stadium":"Nuevo Gasómetro","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Nuevo_Gasometro_San_Lorenzo.jpg/600px-Nuevo_Gasometro_San_Lorenzo.jpg"},
+    {"id":"estudianteslp","name":"Estudiantes LP","strength":81,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Estudiantes_de_La_Plata_logo.svg/200px-Estudiantes_de_La_Plata_logo.svg.png","league":"argentina","balance":75000000,"stadium":"UNO Jorge Luis Hirschi","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Estadio_Jorge_Luis_Hirschi_%28Estudiantes_de_La_Plata%29_vista_a%C3%A9rea.jpg/600px-Estadio_Jorge_Luis_Hirschi_%28Estudiantes_de_La_Plata%29_vista_a%C3%A9rea.jpg"},
+    {"id":"talleres","name":"Talleres","strength":81,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Talleres_de_C%C3%B3rdoba_logo.svg/200px-Talleres_de_C%C3%B3rdoba_logo.svg.png","league":"argentina","balance":70000000,"stadium":"Mario Alberto Kempes","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Estadio_Kempes.jpg/600px-Estadio_Kempes.jpg"},
+    {"id":"velezsarsfield","name":"Vélez Sarsfield","strength":78,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/V%C3%A9lez_Sarsfield_logo.svg/200px-V%C3%A9lez_Sarsfield_logo.svg.png","league":"argentina","balance":65000000,"stadium":"José Amalfitani","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Estadio_Jose_Amalfitani.jpg/600px-Estadio_Jose_Amalfitani.jpg"},
+    {"id":"rosariocentral","name":"Rosario Central","strength":78,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Club_Atletico_Rosario_Central_logo.svg/200px-Club_Atletico_Rosario_Central_logo.svg.png","league":"argentina","balance":60000000,"stadium":"Gigante de Arroyito","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Gigante_de_Arroyito_aereao.jpg/600px-Gigante_de_Arroyito_aereao.jpg"},
+    {"id":"newellsoldboys","name":"Newell's Old Boys","strength":77,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Newell%27s_Old_Boys_logo.svg/200px-Newell%27s_Old_Boys_logo.svg.png","league":"argentina","balance":58000000,"stadium":"Marcelo Bielsa","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Estadio_Marcelo_Bielsa_-_Rosario.jpg/600px-Estadio_Marcelo_Bielsa_-_Rosario.jpg"},
+    {"id":"argentinosjuniors","name":"Argentinos Juniors","strength":77,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Argentinos_Juniors_logo.svg/200px-Argentinos_Juniors_logo.svg.png","league":"argentina","balance":55000000,"stadium":"Diego Armando Maradona","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Estadio_Diego_Armando_Maradona_AJ.jpg/600px-Estadio_Diego_Armando_Maradona_AJ.jpg"},
+    {"id":"lanus","name":"Lanús","strength":76,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Club_Atl%C3%A9tico_Lan%C3%BAs.png/200px-Club_Atl%C3%A9tico_Lan%C3%BAs.png","league":"argentina","balance":50000000,"stadium":"Ciudad de Lanús","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Estadio_Lanus_1.jpg/600px-Estadio_Lanus_1.jpg"},
+    {"id":"huracan","name":"Huracán","strength":75,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Hurac%C3%A1n_logo.svg/200px-Hurac%C3%A1n_logo.svg.png","league":"argentina","balance":48000000,"stadium":"Tomás Adolfo Ducó","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Estadio_Tom%C3%A1s_Adolfo_Duc%C3%B3_-_2021.jpg/600px-Estadio_Tom%C3%A1s_Adolfo_Duc%C3%B3_-_2021.jpg"},
+    {"id":"defensayjusticia","name":"Defensa y Justicia","strength":76,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Defensa_y_Justicia_logo.svg/200px-Defensa_y_Justicia_logo.svg.png","league":"argentina","balance":45000000,"stadium":"Norberto Tomaghello","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Estadio_Norberto_Tomaghello.jpg/600px-Estadio_Norberto_Tomaghello.jpg"},
+    {"id":"belgrano","name":"Belgrano","strength":75,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Club_Atl%C3%A9tico_Belgrano_logo.svg/200px-Club_Atl%C3%A9tico_Belgrano_logo.svg.png","league":"argentina","balance":45000000,"stadium":"Julio César Villagra","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Estadio_Julio_Cesar_Villagra.jpg/600px-Estadio_Julio_Cesar_Villagra.jpg"},
+    {"id":"godoycruz","name":"Godoy Cruz","strength":74,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Godoy_Cruz_logo.svg/200px-Godoy_Cruz_logo.svg.png","league":"argentina","balance":40000000,"stadium":"Feliciano Gambarte","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Estadio_Feliciano_Gambarte.jpg/600px-Estadio_Feliciano_Gambarte.jpg"},
+    {"id":"banfield","name":"Banfield","strength":73,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Banfield_logo.svg/200px-Banfield_logo.svg.png","league":"argentina","balance":38000000,"stadium":"Florencio Sola","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Estadio_Florencio_Sola.jpg/600px-Estadio_Florencio_Sola.jpg"},
+    {"id":"tigre","name":"Tigre","strength":72,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Club_Atl%C3%A9tico_Tigre_logo.svg/200px-Club_Atl%C3%A9tico_Tigre_logo.svg.png","league":"argentina","balance":35000000,"stadium":"José Dellagiovanna","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Estadio_Jose_Dellagiovanna.jpg/600px-Estadio_Jose_Dellagiovanna.jpg"},
+    {"id":"union","name":"Unión","strength":72,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Club_Atl%C3%A9tico_Uni%C3%B3n_logo.svg/200px-Club_Atl%C3%A9tico_Uni%C3%B3n_logo.svg.png","league":"argentina","balance":35000000,"stadium":"15 de Abril","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Estadio_15_de_Abril.jpg/600px-Estadio_15_de_Abril.jpg"},
+    {"id":"atleticotucuman","name":"Atlético Tucumán","strength":73,"shield":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Atletico_Tucuman_logo.svg/200px-Atletico_Tucuman_logo.svg.png","league":"argentina","balance":35000000,"stadium":"Monumental José Fierro","stadiumImg":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Estadio_Monumental_Jose_Fierro.jpg/600px-Estadio_Monumental_Jose_Fierro.jpg"}
 ];
 
 if (typeof restWorldTeams !== 'undefined') {
@@ -1290,7 +1303,7 @@ function initLibertadores(silent = false) {
             let brQualifiers = allTeams.filter(t => brIds.includes(t.id) && !estrangeirosIds.includes(t.id));
 
             // Garante que o time do jogador participe se ele estiver no Brasil ou América do Sul
-            if ((myTeam.league.startsWith('brazil') || myTeam.league === 'south_america') && !brQualifiers.find(t => t.id === myTeam.id) && !estrangeirosIds.includes(myTeam.id)) {
+            if ((myTeam.league.startsWith('brazil') || ['south_america', 'argentina'].includes(myTeam.league)) && !brQualifiers.find(t => t.id === myTeam.id) && !estrangeirosIds.includes(myTeam.id)) {
                 brQualifiers.unshift(myTeam);
             }
 
@@ -1307,7 +1320,7 @@ function initLibertadores(silent = false) {
         // FIX: Se os participants vieram APENAS de times brasileiros, injeta estrangeiros
         if (!isEurope) {
             // Se houver menos de 24 times estrangeiros, ajusta a proporção
-            const numEstrangeiros = pTeams.filter(t => t.league === 'south_america').length;
+            const numEstrangeiros = pTeams.filter(t => ['south_america', 'argentina'].includes(t.league)).length;
             if (numEstrangeiros < 20) {
                 const VAGAS_ESTRANGEIROS_LIB = 24;
                 const estrangeiros = getEquipasEstrangeirasSulAmericanas(VAGAS_ESTRANGEIROS_LIB);
@@ -1331,7 +1344,7 @@ function initLibertadores(silent = false) {
     // GARANTIA: Se houver menos de 32 times, preenche com os mais fortes disponíveis no jogo
     if (pTeams.length < 32) {
         const usedIds = pTeams.map(t => t.id);
-        const isTeamSouthAmerica = (league) => league === 'south_america' || league.startsWith('brazil_');
+        const isTeamSouthAmerica = (league) => ['south_america', 'argentina'].includes(league) || league.startsWith('brazil_');
         const fillTeams = allTeams.filter(t => {
             if (usedIds.includes(t.id)) return false;
             return isEurope ? !isTeamSouthAmerica(t.league) : isTeamSouthAmerica(t.league);
@@ -1607,6 +1620,7 @@ function getCompetitionNames(leagueId) {
         'france': { league: 'LIGUE 1', cup: 'COUPE DE FRANCE', continental: 'CHAMPIONS LEAGUE' },
         'portugal': { league: 'PRIMEIRA LIGA', cup: 'TAÇA DE PORTUGAL', continental: 'CHAMPIONS LEAGUE' },
         'arabia': { league: 'SAUDI PRO LEAGUE', cup: 'KINGS CUP', continental: 'CHAMPIONS LEAGUE' },
+        'argentina': { league: 'LIGA PROFESIONAL', cup: 'COPA ARGENTINA', continental: 'LIBERTADORES' },
         'south_america': { league: 'LIGA SUL-AMERICANA', cup: 'COPA SUL-AMERICANA', continental: 'LIBERTADORES' }
     };
     return names[leagueId] || { league: 'LIGA NACIONAL', cup: 'COPA NACIONAL', continental: 'TORNEIO CONTINENTAL' };
@@ -1668,7 +1682,7 @@ function updateDashboardUI() {
     if (totalDates === 0) return;
     
     const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
-    const isSA = myTeam.league.startsWith('brazil') || myTeam.league === 'south_america';
+    const isSA = myTeam.league.startsWith('brazil') || ['south_america', 'argentina'].includes(myTeam.league);
 
     const isWindowOpen = (currentRound === 1 || currentRound > totalDates || (currentRound >= 15 && currentRound <= 25)); // Janela de transferências
     const marketBtn = document.getElementById('btn-market');
@@ -3392,7 +3406,7 @@ function endOfSeason() {
             const neededSul = 32 - nextSulParticipants.length;
             continentalPool.slice(neededLib, neededLib + neededSul).forEach(t => nextSulParticipants.push(t.id));
         } else {
-            const poolEstrangeiros = allTeams.filter(t => t.league === 'south_america').sort(() => 0.5 - Math.random());
+            const poolEstrangeiros = allTeams.filter(t => ['south_america', 'argentina'].includes(t.league) && t.league !== myTeam.league).sort(() => 0.5 - Math.random());
             const poolBrasil = allTeams.filter(t => t.league === 'brazil_a' && t.league !== myTeam.league).sort((a,b) => b.strength - a.strength);
 
             const neededLib = 32 - nextLibParticipants.length;
@@ -3424,7 +3438,7 @@ function endOfSeason() {
 
             if (nextSulParticipants.length < 32) {
                 const usedIds = new Set([...nextLibParticipants, ...nextSulParticipants]);
-                allTeams.filter(t => t.league === 'south_america' && !usedIds.has(t.id)).slice(0, 32 - nextSulParticipants.length).forEach(t => nextSulParticipants.push(t.id));
+                allTeams.filter(t => ['south_america', 'argentina'].includes(t.league) && !usedIds.has(t.id)).slice(0, 32 - nextSulParticipants.length).forEach(t => nextSulParticipants.push(t.id));
             }
         }
 
@@ -5809,7 +5823,7 @@ function renderStats(competition) {
         } else if (Array.isArray(libertadoresParticipants) && libertadoresParticipants.length > 0) {
             libertadoresParticipants.forEach(id => participantIds.add(id));
         } else {
-            allTeams.filter(t => t.league === 'south_america' || (t.league && t.league.startsWith('brazil'))).forEach(t => participantIds.add(t.id));
+            allTeams.filter(t => ['south_america', 'argentina'].includes(t.league) || (t.league && t.league.startsWith('brazil'))).forEach(t => participantIds.add(t.id));
         }
     } else {
         // Qualquer liga normal: filtra por league key

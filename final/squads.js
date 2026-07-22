@@ -20655,4 +20655,242 @@ const realSquads = {
         }
     ]
 }
+
+    "racingclub": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 82 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 82 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 82 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 82 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 82 },
+            { "name": "Volante", "pos": "MEI", "str": 82 },
+            { "name": "Meia 1", "pos": "MEI", "str": 82 },
+            { "name": "Meia 2", "pos": "MEI", "str": 82 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 82 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 82 },
+            { "name": "Centroavante", "pos": "ATA", "str": 82 }
+        ]
+    },
+
+    "estudianteslp": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 81 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 81 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 81 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 81 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 81 },
+            { "name": "Volante", "pos": "MEI", "str": 81 },
+            { "name": "Meia 1", "pos": "MEI", "str": 81 },
+            { "name": "Meia 2", "pos": "MEI", "str": 81 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 81 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 81 },
+            { "name": "Centroavante", "pos": "ATA", "str": 81 }
+        ]
+    },
+
+    "velezsarsfield": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 78 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 78 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 78 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 78 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 78 },
+            { "name": "Volante", "pos": "MEI", "str": 78 },
+            { "name": "Meia 1", "pos": "MEI", "str": 78 },
+            { "name": "Meia 2", "pos": "MEI", "str": 78 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 78 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 78 },
+            { "name": "Centroavante", "pos": "ATA", "str": 78 }
+        ]
+    },
+
+    "newellsoldboys": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 77 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 77 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 77 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 77 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 77 },
+            { "name": "Volante", "pos": "MEI", "str": 77 },
+            { "name": "Meia 1", "pos": "MEI", "str": 77 },
+            { "name": "Meia 2", "pos": "MEI", "str": 77 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 77 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 77 },
+            { "name": "Centroavante", "pos": "ATA", "str": 77 }
+        ]
+    },
+
+    "argentinosjuniors": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 77 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 77 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 77 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 77 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 77 },
+            { "name": "Volante", "pos": "MEI", "str": 77 },
+            { "name": "Meia 1", "pos": "MEI", "str": 77 },
+            { "name": "Meia 2", "pos": "MEI", "str": 77 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 77 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 77 },
+            { "name": "Centroavante", "pos": "ATA", "str": 77 }
+        ]
+    },
+
+    "lanus": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 76 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 76 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 76 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 76 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 76 },
+            { "name": "Volante", "pos": "MEI", "str": 76 },
+            { "name": "Meia 1", "pos": "MEI", "str": 76 },
+            { "name": "Meia 2", "pos": "MEI", "str": 76 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 76 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 76 },
+            { "name": "Centroavante", "pos": "ATA", "str": 76 }
+        ]
+    },
+
+    "huracan": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 75 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 75 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 75 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 75 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 75 },
+            { "name": "Volante", "pos": "MEI", "str": 75 },
+            { "name": "Meia 1", "pos": "MEI", "str": 75 },
+            { "name": "Meia 2", "pos": "MEI", "str": 75 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 75 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 75 },
+            { "name": "Centroavante", "pos": "ATA", "str": 75 }
+        ]
+    },
+
+    "defensayjusticia": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 76 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 76 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 76 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 76 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 76 },
+            { "name": "Volante", "pos": "MEI", "str": 76 },
+            { "name": "Meia 1", "pos": "MEI", "str": 76 },
+            { "name": "Meia 2", "pos": "MEI", "str": 76 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 76 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 76 },
+            { "name": "Centroavante", "pos": "ATA", "str": 76 }
+        ]
+    },
+
+    "belgrano": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 75 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 75 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 75 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 75 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 75 },
+            { "name": "Volante", "pos": "MEI", "str": 75 },
+            { "name": "Meia 1", "pos": "MEI", "str": 75 },
+            { "name": "Meia 2", "pos": "MEI", "str": 75 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 75 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 75 },
+            { "name": "Centroavante", "pos": "ATA", "str": 75 }
+        ]
+    },
+
+    "godoycruz": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 74 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 74 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 74 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 74 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 74 },
+            { "name": "Volante", "pos": "MEI", "str": 74 },
+            { "name": "Meia 1", "pos": "MEI", "str": 74 },
+            { "name": "Meia 2", "pos": "MEI", "str": 74 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 74 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 74 },
+            { "name": "Centroavante", "pos": "ATA", "str": 74 }
+        ]
+    },
+
+    "banfield": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 73 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 73 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 73 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 73 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 73 },
+            { "name": "Volante", "pos": "MEI", "str": 73 },
+            { "name": "Meia 1", "pos": "MEI", "str": 73 },
+            { "name": "Meia 2", "pos": "MEI", "str": 73 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 73 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 73 },
+            { "name": "Centroavante", "pos": "ATA", "str": 73 }
+        ]
+    },
+
+    "tigre": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 72 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 72 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 72 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 72 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 72 },
+            { "name": "Volante", "pos": "MEI", "str": 72 },
+            { "name": "Meia 1", "pos": "MEI", "str": 72 },
+            { "name": "Meia 2", "pos": "MEI", "str": 72 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 72 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 72 },
+            { "name": "Centroavante", "pos": "ATA", "str": 72 }
+        ]
+    },
+
+    "union": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 72 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 72 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 72 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 72 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 72 },
+            { "name": "Volante", "pos": "MEI", "str": 72 },
+            { "name": "Meia 1", "pos": "MEI", "str": 72 },
+            { "name": "Meia 2", "pos": "MEI", "str": 72 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 72 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 72 },
+            { "name": "Centroavante", "pos": "ATA", "str": 72 }
+        ]
+    },
+
+    "atleticotucuman": {
+        "formation": "4-3-3",
+        "players": [
+            { "name": "Goleiro", "pos": "GOL", "str": 73 },
+            { "name": "Zagueiro 1", "pos": "ZAG", "str": 73 },
+            { "name": "Zagueiro 2", "pos": "ZAG", "str": 73 },
+            { "name": "Lateral Dir", "pos": "LAT", "str": 73 },
+            { "name": "Lateral Esq", "pos": "LAT", "str": 73 },
+            { "name": "Volante", "pos": "MEI", "str": 73 },
+            { "name": "Meia 1", "pos": "MEI", "str": 73 },
+            { "name": "Meia 2", "pos": "MEI", "str": 73 },
+            { "name": "Ponta Dir", "pos": "ATA", "str": 73 },
+            { "name": "Ponta Esq", "pos": "ATA", "str": 73 },
+            { "name": "Centroavante", "pos": "ATA", "str": 73 }
+        ]
+    },
 };
