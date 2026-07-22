@@ -5127,7 +5127,7 @@ function renderSquad() {
 
             node.innerHTML = `
                 <div class="pitch-player-badge${isOutOfPosition ? ' penalty-badge' : ''}">
-                    <span class="pitch-pos-box sector-${slot.sector}" title="Salário: R$ ${player.salario.toLocaleString('pt-BR')}">${slot.posText}</span>
+                    <span class="pitch-pos-box sector-${slot.sector}" title="Salário: R$ ${((player.salario || player.strength * 1000)).toLocaleString('pt-BR')}">${slot.posText}</span>
                     <span class="pitch-str-box" style="color: ${strColor}">${strDisplay}</span>
                 </div>
                 <div class="pitch-player-name" title="${player.name}${isOutOfPosition ? ' (Fora de Posição: -15%)' : ''}">${player.name}${injuryIcon}${suspIcon}</div>
@@ -6676,7 +6676,7 @@ function renderMarket() {
                 </div>
                 <div class="player-stats" style="flex: 1; justify-content: flex-end; flex-direction: column; align-items: flex-end; gap: 4px;">
                     <span class="stat-str">FOR: ${player.strength}</span>
-                    <span style="color: #4CAF50; font-weight: bold; font-size: 0.95em;" title="Salário: R$ ${player.salario.toLocaleString('pt-BR')}">R$ ${(price/1000000).toFixed(1)}M</span>
+                    <span style="color: #4CAF50; font-weight: bold; font-size: 0.95em;" title="Salário: R$ ${((player.salario || player.strength * 1000)).toLocaleString('pt-BR')}">R$ ${(price/1000000).toFixed(1)}M</span>
                 </div>
             </div>
             <div class="market-item-actions">
