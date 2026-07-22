@@ -1,16 +1,16 @@
-const CACHE_NAME = 'souzafoot-v18';
+const CACHE_NAME = 'souzafoot-v19';
 const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './negotiation.js',
-  './squads.js',
-  './mundial.js',
-  './continental_tournaments.js',
-  './mundial_integration.js',
-  './manifest.json',
-  './icon.svg'
+  '/',
+  '/index.html',
+  '/style.css',
+  '/script.js',
+  '/negotiation.js',
+  '/squads.js',
+  '/mundial.js',
+  '/continental_tournaments.js',
+  '/mundial_integration.js',
+  '/manifest.json',
+  '/icon.svg'
 ];
 
 // Instalação do Service Worker e Caching dos arquivos estáticos
@@ -49,8 +49,8 @@ self.addEventListener('fetch', event => {
   // Apenas lida com requisições GET
   if (req.method !== 'GET') return;
 
-  // Estratégia Cache First para arquivos estáticos locais
-  if (STATIC_ASSETS.some(asset => req.url.includes(asset.replace('./', ''))) || url.origin === location.origin) {
+  // Estratégia "Cache-first" para todos os recursos da mesma origem (locais)
+  if (url.origin === location.origin) {
     event.respondWith(
       caches.match(req).then(cachedResponse => {
         if (cachedResponse) {
