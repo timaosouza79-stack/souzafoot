@@ -1484,7 +1484,7 @@ function renderTeams(league = 'brazil_a') {
     grid.innerHTML = '';
 
     const filteredTeams = allTeams.filter(t => 
-        league === 'rest_world' ? (t.league && t.league.startsWith('rest_world')) : t.league === league
+        league === 'rest_world' ? (t.league === 'arabia' || t.league === 'mls') : t.league === league
     );
 
     filteredTeams.forEach(team => {
@@ -6533,7 +6533,7 @@ function populateMarketTeamFilter(leagueFilter) {
     sel.innerHTML = '<option value="all">⚽ Todos os Times</option>';
     let teams = allTeams.filter(t => String(t.id) !== String(myTeam.id));
     if (leagueFilter && leagueFilter !== 'all') {
-        teams = teams.filter(t => t.league === leagueFilter || (leagueFilter === 'rest_world' && t.league && t.league.startsWith('rest_world')));
+        teams = teams.filter(t => t.league === leagueFilter || (leagueFilter === 'rest_world' && (t.league === 'arabia' || t.league === 'mls')));
     }
     // Ordena por nome
     teams.sort((a, b) => a.name.localeCompare(b.name));
@@ -6630,7 +6630,7 @@ function renderMarket() {
                 // Filtro de Busca por Nome
                 const matchesSearch = searchVal === "" || p.name.toLowerCase().includes(searchVal);
                 // Filtro de Liga
-                const matchesLeague = filterLeague === "all" || team.league === filterLeague || (filterLeague === "rest_world" && team.league && team.league.startsWith("rest_world"));
+                const matchesLeague = filterLeague === "all" || team.league === filterLeague || (filterLeague === "rest_world" && (team.league === "arabia" || team.league === "mls"));
                 // Filtro de Posição
                 const matchesPosition = filterPosition === "all" || p.position === filterPosition;
                 // Filtro de Time
