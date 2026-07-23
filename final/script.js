@@ -808,8 +808,8 @@ function calculateSalary(player) {
         const ratio = (ovr - 85) / 4;
         annualSalary = minVal + ratio * (maxVal - minVal);
     } else {
-        const minVal = 20000000;
-        const maxVal = 40000000;
+        const minVal = 25000000;
+        const maxVal = 80000000;
         const ratio = (ovr - 90) / 9;
         annualSalary = minVal + Math.pow(ratio, 2) * (maxVal - minVal);
     }
@@ -848,7 +848,7 @@ function calculatePlayerMarketValue(player) {
         base = minVal + ratio * (maxVal - minVal);
     } else {
         const minVal = 200000000;
-        const maxVal = 400000000;
+        const maxVal = 1000000000; // 1 Bilhão
         const ratio = (ovr - 90) / 9;
         base = minVal + Math.pow(ratio, 2) * (maxVal - minVal);
     }
