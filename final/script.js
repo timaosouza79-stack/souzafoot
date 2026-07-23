@@ -4544,6 +4544,32 @@ function finishCupRound() {
         if (hg === ag) { // Desempate por pênaltis simples
             if (Math.random() > 0.5) hg++; else ag++;
         }
+        
+        // FIX BUG: Save scores to original match in cupBracket so calendar can render it
+        if (typeof cupBracket !== 'undefined' && Array.isArray(cupBracket)) {
+            for (let phase of cupBracket) {
+                let originalMatch = phase.find(cm => cm.home === m.home && cm.away === m.away);
+                if (originalMatch) {
+                    originalMatch.homeScore = hg;
+                    originalMatch.awayScore = ag;
+                    break;
+                }
+            }
+        }
+        
+        // Also save to matchSchedule for redundancy
+        const roundIdx = currentRound - 1;
+        if (matchSchedule[roundIdx]) {
+            if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
+            let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
+            if (savedMatch) {
+                savedMatch.homeScore = hg;
+                savedMatch.awayScore = ag;
+            } else {
+                matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: hg, awayScore: ag });
+            }
+        }
+
         const winnerId = hg > ag ? m.home : m.away;
         const runnerUpId = hg > ag ? m.away : m.home;
         winners.push(allTeams.find(t => t.id === winnerId));
@@ -4620,6 +4646,19 @@ function finishLibertadoresRound() {
                 h.p++; a.p++; h.e++; a.e++; 
                 if (homeId === myTeam.id || awayId === myTeam.id) myTeam.balance += 600000; // Bônus por empate
             }
+            
+            // FIX BUG: Guardar resultado para aparecer no calendário
+            const roundIdx = currentRound - 1;
+            if (matchSchedule[roundIdx]) {
+                if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
+                let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
+                if (savedMatch) {
+                    savedMatch.homeScore = m.currentHomeGoals;
+                    savedMatch.awayScore = m.currentAwayGoals;
+                } else {
+                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: m.currentHomeGoals, awayScore: m.currentAwayGoals });
+                }
+            }
         });
 
         const libRound = matchSchedule.slice(0, currentRound).filter(r => r.type === 'libertadores').length;
@@ -4657,6 +4696,31 @@ function finishLibertadoresRound() {
             const winnerId = homeGoals > awayGoals ? m.home : m.away;
             const winnerObj = allTeams.find(t => t.id === winnerId);
             if (winnerObj) winners.push(winnerObj);
+            
+            // FIX BUG: Guardar resultado da fase de mata-mata continental
+            if (typeof libertadoresBracket !== 'undefined' && Array.isArray(libertadoresBracket)) {
+                for (let phase of libertadoresBracket) {
+                    let originalMatch = phase.find(cm => cm.home === m.home && cm.away === m.away);
+                    if (originalMatch) {
+                        originalMatch.homeScore = homeGoals;
+                        originalMatch.awayScore = awayGoals;
+                        break;
+                    }
+                }
+            }
+            
+            const roundIdx = currentRound - 1;
+            if (matchSchedule[roundIdx]) {
+                if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
+                let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
+                if (savedMatch) {
+                    savedMatch.homeScore = homeGoals;
+                    savedMatch.awayScore = awayGoals;
+                } else {
+                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: homeGoals, awayScore: awayGoals });
+                }
+            }
+
             const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
             const compName = isEurope ? "Champions League" : "Libertadores";
             if (m.home === myTeam.id || m.away === myTeam.id) {
@@ -5796,6 +5860,14 @@ function renderCalendar() {
         
         if (match) {
             shouldRender = true; // Jogo sorteado (ou grupo) e envolve meu time
+            // Recupera score do matchSchedule se existir
+            if (roundData && roundData.matches && match.homeScore === undefined) {
+                let savedMatch = roundData.matches.find(sm => sm.home === match.home && sm.away === match.away);
+                if (savedMatch && savedMatch.homeScore !== undefined) {
+                    match.homeScore = savedMatch.homeScore;
+                    match.awayScore = savedMatch.awayScore;
+                }
+            }
         } else {
             // Se for uma rodada futura onde os sorteios ainda não foram feitos
             if (roundNum >= currentRound) {
