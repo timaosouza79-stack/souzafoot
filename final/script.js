@@ -1238,7 +1238,7 @@ function loadGame() {
                 team.squad = team.squad.filter(p => {
                     if (!p || !p.id || !p.name || seenIds.has(p.id)) return false;
                     
-                    const normalizedName = p.name.trim().toLowerCase();
+                    const normalizedName = String(p.name).trim().toLowerCase();
                     // Garante que o mesmo jogador não esteja em duas equipes
                     if (seenNormalizedNames.has(normalizedName)) {
                         console.warn(`[EXCLUSIVIDADE SAVE] Removendo duplicado retroativo: ${p.name} do time ${team.name}`);
@@ -7924,7 +7924,9 @@ function generateYouthIntake(team) {
         const age = Math.floor(Math.random() * 3) + 16; // 16 a 18 anos
         const positions = ['GK', 'DF', 'MD', 'AT'];
         const position = positions[Math.floor(Math.random() * positions.length)];
-        const name = nameGenerator.generate(team.league);
+        const firstNames = ['João', 'Pedro', 'Lucas', 'Mateus', 'Gabriel', 'Guilherme', 'Rafael', 'Felipe', 'Gustavo', 'Arthur', 'Bruno', 'Diego', 'Thiago', 'Leonardo', 'Eduardo'];
+        const lastNames = ['Silva', 'Santos', 'Oliveira', 'Souza', 'Rodrigues', 'Ferreira', 'Alves', 'Pereira', 'Lima', 'Gomes', 'Costa', 'Ribeiro', 'Martins', 'Carvalho', 'Almeida'];
+        const name = firstNames[Math.floor(Math.random() * firstNames.length)] + ' ' + lastNames[Math.floor(Math.random() * lastNames.length)];
         
         const newPlayer = {
             id: Date.now() + i + Math.floor(Math.random() * 1000), // Unique ID
