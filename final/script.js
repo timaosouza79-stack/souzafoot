@@ -638,7 +638,7 @@ function handleLogin(event) {
         }
     } catch (e) {
         console.error("Erro fatal no login/carregamento:", e);
-        alert("Erro nos dados salvos. Iniciando uma nova carreira para este usuário.");
+        alert("Erro nos dados salvos. Iniciando uma nova carreira. Detalhe do Erro (mande pro desenvolvedor): " + e.message);
         if (users[user]) {
             users[user].gameState = null;
             try {
@@ -1029,7 +1029,9 @@ function loadGame() {
             // Registra os nomes do time do usuário ativo para não serem duplicados nas CPUs
             if (myTeam && myTeam.squad) {
                 myTeam.squad.forEach(p => {
-                    migrationPlayerNames.add(p.name.trim().toLowerCase());
+                    if (p && p.name) {
+                        migrationPlayerNames.add(p.name.trim().toLowerCase());
+                    }
                 });
             }
             
@@ -1038,10 +1040,12 @@ function loadGame() {
                 let playerIdCounter = 20000;
                 const userUnique = [];
                 realSquads[myTeam.id].players.forEach(p => {
-                    const normalized = p.name.trim().toLowerCase();
-                    if (!migrationPlayerNames.has(normalized)) {
-                        migrationPlayerNames.add(normalized);
-                        userUnique.push(p);
+                    if (p && p.name) {
+                        const normalized = p.name.trim().toLowerCase();
+                        if (!migrationPlayerNames.has(normalized)) {
+                            migrationPlayerNames.add(normalized);
+                            userUnique.push(p);
+                        }
                     }
                 });
                 myTeam.squad = userUnique.map((p, index) => ({
@@ -1068,10 +1072,12 @@ function loadGame() {
                         const uniqueCpu = [];
                         const teamPlayerNames = new Set();
                         realSquads[team.id].players.forEach(p => {
-                            const normalized = p.name.trim().toLowerCase();
-                            if (!teamPlayerNames.has(normalized)) {
-                                teamPlayerNames.add(normalized);
-                                uniqueCpu.push(p);
+                            if (p && p.name) {
+                                const normalized = p.name.trim().toLowerCase();
+                                if (!teamPlayerNames.has(normalized)) {
+                                    teamPlayerNames.add(normalized);
+                                    uniqueCpu.push(p);
+                                }
                             }
                         });
                         team.squad = uniqueCpu.map((p, index) => ({
@@ -1249,10 +1255,12 @@ function loadGame() {
         allTeams.forEach(team => {
             if (team.squad) {
                 team.squad.forEach(p => {
-                    delete p.hasLeftMatch;
-                    delete p.playedInMatch;
-                    delete p.startedMatch;
-                    p.redCardInMatch = false;
+                    if (p) {
+                        delete p.hasLeftMatch;
+                        delete p.playedInMatch;
+                        delete p.startedMatch;
+                        p.redCardInMatch = false;
+                    }
                 });
             }
         });
