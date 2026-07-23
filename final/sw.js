@@ -1,4 +1,4 @@
-const CACHE_NAME = 'souzafoot-v19';
+const CACHE_NAME = 'souzafoot-v20';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -9,6 +9,7 @@ const STATIC_ASSETS = [
   '/mundial.js',
   '/continental_tournaments.js',
   '/mundial_integration.js',
+  '/lz-string.min.js',
   '/manifest.json',
   '/icon.svg'
 ];
