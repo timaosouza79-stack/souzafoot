@@ -506,7 +506,12 @@ let currentUser = null;
 let users = (function() {
     try {
         const saved = localStorage.getItem('brasfoot_users');
-        return saved ? JSON.parse(saved) : {};
+        if (!saved) return {};
+        try {
+            const decompressed = LZString.decompressFromUTF16(saved);
+            if (decompressed) return JSON.parse(decompressed);
+        } catch (e) {}
+        return JSON.parse(saved);
     } catch (e) {
         console.error("Erro ao carregar usuários:", e);
         return {};
@@ -574,7 +579,7 @@ function handleLogin(event) {
                 gameState: null 
             };
             try {
-                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                localStorage.setItem('brasfoot_users', LZString.compressToUTF16(JSON.stringify(users)));
             } catch (e) {
                 console.warn("localStorage indisponível. Usando sessão em memória.", e);
             }
@@ -596,7 +601,7 @@ function handleLogin(event) {
             if (savedPassword === undefined) {
                 users[user].password = password;
                 try {
-                    localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                    localStorage.setItem('brasfoot_users', LZString.compressToUTF16(JSON.stringify(users)));
                 } catch (e) {
                     console.warn("localStorage indisponível. Usando sessão em memória.", e);
                 }
@@ -615,7 +620,7 @@ function handleLogin(event) {
         if (users[user]) {
             users[user].gameState = null;
             try {
-                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                localStorage.setItem('brasfoot_users', LZString.compressToUTF16(JSON.stringify(users)));
             } catch (lsError) {
                 console.warn("localStorage indisponível. Usando sessão em memória.", lsError);
             }
@@ -676,7 +681,7 @@ function saveGame() {
         isIntercontinentalMode
     };
     try {
-        localStorage.setItem('brasfoot_users', JSON.stringify(users));
+        localStorage.setItem('brasfoot_users', LZString.compressToUTF16(JSON.stringify(users)));
     } catch (e) {
         console.error("Erro ao salvar no localStorage (espaço insuficiente?):", e);
     }
@@ -692,7 +697,7 @@ function confirmReset() {
         if (currentUser && users[currentUser]) {
             users[currentUser].gameState = null; // Limpa o save do usuário
             try {
-                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                localStorage.setItem('brasfoot_users', LZString.compressToUTF16(JSON.stringify(users)));
             } catch (e) {
                 console.warn("localStorage indisponível. Usando sessão em memória.", e);
             }
@@ -3111,7 +3116,7 @@ function deleteUser(name) {
     if (confirm(`Deseja apagar o usuário "${name}"?`)) {
         delete users[name];
         try {
-            localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            localStorage.setItem('brasfoot_users', LZString.compressToUTF16(JSON.stringify(users)));
         } catch (e) {
             console.warn("localStorage indisponível. Usando sessão em memória.", e);
         }
