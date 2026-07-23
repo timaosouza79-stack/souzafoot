@@ -1139,6 +1139,9 @@ function loadGame() {
         currentRound = state.currentRound;
         lastRoundResults = state.lastRoundResults || [];
         matchSchedule = state.matchSchedule;
+        if (matchSchedule && matchSchedule.length > 0 && !matchSchedule[0].dateStr) {
+            generateDatesForSchedule(myTeam.league);
+        }
         standings = state.standings;
         isCupMode = state.isCupMode || false;
         cupBracket = state.cupBracket || []; 
@@ -3400,6 +3403,44 @@ function initChampionship(selectedLeague = 'brazil_a') {
     
     // Adiciona a rodada do Mundial Intercontinental no fim do ano
     matchSchedule.push({ type: 'intercontinental', matches: [] });
+
+    generateDatesForSchedule(selectedLeague);
+}
+
+function generateDatesForSchedule(leagueId) {
+    if (!matchSchedule || matchSchedule.length === 0) return;
+    const isBrazil = leagueId.startsWith('brazil') || ['south_america', 'argentina'].includes(leagueId);
+    // currentYear é inicializado no startGame
+    const year = typeof currentYear !== 'undefined' ? currentYear : new Date().getFullYear();
+    
+    // Configura a data de início da temporada
+    let currentDate;
+    if (isBrazil) {
+        currentDate = new Date(year, 1, 1); // 1 de Fevereiro
+    } else {
+        currentDate = new Date(year, 7, 10); // 10 de Agosto
+    }
+
+    const totalRounds = matchSchedule.length;
+    // Temporada tem aprox 300 dias (Brasil: Fev a Nov, Europa: Ago a Mai)
+    const daysInSeason = 300; 
+    const daysPerRound = Math.floor(daysInSeason / totalRounds) || 1;
+
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+    matchSchedule.forEach((round, index) => {
+        // Avança os dias, mas intercala quarta (midweek) e domingo (weekend) se possível
+        // Para simplificar e evitar lógica complexa de dias da semana, apenas somamos os dias
+        currentDate.setDate(currentDate.getDate() + daysPerRound);
+        
+        const dia = String(currentDate.getDate()).padStart(2, '0');
+        const mesStr = meses[currentDate.getMonth()];
+        const ano = currentDate.getFullYear();
+        
+        round.dateStr = `${dia} de ${mesStr}`;
+        // Armazenamos o objecto Date para uso interno (opcional)
+        round.dateObj = new Date(currentDate);
+    });
 }
 
 function initCopaDoBrasil(silent = false) { 
@@ -5797,7 +5838,10 @@ function renderCalendar() {
         if (roundData.type === 'league') leagueRd++;
         const type = roundData.type;
         const compNames = getCompetitionNames(myTeam.league);
-        const label = type === 'cup' ? compNames.cup : (type === 'libertadores' || type === 'continental' ? compNames.continental : `${compNames.league} - RD ${leagueRd}`);
+        let label = type === 'cup' ? compNames.cup : (type === 'libertadores' || type === 'continental' ? compNames.continental : `${compNames.league} - RD ${leagueRd}`);
+        if (roundData.dateStr) {
+            label = `${roundData.dateStr} - ${label}`;
+        }
         const labelColor = type === 'cup' ? '#ffd700' : (type === 'libertadores' || type === 'continental' ? '#3f51b5' : '#4CAF50');
         
         const roundNum = index + 1;
