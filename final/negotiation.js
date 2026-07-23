@@ -44,7 +44,7 @@ function openMasterNegotiation(playerId, fromTeamId) {
     document.getElementById('neg-club-name').innerText = fromTeam.name;
     document.getElementById('neg-player-age').innerText = player.age;
 
-    const marketValue = Math.pow(player.strength, 2) * 14000;
+    const marketValue = calculatePlayerMarketValue(player);
     document.getElementById('neg-market-value').innerText = "R$ " + (marketValue / 1000000).toFixed(1) + "M";
 
     // Setup initial sliders and inputs
@@ -56,7 +56,7 @@ function openMasterNegotiation(playerId, fromTeamId) {
     transferRange.value = initialOffer.toFixed(1);
     transferInput.value = initialOffer.toFixed(1);
 
-    const initialWage = (player.salario || (player.strength * 1000)) / 1000000;
+    const initialWage = calculateSalary(player) / 1000000;
     const wageRange = document.getElementById('neg-wage-range');
     const wageInput = document.getElementById('neg-wage-input');
     wageRange.max = Math.max(initialWage * 5, 20).toFixed(1);
@@ -165,7 +165,7 @@ function recalcProb() {
     if (!currentNegPlayer) return;
 
     const marketValue = calculatePlayerMarketValue(currentNegPlayer);
-    const currentWage = currentNegPlayer.salario || (currentNegPlayer.strength * 1000);
+    const currentWage = currentNegPlayer.salario || calculateSalary(currentNegPlayer);
     
     const offerTransferM = parseFloat(document.getElementById('neg-transfer-input').value) || 0;
     const offerWageM = parseFloat(document.getElementById('neg-wage-input').value) || 0;
