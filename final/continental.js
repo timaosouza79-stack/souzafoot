@@ -136,7 +136,20 @@ function finishSulAmericanaRound() {
             }
             else { 
                 h.p++; a.p++; h.e++; a.e++; 
-                if (homeId === myTeam.id || awayId === myTeam.id) myTeam.balance += 300000;
+                if (homeId === myTeam.id || awayId === myTeam.id) myTeam.balance += 250000;
+            }
+            
+            // FIX BUG: Guardar resultado para aparecer no calendário
+            const roundIdx = currentRound - 1;
+            if (matchSchedule[roundIdx]) {
+                if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
+                let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
+                if (savedMatch) {
+                    savedMatch.homeScore = m.currentHomeGoals;
+                    savedMatch.awayScore = m.currentAwayGoals;
+                } else {
+                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: m.currentHomeGoals, awayScore: m.currentAwayGoals });
+                }
             }
         });
 
@@ -162,9 +175,37 @@ function finishSulAmericanaRound() {
             let awayGoals = m.currentAwayGoals;
             if (homeGoals === awayGoals) {
                 if (Math.random() > 0.5) homeGoals++; else awayGoals++;
+                // Atualiza também o objecto local para que lastRoundResults apanhe os novos golos!
+                m.currentHomeGoals = homeGoals;
+                m.currentAwayGoals = awayGoals;
             }
             const winnerId = homeGoals > awayGoals ? m.home : m.away;
             const winnerObj = allTeams.find(t => t.id === winnerId);
+            
+            // FIX BUG: Guardar resultado da fase de mata-mata continental
+            if (typeof sulAmericanaBracket !== 'undefined' && Array.isArray(sulAmericanaBracket)) {
+                for (let phase of sulAmericanaBracket) {
+                    let originalMatch = phase.find(cm => cm.home === m.home && cm.away === m.away);
+                    if (originalMatch) {
+                        originalMatch.homeScore = homeGoals;
+                        originalMatch.awayScore = awayGoals;
+                        break;
+                    }
+                }
+            }
+            
+            const roundIdx = currentRound - 1;
+            if (matchSchedule[roundIdx]) {
+                if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
+                let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
+                if (savedMatch) {
+                    savedMatch.homeScore = homeGoals;
+                    savedMatch.awayScore = awayGoals;
+                } else {
+                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: homeGoals, awayScore: awayGoals });
+                }
+            }
+            
             if (winnerObj) winners.push(winnerObj);
             
             const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);

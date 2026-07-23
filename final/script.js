@@ -4589,6 +4589,9 @@ function finishCupRound() {
         let ag = m.currentAwayGoals;
         if (hg === ag) { // Desempate por pênaltis simples
             if (Math.random() > 0.5) hg++; else ag++;
+            // Atualiza também o objecto local para que lastRoundResults apanhe os novos golos!
+            m.currentHomeGoals = hg;
+            m.currentAwayGoals = ag;
         }
         
         // FIX BUG: Save scores to original match in cupBracket so calendar can render it
@@ -4734,6 +4737,9 @@ function finishLibertadoresRound() {
             let awayGoals = m.currentAwayGoals;
             if (homeGoals === awayGoals) {
                 if (Math.random() > 0.5) homeGoals++; else awayGoals++;
+                // Atualiza também o objecto local para que lastRoundResults apanhe os novos golos!
+                m.currentHomeGoals = homeGoals;
+                m.currentAwayGoals = awayGoals;
             }
             // FIX BUG #3: m.homeTeam pode ser undefined em partidas de mata-mata continental
             const htNameKO = (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : m.home;
