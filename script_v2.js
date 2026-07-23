@@ -931,10 +931,11 @@ function loadGame() {
 
             const migrationPlayerNames = new Set();
             
-            // Registra os nomes do time do usuário ativo para não serem duplicados nas CPUs
             if (myTeam && myTeam.squad) {
                 myTeam.squad.forEach(p => {
-                    migrationPlayerNames.add(p.name.trim().toLowerCase());
+                    if (p && p.name) {
+                        migrationPlayerNames.add(p.name.trim().toLowerCase());
+                    }
                 });
             }
             
@@ -943,10 +944,12 @@ function loadGame() {
                 let playerIdCounter = 20000;
                 const userUnique = [];
                 realSquads[myTeam.id].players.forEach(p => {
-                    const normalized = p.name.trim().toLowerCase();
-                    if (!migrationPlayerNames.has(normalized)) {
-                        migrationPlayerNames.add(normalized);
-                        userUnique.push(p);
+                    if (p && p.name) {
+                        const normalized = p.name.trim().toLowerCase();
+                        if (!migrationPlayerNames.has(normalized)) {
+                            migrationPlayerNames.add(normalized);
+                            userUnique.push(p);
+                        }
                     }
                 });
                 myTeam.squad = userUnique.map((p, index) => ({
@@ -972,10 +975,12 @@ function loadGame() {
                         let playerIdCounter = 10000 + Math.floor(Math.random() * 10000);
                         const uniqueCpu = [];
                         realSquads[team.id].players.forEach(p => {
-                            const normalized = p.name.trim().toLowerCase();
-                            if (!migrationPlayerNames.has(normalized)) {
-                                migrationPlayerNames.add(normalized);
-                                uniqueCpu.push(p);
+                            if (p && p.name) {
+                                const normalized = p.name.trim().toLowerCase();
+                                if (!migrationPlayerNames.has(normalized)) {
+                                    migrationPlayerNames.add(normalized);
+                                    uniqueCpu.push(p);
+                                }
                             }
                         });
                         team.squad = uniqueCpu.map((p, index) => ({
