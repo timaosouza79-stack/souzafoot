@@ -170,28 +170,52 @@ function finishSulAmericanaRound() {
     } else {
         const currentPhase = sulMatches;
         const winners = [];
+        
+        const isFinal = sulAmericanaBracket.length === 7;
+        const isLeg2 = sulAmericanaBracket.length % 2 === 0;
+        const currentPhaseIndex = sulAmericanaBracket.length - 1;
+        const currentPhaseMatches = sulAmericanaBracket[currentPhaseIndex];
+        const previousPhaseMatches = isLeg2 ? sulAmericanaBracket[currentPhaseIndex - 1] : null;
+
         currentPhase.forEach(m => {
-            let homeGoals = m.currentHomeGoals;
-            let awayGoals = m.currentAwayGoals;
-            if (homeGoals === awayGoals) {
-                if (Math.random() > 0.5) homeGoals++; else awayGoals++;
-                // Atualiza também o objecto local para que lastRoundResults apanhe os novos golos!
-                m.currentHomeGoals = homeGoals;
-                m.currentAwayGoals = awayGoals;
-            }
-            const winnerId = homeGoals > awayGoals ? m.home : m.away;
-            const winnerObj = allTeams.find(t => t.id === winnerId);
-            
-            // FIX BUG: Guardar resultado da fase de mata-mata continental
-            if (typeof sulAmericanaBracket !== 'undefined' && Array.isArray(sulAmericanaBracket)) {
-                for (let phase of sulAmericanaBracket) {
-                    let originalMatch = phase.find(cm => cm.home === m.home && cm.away === m.away);
-                    if (originalMatch) {
-                        originalMatch.homeScore = homeGoals;
-                        originalMatch.awayScore = awayGoals;
-                        break;
+            let hg = m.currentHomeGoals;
+            let ag = m.currentAwayGoals;
+            let matchWinnerId = null;
+
+            if (isLeg2) {
+                const leg1Match = previousPhaseMatches.find(pm => pm.home === m.away && pm.away === m.home);
+                if (leg1Match) {
+                    const aggregateHome = hg + leg1Match.awayScore; 
+                    const aggregateAway = ag + leg1Match.homeScore;
+                    
+                    if (aggregateHome === aggregateAway) {
+                        if (Math.random() > 0.5) hg++; else ag++;
+                        m.currentHomeGoals = hg;
+                        m.currentAwayGoals = ag;
                     }
+                    
+                    const finalAggHome = hg + leg1Match.awayScore;
+                    const finalAggAway = ag + leg1Match.homeScore;
+                    matchWinnerId = finalAggHome > finalAggAway ? m.home : m.away;
                 }
+            } else if (isFinal) {
+                if (hg === ag) {
+                    if (Math.random() > 0.5) hg++; else ag++;
+                    m.currentHomeGoals = hg;
+                    m.currentAwayGoals = ag;
+                }
+                matchWinnerId = hg > ag ? m.home : m.away;
+            }
+
+            if (matchWinnerId) {
+                const winnerObj = allTeams.find(t => t.id === matchWinnerId);
+                if (winnerObj) winners.push(winnerObj);
+            }
+            
+            let originalMatch = currentPhaseMatches.find(cm => cm.home === m.home && cm.away === m.away);
+            if (originalMatch) {
+                originalMatch.homeScore = hg;
+                originalMatch.awayScore = ag;
             }
             
             const roundIdx = currentRound - 1;
@@ -199,50 +223,57 @@ function finishSulAmericanaRound() {
                 if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
                 let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
                 if (savedMatch) {
-                    savedMatch.homeScore = homeGoals;
-                    savedMatch.awayScore = awayGoals;
+                    savedMatch.homeScore = hg;
+                    savedMatch.awayScore = ag;
                 } else {
-                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: homeGoals, awayScore: awayGoals });
+                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: hg, awayScore: ag });
                 }
             }
             
-            if (winnerObj) winners.push(winnerObj);
-            
             const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
             const compName = isEurope ? "Europa League" : "Sul-Americana";
-            if (m.home === myTeam.id || m.away === myTeam.id) {
-                if (winnerId === myTeam.id) {
-                    const prizes = {
-                        8: 3000000, 
-                        4: 4500000, 
-                        2: 6000000, 
-                        1: 35000000 
-                    };
-                    const prize = prizes[currentPhase.length] || 0;
-                    if (prize > 0) {
-                        myTeam.balance += prize;
-                        addCommentaryItem(`🏆 ${compName.toUpperCase()}: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
-                    }
-                } else {
-                    addCommentaryItem(`❌ ${compName.toUpperCase()}: O ${myTeam.name} foi eliminado.`, 'info', 90);
+            
+            if (matchWinnerId && (m.home === myTeam.id || m.away === myTeam.id)) {
+                if (matchWinnerId === myTeam.id && !isFinal) {
+                    const prizes = { 2: 3000000, 4: 4500000, 6: 6000000 };
+                    const prize = prizes[sulAmericanaBracket.length] || 2000000;
+                    myTeam.balance += prize;
+                    addCommentaryItem(`💰 ${compName}: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
+                } else if (!isFinal) {
+                    addCommentaryItem(`❌ CONTINENTAL: O ${myTeam.name} foi eliminado.`, 'info', 90);
                 }
             }
         });
 
-        if (winners.length >= 2) {
-            const nextPhase = [];
-            for (let i = 0; i < winners.length; i += 2) {
-                if (winners[i+1]) {
-                    nextPhase.push({ home: winners[i].id, away: winners[i+1].id, currentHomeGoals: 0, currentAwayGoals: 0 });
-                }
-            }
-            sulAmericanaBracket.push(nextPhase);
-        } else if (winners.length === 1) {
+        if (isFinal) {
+            sulamericanaWinnerId = winners[0].id;
+            isSulAmericanaMode = false;
             const champion = winners[0];
-            sulamericanaWinnerId = champion.id;
+            const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
+            const compName = isEurope ? "Europa League" : "Sul-Americana";
+            
+            alert(`🏆 FIM DO CONTINENTAL! O ${champion.name} é o campeão da ${compName}!`);
             if (champion.id === myTeam.id) {
-                alert(`🏆 SENSACIONAL! O ${champion.name} é o Campeão da Sul-Americana!`);
+                const finalPrize = 35000000;
+                myTeam.hallOfFame.titles.push({ year: currentYear, title: compName });
+                myTeam.balance += finalPrize;
             }
+        } else if (isLeg2) {
+            if (winners.length >= 2) {
+                const nextPhase = [];
+                for (let i = 0; i < winners.length; i += 2) {
+                    if (winners[i+1]) {
+                        nextPhase.push({ home: winners[i].id, away: winners[i+1].id, currentHomeGoals: 0, currentAwayGoals: 0 });
+                    }
+                }
+                sulAmericanaBracket.push(nextPhase);
+            }
+        } else {
+            const nextPhase = [];
+            currentPhaseMatches.forEach(m => {
+                nextPhase.push({ home: m.away, away: m.home, currentHomeGoals: 0, currentAwayGoals: 0 });
+            });
+            sulAmericanaBracket.push(nextPhase);
         }
     }
 }
@@ -251,30 +282,34 @@ function initIntercontinental(silent = false) {
     if (intercontinentalBracket.length > 0) return;
     isIntercontinentalMode = true;
 
-    // Apenas se o jogador ganhou a Libertadores
-    let wonLibertadores = false;
-    if (myTeam.history && myTeam.history.length > 0) {
-        wonLibertadores = myTeam.history.some(h => h.includes("Campeão da Copa Libertadores") || h.includes("Campeão da Champions League"));
-    }
-
-    if (!wonLibertadores) {
-        // Se não ganhou, cria um jogo fantasma só para o calendário não encravar
+    if (!libertadoresWinnerId) {
         intercontinentalBracket = [[{ home: 'realmadrid', away: 'bocajuniors', currentHomeGoals: 0, currentAwayGoals: 0 }]];
         return;
     }
 
-    const bossName = Math.random() > 0.5 ? "Real Madrid" : "Manchester City";
+    const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
+    const ourChampionId = libertadoresWinnerId;
+    
+    let bossName, bossLeague;
+    if (isEurope) {
+        bossName = Math.random() > 0.5 ? "Boca Juniors" : "Flamengo";
+        bossLeague = "brazil_a"; 
+    } else {
+        bossName = Math.random() > 0.5 ? "Real Madrid" : "Manchester City";
+        bossLeague = "europe";
+    }
+
     const boss = {
         id: "boss_intercontinental",
         name: bossName,
-        strength: 95,
+        strength: isEurope ? 88 : 96,
         shield: `https://ui-avatars.com/api/?name=${encodeURIComponent(bossName)}&background=random`,
-        league: "europe",
+        league: bossLeague,
         squad: []
     };
     allTeams.push(boss);
 
-    intercontinentalBracket = [[{ home: myTeam.id, away: boss.id, currentHomeGoals: 0, currentAwayGoals: 0 }]];
+    intercontinentalBracket = [[{ home: ourChampionId, away: boss.id, currentHomeGoals: 0, currentAwayGoals: 0 }]];
 }
 
 function finishIntercontinentalRound() {
@@ -286,12 +321,29 @@ function finishIntercontinentalRound() {
         if (Math.random() > 0.5) homeGoals++; else awayGoals++;
     }
     const winnerId = homeGoals > awayGoals ? m.home : m.away;
+    const champion = allTeams.find(t => t.id === winnerId);
+    
+    if (intercontinentalBracket.length > 0 && intercontinentalBracket[0].length > 0) {
+        intercontinentalBracket[0][0].homeScore = homeGoals;
+        intercontinentalBracket[0][0].awayScore = awayGoals;
+    }
+    
+    const roundIdx = currentRound - 1;
+    if (matchSchedule[roundIdx]) {
+        if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
+        let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
+        if (savedMatch) {
+            savedMatch.homeScore = homeGoals;
+            savedMatch.awayScore = awayGoals;
+        } else {
+            matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: homeGoals, awayScore: awayGoals });
+        }
+    }
+
     if (winnerId === myTeam.id) {
         alert("🌍 MUNDIAL DE CLUBES! VOCÊ É O CAMPEÃO DO MUNDO!");
-        myTeam.balance += 50000000; // 50 milhões
-        myTeam.history.push("🌍 CAMPEÃO MUNDIAL");
-        
-        // Boost de energia e moral
+        myTeam.balance += 50000000;
+        myTeam.hallOfFame.titles.push({ year: currentYear, title: "Mundial de Clubes" });
         if(myTeam.squad) {
             myTeam.squad.forEach(p => {
                 p.energy = 100;
@@ -299,7 +351,11 @@ function finishIntercontinentalRound() {
             });
         }
     } else {
-        alert("🌍 Fim de jogo. O gigante europeu venceu o Mundial.");
+        if (m.home === myTeam.id || m.away === myTeam.id) {
+            alert("🌍 Fim de jogo. O adversário venceu o Mundial.");
+        } else {
+            console.log(`Mundial de Clubes vencido por ${champion ? champion.name : winnerId}`);
+        }
     }
 }
 
@@ -353,31 +409,66 @@ function renderSulAmericanaBracket() {
             list.appendChild(table);
         });
     } else {
-        const phases = {
-            16: 'Dezasseis-Avos',
-            8: 'Oitavas de Final',
-            4: 'Quartas de Final',
-            2: 'Semifinal',
-            1: 'Final'
-        };
         const currentPhaseMatches = sulAmericanaBracket[sulAmericanaBracket.length - 1];
-        const phaseName = phases[currentPhaseMatches.length] || 'Mata-Mata';
+        const phaseNames = ["Final", "Semifinal", "Quartas de Final", "Oitavas de Final", "Dezasseis-Avos"];
+        const phaseName = phaseNames[Math.log2(currentPhaseMatches.length)] || 'Mata-Mata';
         document.getElementById('lib-phase-title').innerText = `${compName} - ${phaseName}`;
 
-        currentPhaseMatches.forEach(m => {
-            const home = allTeams.find(t => t.id === m.home);
-            const away = allTeams.find(t => t.id === m.away);
-            if (!home || !away) return;
-            const div = document.createElement('div');
-            div.className = "match-item";
-            div.innerHTML = `
-                <div class="team-name">${home.name}</div>
-                <div class="score-box">${m.currentHomeGoals}</div>
-                <div style="padding: 0 5px;">X</div>
-                <div class="score-box">${m.currentAwayGoals}</div>
-                <div class="team-name" style="text-align: right;">${away.name}</div>
+        const isLeg2 = sulAmericanaBracket.length % 2 === 0 && sulAmericanaBracket.length < 9;
+
+        currentPhaseMatches.forEach(match => {
+            const home = allTeams.find(t => t.id === match.home) || { name: 'A definir', shield: '' };
+            const away = allTeams.find(t => t.id === match.away) || { name: 'A definir', shield: '' };
+            
+            let scoreText = "VS";
+            if (match.homeScore !== undefined && match.awayScore !== undefined) {
+                scoreText = `${match.homeScore} x ${match.awayScore}`;
+            }
+
+            let extraText = "";
+            if (isLeg2) {
+                const previousPhaseMatches = sulAmericanaBracket[sulAmericanaBracket.length - 2];
+                const leg1Match = previousPhaseMatches.find(pm => pm.home === match.away && pm.away === match.home);
+                if (leg1Match && leg1Match.homeScore !== undefined) {
+                    const leg1HomeName = away.name;
+                    const leg1AwayName = home.name;
+                    extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Ida: ${leg1HomeName} ${leg1Match.homeScore} x ${leg1Match.awayScore} ${leg1AwayName}</div>`;
+                    
+                    if (match.homeScore !== undefined) {
+                        const aggHome = match.homeScore + leg1Match.awayScore;
+                        const aggAway = match.awayScore + leg1Match.homeScore;
+                        scoreText += `<br><span style="color:#ffd700; font-size: 11px;">Agr: ${aggHome} x ${aggAway}</span>`;
+                    }
+                }
+            } else if (sulAmericanaBracket.length < 9) {
+                extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Jogo de Ida</div>`;
+            } else {
+                extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Jogo Único</div>`;
+            }
+
+            const item = document.createElement('div');
+            item.className = 'match-preview';
+            item.style.borderLeft = "4px solid #3f51b5";
+            item.style.padding = "10px";
+            item.style.marginBottom = "10px";
+            
+            item.innerHTML = `
+                <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="flex:1; text-align:right; display:flex; align-items:center; justify-content:flex-end; gap:5px; padding-right:10px;">
+                        <span>${home.name}</span>
+                        ${home.shield ? `<img src="${home.shield}" alt="${home.name}" style="width:24px; height:24px; object-fit:contain; flex-shrink:0;">` : ''}
+                    </div>
+                    <div style="text-align:center;">
+                        <strong>${scoreText}</strong>
+                    </div>
+                    <div style="flex:1; text-align:left; display:flex; align-items:center; gap:5px; padding-left:10px;">
+                        ${away.shield ? `<img src="${away.shield}" alt="${away.name}" style="width:24px; height:24px; object-fit:contain; flex-shrink:0;">` : ''}
+                        <span>${away.name}</span>
+                    </div>
+                </div>
+                <div style="text-align:center;">${extraText}</div>
             `;
-            list.appendChild(div);
+            list.appendChild(item);
         });
     }
 }

@@ -1608,23 +1608,61 @@ function renderLibertadoresBracket() {
         
         document.getElementById('lib-phase-title').innerText = `${compName} - ${currentPhaseName}`;
 
+        const isLeg2 = libertadoresBracket.length % 2 === 0 && libertadoresBracket.length < 7;
+
         if (currentPhase) {
             currentPhase.forEach(match => {
                 const home = allTeams.find(t => t.id === match.home) || { name: 'A definir', shield: '' };
                 const away = allTeams.find(t => t.id === match.away) || { name: 'A definir', shield: '' };
+                
+                let scoreText = "VS";
+                if (match.homeScore !== undefined && match.awayScore !== undefined) {
+                    scoreText = `${match.homeScore} x ${match.awayScore}`;
+                }
+
+                let extraText = "";
+                if (isLeg2) {
+                    const previousPhaseMatches = libertadoresBracket[libertadoresBracket.length - 2];
+                    const leg1Match = previousPhaseMatches.find(pm => pm.home === match.away && pm.away === match.home);
+                    if (leg1Match && leg1Match.homeScore !== undefined) {
+                        const leg1HomeName = away.name;
+                        const leg1AwayName = home.name;
+                        extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Ida: ${leg1HomeName} ${leg1Match.homeScore} x ${leg1Match.awayScore} ${leg1AwayName}</div>`;
+                        
+                        if (match.homeScore !== undefined) {
+                            const aggHome = match.homeScore + leg1Match.awayScore;
+                            const aggAway = match.awayScore + leg1Match.homeScore;
+                            scoreText += `<br><span style="color:#ffd700; font-size: 11px;">Agr: ${aggHome} x ${aggAway}</span>`;
+                        }
+                    }
+                } else if (libertadoresBracket.length < 7) {
+                    extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Jogo de Ida</div>`;
+                } else {
+                    extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Jogo Único</div>`;
+                }
+
                 const item = document.createElement('div');
                 item.className = 'match-preview';
                 item.style.borderLeft = "4px solid #3f51b5";
+                item.style.padding = "10px";
+                item.style.marginBottom = "10px";
+                
                 item.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        ${home.shield ? `<img src="${home.shield}" alt="${home.name}" style="width:36px; height:36px; object-fit:contain; flex-shrink:0;">` : ''} 
-                        <span>${home.name}</span>
+                    <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="flex:1; text-align:right; display:flex; align-items:center; justify-content:flex-end; gap:5px; padding-right:10px;">
+                            <span>${home.name}</span>
+                            ${home.shield ? `<img src="${home.shield}" alt="${home.name}" style="width:24px; height:24px; object-fit:contain; flex-shrink:0;">` : ''}
+                        </div>
+                        <div style="text-align:center;">
+                            <strong>${scoreText}</strong>
+                        </div>
+                        <div style="flex:1; text-align:left; display:flex; align-items:center; gap:5px; padding-left:10px;">
+                            ${away.shield ? `<img src="${away.shield}" alt="${away.name}" style="width:24px; height:24px; object-fit:contain; flex-shrink:0;">` : ''}
+                            <span>${away.name}</span>
+                        </div>
                     </div>
-                    <strong>VS</strong>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span>${away.name}</span> 
-                        ${away.shield ? `<img src="${away.shield}" alt="${away.name}" style="width:36px; height:36px; object-fit:contain; flex-shrink:0;">` : ''}
-                    </div>`;
+                    <div style="text-align:center;">${extraText}</div>
+                `;
                 list.appendChild(item);
             });
         }
@@ -3386,8 +3424,8 @@ function initChampionship(selectedLeague = 'brazil_a') {
     
     let leagueIdx = 0;
     let currentRoundCounter = 1;
-    const cupIndices = [4, 8, 12, 16, 20, 24, 28, 32];
-    const continentalIndices = [2, 4, 6, 9, 12, 15, 18, 21, 24, 27];
+    const cupIndices = [5, 10, 15, 20, 25, 30, 35, 40, 45];
+    const continentalIndices = [3, 7, 12, 17, 22, 27, 32, 37, 42, 47, 51, 55, 59];
 
     while (leagueIdx < fullLeague.length) {
         if ((isBrazil || isEurope) && cupIndices.includes(currentRoundCounter)) {
@@ -4583,30 +4621,57 @@ function rejectSpontaneousJobOffer() {
 
 function finishCupRound() {
     console.log("finishCupRound: Iniciando...");
+    
+    const isFinal = cupBracket.length === 9; 
+    const isLeg2 = cupBracket.length % 2 === 0; 
+    const currentPhaseIndex = cupBracket.length - 1;
+    const currentPhaseMatches = cupBracket[currentPhaseIndex];
+    const previousPhaseMatches = isLeg2 ? cupBracket[currentPhaseIndex - 1] : null;
+
     const winners = [];
+
     simulatedRoundMatches.forEach(m => {
         let hg = m.currentHomeGoals;
         let ag = m.currentAwayGoals;
-        if (hg === ag) { // Desempate por pênaltis simples
-            if (Math.random() > 0.5) hg++; else ag++;
-            // Atualiza também o objecto local para que lastRoundResults apanhe os novos golos!
-            m.currentHomeGoals = hg;
-            m.currentAwayGoals = ag;
-        }
         
-        // FIX BUG: Save scores to original match in cupBracket so calendar can render it
-        if (typeof cupBracket !== 'undefined' && Array.isArray(cupBracket)) {
-            for (let phase of cupBracket) {
-                let originalMatch = phase.find(cm => cm.home === m.home && cm.away === m.away);
-                if (originalMatch) {
-                    originalMatch.homeScore = hg;
-                    originalMatch.awayScore = ag;
-                    break;
+        let matchWinnerId = null;
+        let matchRunnerUpId = null;
+
+        if (isLeg2) {
+            const leg1Match = previousPhaseMatches.find(pm => pm.home === m.away && pm.away === m.home);
+            if (leg1Match) {
+                const aggregateHome = hg + leg1Match.awayScore; 
+                const aggregateAway = ag + leg1Match.homeScore;
+                
+                if (aggregateHome === aggregateAway) {
+                    if (Math.random() > 0.5) hg++; else ag++;
+                    m.currentHomeGoals = hg;
+                    m.currentAwayGoals = ag;
                 }
+                
+                const finalAggHome = hg + leg1Match.awayScore;
+                const finalAggAway = ag + leg1Match.homeScore;
+                matchWinnerId = finalAggHome > finalAggAway ? m.home : m.away;
+                matchRunnerUpId = finalAggHome > finalAggAway ? m.away : m.home;
+            } else {
+                console.error("finishCupRound: Leg 1 match not found!");
             }
+        } else if (isFinal) {
+            if (hg === ag) {
+                if (Math.random() > 0.5) hg++; else ag++;
+                m.currentHomeGoals = hg;
+                m.currentAwayGoals = ag;
+            }
+            matchWinnerId = hg > ag ? m.home : m.away;
+            matchRunnerUpId = hg > ag ? m.away : m.home;
         }
-        
-        // Also save to matchSchedule for redundancy
+
+        let originalMatch = currentPhaseMatches.find(cm => cm.home === m.home && cm.away === m.away);
+        if (originalMatch) {
+            originalMatch.homeScore = hg;
+            originalMatch.awayScore = ag;
+        }
+
         const roundIdx = currentRound - 1;
         if (matchSchedule[roundIdx]) {
             if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
@@ -4619,38 +4684,28 @@ function finishCupRound() {
             }
         }
 
-        const winnerId = hg > ag ? m.home : m.away;
-        const runnerUpId = hg > ag ? m.away : m.home;
-        winners.push(allTeams.find(t => t.id === winnerId));
-        const compNames = getCompetitionNames(myTeam.league);
-
-        if (simulatedRoundMatches.length === 1) {
-            cupWinnerId = winnerId;
-            cupRunnerUpId = runnerUpId;
-        }
-
-        if (m.home === myTeam.id || m.away === myTeam.id) {
-            if (winnerId === myTeam.id) {
-                const prize = 2500000; // Bônus fixo por avançar
-                myTeam.balance += prize;
-                addCommentaryItem(`💰 ${compNames.cup}: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
-            } else {
-                addCommentaryItem(`❌ COPA: O ${myTeam.name} foi eliminado.`, 'info', 90);
+        if (matchWinnerId) {
+            winners.push(allTeams.find(t => t.id === matchWinnerId));
+            if (m.home === myTeam.id || m.away === myTeam.id) {
+                if (matchWinnerId === myTeam.id && !isFinal) {
+                    const compNames = getCompetitionNames(myTeam.league);
+                    const prize = 2500000;
+                    myTeam.balance += prize;
+                    addCommentaryItem(`💰 ${compNames.cup}: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
+                } else if (matchRunnerUpId === myTeam.id && !isFinal) {
+                    addCommentaryItem(`❌ COPA: O ${myTeam.name} foi eliminado.`, 'info', 90);
+                }
             }
         }
     });
 
-    if (winners.length >= 2) {
-        const nextPhase = [];
-        for (let i = 0; i < winners.length; i += 2) {
-            if (winners[i+1]) {
-                nextPhase.push({ home: winners[i].id, away: winners[i+1].id, currentHomeGoals: 0, currentAwayGoals: 0 });
-            }
-        }
-        cupBracket.push(nextPhase);
-    } else if (winners.length === 1) {
-        cupFinished = true; // Marca a copa como encerrada para não repetir a final
+    if (isFinal) {
+        cupFinished = true;
         const champion = winners[0];
+        const runnerUp = simulatedRoundMatches[0].home === champion.id ? simulatedRoundMatches[0].away : simulatedRoundMatches[0].home;
+        cupWinnerId = champion.id;
+        cupRunnerUpId = runnerUp;
+        
         const compNames = getCompetitionNames(myTeam.league);
         alert(`🏆 FIM DA COPA! O ${champion.name} é o campeão da ${compNames.cup}!`);
         if (champion.id === myTeam.id) {
@@ -4658,6 +4713,22 @@ function finishCupRound() {
             myTeam.hallOfFame.titles.push({ year: currentYear, title: compNames.cup });
             myTeam.balance += finalPrize;
         }
+    } else if (isLeg2) {
+        if (winners.length >= 2) {
+            const nextPhase = [];
+            for (let i = 0; i < winners.length; i += 2) {
+                if (winners[i+1]) {
+                    nextPhase.push({ home: winners[i].id, away: winners[i+1].id, currentHomeGoals: 0, currentAwayGoals: 0 });
+                }
+            }
+            cupBracket.push(nextPhase);
+        }
+    } else {
+        const nextPhase = [];
+        currentPhaseMatches.forEach(m => {
+            nextPhase.push({ home: m.away, away: m.home, currentHomeGoals: 0, currentAwayGoals: 0 });
+        });
+        cupBracket.push(nextPhase);
     }
 }
 
@@ -4732,33 +4803,56 @@ function finishLibertadoresRound() {
         console.log("finishLibertadoresRound: Processando fase de mata-mata.");
         const currentPhase = libMatches;
         const winners = [];
+        
+        const isFinal = libertadoresBracket.length === 7;
+        const isLeg2 = libertadoresBracket.length % 2 === 0;
+        const currentPhaseIndex = libertadoresBracket.length - 1;
+        const currentPhaseMatches = libertadoresBracket[currentPhaseIndex];
+        const previousPhaseMatches = isLeg2 ? libertadoresBracket[currentPhaseIndex - 1] : null;
+
         currentPhase.forEach(m => {
-            let homeGoals = m.currentHomeGoals;
-            let awayGoals = m.currentAwayGoals;
-            if (homeGoals === awayGoals) {
-                if (Math.random() > 0.5) homeGoals++; else awayGoals++;
-                // Atualiza também o objecto local para que lastRoundResults apanhe os novos golos!
-                m.currentHomeGoals = homeGoals;
-                m.currentAwayGoals = awayGoals;
+            let hg = m.currentHomeGoals;
+            let ag = m.currentAwayGoals;
+            let matchWinnerId = null;
+
+            if (isLeg2) {
+                const leg1Match = previousPhaseMatches.find(pm => pm.home === m.away && pm.away === m.home);
+                if (leg1Match) {
+                    const aggregateHome = hg + leg1Match.awayScore; 
+                    const aggregateAway = ag + leg1Match.homeScore;
+                    
+                    if (aggregateHome === aggregateAway) {
+                        if (Math.random() > 0.5) hg++; else ag++;
+                        m.currentHomeGoals = hg;
+                        m.currentAwayGoals = ag;
+                    }
+                    
+                    const finalAggHome = hg + leg1Match.awayScore;
+                    const finalAggAway = ag + leg1Match.homeScore;
+                    matchWinnerId = finalAggHome > finalAggAway ? m.home : m.away;
+                }
+            } else if (isFinal) {
+                if (hg === ag) {
+                    if (Math.random() > 0.5) hg++; else ag++;
+                    m.currentHomeGoals = hg;
+                    m.currentAwayGoals = ag;
+                }
+                matchWinnerId = hg > ag ? m.home : m.away;
             }
-            // FIX BUG #3: m.homeTeam pode ser undefined em partidas de mata-mata continental
+
             const htNameKO = (m.homeTeam && m.homeTeam.name) ? m.homeTeam.name : m.home;
             const atNameKO = (m.awayTeam && m.awayTeam.name) ? m.awayTeam.name : m.away;
             console.log(`finishLibertadoresRound: Processando partida de mata-mata ${htNameKO} vs ${atNameKO}`);
-            const winnerId = homeGoals > awayGoals ? m.home : m.away;
-            const winnerObj = allTeams.find(t => t.id === winnerId);
-            if (winnerObj) winners.push(winnerObj);
             
-            // FIX BUG: Guardar resultado da fase de mata-mata continental
-            if (typeof libertadoresBracket !== 'undefined' && Array.isArray(libertadoresBracket)) {
-                for (let phase of libertadoresBracket) {
-                    let originalMatch = phase.find(cm => cm.home === m.home && cm.away === m.away);
-                    if (originalMatch) {
-                        originalMatch.homeScore = homeGoals;
-                        originalMatch.awayScore = awayGoals;
-                        break;
-                    }
-                }
+            if (matchWinnerId) {
+                const winnerObj = allTeams.find(t => t.id === matchWinnerId);
+                if (winnerObj) winners.push(winnerObj);
+            }
+            
+            let originalMatch = currentPhaseMatches.find(cm => cm.home === m.home && cm.away === m.away);
+            if (originalMatch) {
+                originalMatch.homeScore = hg;
+                originalMatch.awayScore = ag;
             }
             
             const roundIdx = currentRound - 1;
@@ -4766,46 +4860,59 @@ function finishLibertadoresRound() {
                 if (!matchSchedule[roundIdx].matches) matchSchedule[roundIdx].matches = [];
                 let savedMatch = matchSchedule[roundIdx].matches.find(sm => sm.home === m.home && sm.away === m.away);
                 if (savedMatch) {
-                    savedMatch.homeScore = homeGoals;
-                    savedMatch.awayScore = awayGoals;
+                    savedMatch.homeScore = hg;
+                    savedMatch.awayScore = ag;
                 } else {
-                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: homeGoals, awayScore: awayGoals });
+                    matchSchedule[roundIdx].matches.push({ home: m.home, away: m.away, homeScore: hg, awayScore: ag });
                 }
             }
 
             const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
             const compName = isEurope ? "Champions League" : "Libertadores";
-            if (m.home === myTeam.id || m.away === myTeam.id) {
-                if (winnerId === myTeam.id) {
-                    const prizes = {
-                        8: 6250000,   // Vitória nas Oitavas (Avança p/ Quartas)
-                        4: 8500000,   // Vitória nas Quartas (Avança p/ Semi)
-                        2: 11500000,  // Vitória na Semi (Garante prêmio de Vice)
-                        1: 80000000   // Vitória na Final (~R$ 115M total acumulado do campeão)
-                    };
-                    const prize = prizes[currentPhase.length] || 0;
-                    if (prize > 0) {
-                        myTeam.balance += prize; // FIX: Corrigido para usar o nome dinâmico da competição
-                        if (currentPhase.length === 1) myTeam.hallOfFame.titles.push({ year: currentYear, title: compName });
-                        addCommentaryItem(`🌎 ${compName.toUpperCase()}: O ${myTeam.name} recebeu R$ ${(prize/1000000).toFixed(1)}M por avançar de fase!`, 'info', 90);
-                    }
-                    if (currentPhase.length === 1) addCommentaryItem("GLÓRIA ETERNA! Você é o campeão da América!", 'info', 90);
+            
+            if (matchWinnerId && (m.home === myTeam.id || m.away === myTeam.id)) {
+                if (matchWinnerId === myTeam.id && !isFinal) {
+                    const prizes = { 2: 7000000, 4: 10000000, 6: 12000000 };
+                    const prize = prizes[libertadoresBracket.length] || 5000000;
+                    myTeam.balance += prize;
+                    addCommentaryItem(`💰 ${compName}: O ${myTeam.name} avançou e recebeu R$ ${(prize/1000000).toFixed(1)}M!`, 'info', 90);
+                } else if (!isFinal) {
+                    addCommentaryItem(`❌ CONTINENTAL: O ${myTeam.name} foi eliminado.`, 'info', 90);
                 }
             }
         });
-        if (winners.length >= 2) {
-            const nextPhase = [];
-            for (let i = 0; i < winners.length; i += 2) {
-                if (winners[i] && winners[i+1]) {
-                    nextPhase.push({ home: winners[i].id, away: winners[i+1].id, currentHomeGoals: 0, currentAwayGoals: 0 });
-                }
+
+        if (isFinal) {
+            libertadoresFinished = true;
+            const champion = winners[0];
+            const runnerUp = currentPhase[0].home === champion.id ? currentPhase[0].away : currentPhase[0].home;
+            libertadoresWinnerId = champion.id;
+            
+            const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
+            const compName = isEurope ? "Champions League" : "Libertadores";
+            alert(`🏆 FIM DO CONTINENTAL! O ${champion.name} é o campeão da ${compName}!`);
+            
+            if (champion.id === myTeam.id) {
+                const finalPrize = 115000000;
+                myTeam.hallOfFame.titles.push({ year: currentYear, title: compName });
+                myTeam.balance += finalPrize;
             }
+        } else if (isLeg2) {
+            if (winners.length >= 2) {
+                const nextPhase = [];
+                for (let i = 0; i < winners.length; i += 2) {
+                    if (winners[i+1]) {
+                        nextPhase.push({ home: winners[i].id, away: winners[i+1].id, currentHomeGoals: 0, currentAwayGoals: 0 });
+                    }
+                }
+                libertadoresBracket.push(nextPhase);
+            }
+        } else {
+            const nextPhase = [];
+            currentPhaseMatches.forEach(m => {
+                nextPhase.push({ home: m.away, away: m.home, currentHomeGoals: 0, currentAwayGoals: 0 });
+            });
             libertadoresBracket.push(nextPhase);
-        } else if (winners.length === 1 && winners[0]) {
-            alert(`GLÓRIA ETERNA! O ${winners[0].name} conquistou a América!`);
-            libertadoresWinnerId = winners[0].id;
-            libertadoresBracket = [];
-            isLibertadoresMode = false;
         }
     }
 }
@@ -4821,14 +4928,52 @@ function renderCupBracket() {
     const titleEl = document.getElementById('cup-phase-title');
     if (titleEl) titleEl.innerText = phaseNames[Math.log2(currentPhase.length)] || "Copa";
 
+    const isLeg2 = cupBracket.length % 2 === 0 && cupBracket.length < 9;
+
     currentPhase.forEach(match => {
         const home = allTeams.find(t => t.id === match.home) || { name: 'A definir' };
         const away = allTeams.find(t => t.id === match.away) || { name: 'A definir' };
+        
+        let scoreText = "VS";
+        if (match.homeScore !== undefined && match.awayScore !== undefined) {
+            scoreText = `${match.homeScore} x ${match.awayScore}`;
+        }
+
+        let extraText = "";
+        if (isLeg2) {
+            const previousPhaseMatches = cupBracket[cupBracket.length - 2];
+            const leg1Match = previousPhaseMatches.find(pm => pm.home === match.away && pm.away === match.home);
+            if (leg1Match && leg1Match.homeScore !== undefined) {
+                const leg1HomeName = away.name;
+                const leg1AwayName = home.name;
+                extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Ida: ${leg1HomeName} ${leg1Match.homeScore} x ${leg1Match.awayScore} ${leg1AwayName}</div>`;
+                
+                if (match.homeScore !== undefined) {
+                    const aggHome = match.homeScore + leg1Match.awayScore;
+                    const aggAway = match.awayScore + leg1Match.homeScore;
+                    scoreText += `<br><span style="color:#ffd700; font-size: 11px;">Agr: ${aggHome} x ${aggAway}</span>`;
+                }
+            }
+        } else if (cupBracket.length < 9) {
+            extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Jogo de Ida</div>`;
+        } else {
+            extraText = `<div style="font-size: 11px; color: #aaa; margin-top: 4px;">Jogo Único</div>`;
+        }
+
         const div = document.createElement('div');
         div.className = 'match-preview';
         div.style.padding = "10px";
         div.style.borderBottom = "1px solid rgba(255,255,255,0.1)";
-        div.innerHTML = `<div style="display:flex; justify-content: space-between; width: 100%;"><span>${home.name}</span> <strong>VS</strong> <span>${away.name}</span></div>`;
+        div.innerHTML = `
+            <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span style="flex:1; text-align:right; padding-right:10px;">${home.name}</span> 
+                <div style="text-align:center;">
+                    <strong>${scoreText}</strong>
+                </div>
+                <span style="flex:1; text-align:left; padding-left:10px;">${away.name}</span>
+            </div>
+            <div style="text-align:center;">${extraText}</div>
+        `;
         list.appendChild(div);
     });
 }
