@@ -197,7 +197,7 @@ function recalcProb() {
     // Bonus atraentes reduzem a exigência do clube e agradam jogador
     const bonusFactor = (bonusSign / (marketValue * 0.1)) * 0.1 + (sellon / 50) * 0.15;
     
-    let prob = (transferFactor * 0.4) + (wageFactor * 0.4) + bonusFactor - repPenalty;
+    let prob = (transferFactor * 0.6) + (Math.min(1.5, wageFactor) * 0.2) + bonusFactor - repPenalty;
     
     const state = getNegotiationState(currentNegPlayer.id);
     // Humor reduz probabilidade
@@ -242,6 +242,17 @@ function submitMasterOffer() {
         bigClubPremium = 1.4;
     }
     const transferFactor = offerTransfer / (marketValue * bigClubPremium);
+
+    // Regra de Superestrelas (OVR 90+): O clube se recusa a vender por qualquer valor menor que a multa
+    if (currentNegPlayer.strength >= 90) {
+        const releaseClause = marketValue * 3;
+        if (offerTransfer < releaseClause) {
+            setDialogue(`"O ${currentNegPlayer.name} é inegociável! O nosso clube não aceita vender uma superestrela desse nível. A única forma de o levar é pagando o valor integral da Multa Rescisória!"`);
+            state.patience = Math.max(0, state.patience - 20);
+            updatePatienceUI();
+            return;
+        }
+    }
 
     // Proposta ofensiva
     if (transferFactor < 0.6) {
