@@ -857,8 +857,81 @@ function calculatePlayerMarketValue(player) {
 }
 
 // Gera uma idade consistente com base no nome do jogador (seed pseudo-aleatória)
+// Atualizado para 2026: Astros mundiais recebem a idade real cravada
+const starAges2026 = {
+    "lamine yamal": 19,
+    "endrick": 20,
+    "bellingham": 23,
+    "mbappé": 27,
+    "haaland": 26,
+    "vini jr": 26,
+    "vinícius júnior": 26,
+    "messi": 39,
+    "lionel messi": 39,
+    "cristiano ronaldo": 41,
+    "cr7": 41,
+    "neymar": 34,
+    "neymar jr": 34,
+    "de bruyne": 35,
+    "kevin de bruyne": 35,
+    "salah": 34,
+    "mohamed salah": 34,
+    "lewandowski": 38,
+    "robert lewandowski": 38,
+    "rodri": 30,
+    "foden": 26,
+    "phil foden": 26,
+    "pedri": 23,
+    "gavi": 22,
+    "musiala": 23,
+    "jamal musiala": 23,
+    "wirtz": 23,
+    "florian wirtz": 23,
+    "kane": 33,
+    "harry kane": 33,
+    "griezmann": 35,
+    "antoine griezmann": 35,
+    "valverde": 28,
+    "fede valverde": 28,
+    "saka": 24,
+    "bukayo saka": 24,
+    "declan rice": 27,
+    "rice": 27,
+    "odegaard": 27,
+    "martin odegaard": 27,
+    "ruben dias": 29,
+    "bernardo silva": 31,
+    "bruno fernandes": 31,
+    "rafael leão": 27,
+    "leão": 27,
+    "donnarumma": 27,
+    "courtois": 34,
+    "alisson": 33,
+    "ederson": 32,
+    "araújo": 27,
+    "koundé": 27,
+    "saliba": 25,
+    "gabriel magalhães": 28,
+    "militão": 28,
+    "eder militão": 28,
+    "tchouaméni": 26,
+    "camavinga": 23,
+    "rodrygo": 25,
+    "darwin núñez": 27,
+    "luis díaz": 29,
+    "alexander-arnold": 27,
+    "trent alexander-arnold": 27,
+    "robertson": 32,
+    "van dijk": 35
+};
+
 function getConsistentAge(name) {
     if (!name) return Math.floor(Math.random() * (35 - 18 + 1)) + 18;
+    
+    const nKey = name.toLowerCase().trim();
+    if (starAges2026[nKey]) return starAges2026[nKey];
+    
+    // Fallback original para jogadores não mapeados
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
         hash = name.charCodeAt(i) + ((hash << 5) - hash);
