@@ -164,7 +164,7 @@ function updateNegValues(source) {
 function recalcProb() {
     if (!currentNegPlayer) return;
 
-    const marketValue = Math.pow(currentNegPlayer.strength, 2) * 14000;
+    const marketValue = calculatePlayerMarketValue(currentNegPlayer);
     const currentWage = currentNegPlayer.salario || (currentNegPlayer.strength * 1000);
     
     const offerTransferM = parseFloat(document.getElementById('neg-transfer-input').value) || 0;
@@ -177,8 +177,15 @@ function recalcProb() {
     const bonusGoal = parseFloat(document.getElementById('neg-bonus-goal').value || 0) * 1000;
     const sellon = parseFloat(document.getElementById('neg-sellon').value || 0);
     
+    // Clubes grandes exigem sobrepreço para seus craques
+    let bigClubPremium = 1.0;
+    const bigClubs = ['realmadrid', 'mancity', 'psg', 'bayern', 'barcelona', 'liverpool', 'arsenal'];
+    if (currentNegPlayer.strength >= 87 && typeof currentNegTeam !== 'undefined' && currentNegTeam && bigClubs.includes(currentNegTeam.id)) {
+        bigClubPremium = 1.4; // 40% acima do valor de mercado
+    }
+    
     // Fatores
-    const transferFactor = offerTransfer / marketValue;
+    const transferFactor = offerTransfer / (marketValue * bigClubPremium);
     const wageFactor = offerWage / currentWage;
     
     // Reputação vs Ego
@@ -228,8 +235,13 @@ function submitMasterOffer() {
     state.attempts++;
     
     const chance = recalcProb();
-    const marketValue = Math.pow(currentNegPlayer.strength, 2) * 14000;
-    const transferFactor = offerTransfer / marketValue;
+    const marketValue = calculatePlayerMarketValue(currentNegPlayer);
+    let bigClubPremium = 1.0;
+    const bigClubs = ['realmadrid', 'mancity', 'psg', 'bayern', 'barcelona', 'liverpool', 'arsenal'];
+    if (currentNegPlayer.strength >= 87 && typeof currentNegTeam !== 'undefined' && currentNegTeam && bigClubs.includes(currentNegTeam.id)) {
+        bigClubPremium = 1.4;
+    }
+    const transferFactor = offerTransfer / (marketValue * bigClubPremium);
 
     // Proposta ofensiva
     if (transferFactor < 0.6) {
@@ -281,7 +293,7 @@ function submitMasterOffer() {
 function payReleaseClause() {
     if (!currentNegPlayer) return;
     
-    const marketValue = Math.pow(currentNegPlayer.strength, 2) * 14000;
+    const marketValue = calculatePlayerMarketValue(currentNegPlayer);
     const releaseClause = marketValue * 3;
     
     if (myTeam.balance < releaseClause) {
