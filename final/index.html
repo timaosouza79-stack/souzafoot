@@ -1156,7 +1156,7 @@
     <script src="rest_world.js"></script>
     <script src="squads.js"></script>
     <script src="continental.js?v=2"></script>
-    <script src="script.js?v=104"></script>
+    <script src="script.js?v=105"></script>
     <script src="negotiation.js?v=8"></script>
     <script>
         // Popula o seletor de competições dinamicamente após os scripts carregarem
@@ -1247,6 +1247,10 @@
                 showScreen('screen-squad');
                 if (typeof renderSquad === 'function') renderSquad();
             } else if (tab === 'market') {
+                if (typeof isTransferWindowOpen === 'function' && !isTransferWindowOpen()) {
+                    alert("O Mercado de Transferências está fechado!\nAbre apenas no início, meio (15-25) e fim da temporada.");
+                    return;
+                }
                 document.getElementById('mnav-market').classList.add('active');
                 showScreen('screen-market');
                 if (typeof renderMarket === 'function') renderMarket();

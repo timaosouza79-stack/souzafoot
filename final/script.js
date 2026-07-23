@@ -1837,12 +1837,17 @@ function updateDashboardUI() {
     const isEurope = ['england', 'spain', 'italy', 'france', 'germany', 'portugal', 'arabia'].includes(myTeam.league);
     const isSA = myTeam.league.startsWith('brazil') || ['south_america', 'argentina'].includes(myTeam.league);
 
-    const isWindowOpen = (currentRound === 1 || currentRound > totalDates || (currentRound >= 15 && currentRound <= 25)); // Janela de transferências
+    const isWindowOpen = isTransferWindowOpen();
     const marketBtn = document.getElementById('btn-market');
     if (marketBtn) {
         marketBtn.disabled = !isWindowOpen;
         marketBtn.style.opacity = isWindowOpen ? "1" : "0.5";
         marketBtn.title = isWindowOpen ? "Janela Aberta" : "Janela Fechada (Abre na Rodada 15)";
+    }
+    const mnavMarket = document.getElementById('mnav-market');
+    if (mnavMarket) {
+        mnavMarket.disabled = !isWindowOpen;
+        mnavMarket.style.opacity = isWindowOpen ? "1" : "0.5";
     }
     
     const libBtn = document.getElementById('btn-view-libertadores');
@@ -7153,8 +7158,8 @@ Deseja aceitar a venda?`);
 function isTransferWindowOpen() {
     if (!matchSchedule || matchSchedule.length === 0) return false;
     const totalRounds = matchSchedule.length;
-    // Janela de pré-época (rodada 1) e janela de meio de temporada (rodadas 15-20)
-    return currentRound === 1 || (currentRound >= 15 && currentRound <= 20) || currentRound > totalRounds;
+    // Janela de pré-época (rodada 1) e janela de meio de temporada (rodadas 15-25)
+    return currentRound === 1 || (currentRound >= 15 && currentRound <= 25) || currentRound > totalRounds;
 }
 
 function checkForIncomingBids() {
