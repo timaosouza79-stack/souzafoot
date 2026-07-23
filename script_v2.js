@@ -506,7 +506,15 @@ let currentUser = null;
 let users = (function() {
     try {
         const saved = localStorage.getItem('brasfoot_users');
-        return saved ? JSON.parse(saved) : {};
+        if (saved) {
+            if (saved.startsWith('{')) {
+                return JSON.parse(saved);
+            } else if (typeof LZString !== 'undefined') {
+                const decomp = LZString.decompressFromUTF16(saved);
+                if (decomp) return JSON.parse(decomp);
+            }
+        }
+        return {};
     } catch (e) {
         console.error("Erro ao carregar usuários:", e);
         return {};
@@ -645,8 +653,12 @@ function logout() {
     updateDynamicBackground(null);
 }
 
-function saveGame() {
+function saveGame(force = false) {
     if (!currentUser) return;
+    
+    const settings = users[currentUser].settings || { autoSave: true, savePerGame: true };
+    if (!force && !settings.autoSave) return;
+
     users[currentUser].gameState = {
         databaseVersion,
         currentYear,
@@ -676,15 +688,35 @@ function saveGame() {
         isIntercontinentalMode
     };
     try {
-        localStorage.setItem('brasfoot_users', JSON.stringify(users));
+        const jsonString = JSON.stringify(users);
+        const compressed = typeof LZString !== 'undefined' ? LZString.compressToUTF16(jsonString) : jsonString;
+        localStorage.setItem('brasfoot_users', compressed);
     } catch (e) {
         console.error("Erro ao salvar no localStorage (espaço insuficiente?):", e);
     }
 }
 
 function manualSave() {
-    saveGame();
+    saveGame(true);
     alert("Jogo salvo com sucesso! Você pode continuar de onde parou na próxima vez que entrar.");
+}
+
+function showSaveSettings() {
+    const settings = (users[currentUser] && users[currentUser].settings) || { autoSave: true, savePerGame: true };
+    document.getElementById('toggle-autosave').checked = settings.autoSave;
+    document.getElementById('toggle-save-per-game').checked = settings.savePerGame;
+    document.getElementById('modal-save-settings').style.display = 'flex';
+}
+
+function saveSettingsConfig() {
+    if (!currentUser || !users[currentUser]) return;
+    if (!users[currentUser].settings) users[currentUser].settings = {};
+    
+    users[currentUser].settings.autoSave = document.getElementById('toggle-autosave').checked;
+    users[currentUser].settings.savePerGame = document.getElementById('toggle-save-per-game').checked;
+    
+    document.getElementById('modal-save-settings').style.display = 'none';
+    saveGame(true);
 }
 
 function confirmReset() {
@@ -2263,7 +2295,8 @@ function advanceRound() {
             console.warn('Falha ao avançar currentRound no fallback:', err);
         }
         try { updateDashboardUI(); } catch (err) {}
-        try { saveGame(); } catch (err) {}
+        const settings = (users[currentUser] && users[currentUser].settings) || { autoSave: true, savePerGame: true };
+        try { saveGame(settings.savePerGame); } catch (err) {}
         showScreen('screen-main');
     }
 }
@@ -4181,7 +4214,9 @@ ${p.name} lesionou-se e vai desfalcar a equipa por ${p.injuryRounds} rodada(s)!`
         if (finBtn) finBtn.style.display = 'none';
 
         try { updateDashboardUI(); } catch (err) { console.warn('Erro ao atualizar UI do dashboard:', err); }
-        try { saveGame(); } catch (err) { console.warn('Erro ao salvar jogo:', err); }
+        
+        const settings = (users[currentUser] && users[currentUser].settings) || { autoSave: true, savePerGame: true };
+        try { saveGame(settings.savePerGame); } catch (err) { console.warn('Erro ao salvar jogo:', err); }
 
         try {
             showScreen('screen-main');
