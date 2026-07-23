@@ -664,6 +664,7 @@ function saveGame(force = false) {
         currentYear,
         myTeamId: myTeam ? myTeam.id : null,
         currentRound,
+        activeScreen: typeof currentActiveScreen !== 'undefined' ? currentActiveScreen : 'screen-main',
         matchSchedule,
         standings,
         allTeams,
@@ -1140,9 +1141,13 @@ function loadGame() {
         cupWinnerId = state.cupWinnerId || null;
         cupRunnerUpId = state.cupRunnerUpId || null;
         cupFinished = state.cupFinished || false;
-        console.log("loadGame: Exibindo screen-main.");
+        console.log("loadGame: Exibindo tela salva.");
         ensureShields();
-        showScreen('screen-main');
+        if (state.activeScreen && state.activeScreen !== 'screen-selection' && state.activeScreen !== 'screen-login') {
+            showScreen(state.activeScreen);
+        } else {
+            showScreen('screen-main');
+        }
         updateDashboardUI();
         updateDynamicBackground(myTeam.id);
     } else {
@@ -1652,7 +1657,9 @@ document.getElementById('league-select').addEventListener('change', function() {
 });
 
 // Troca as telas
+let currentActiveScreen = 'screen-main';
 function showScreen(screenId) {
+    currentActiveScreen = screenId;
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
 }

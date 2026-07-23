@@ -7,6 +7,7 @@ const STATIC_ASSETS = [
   './script_v2.js',
   './negotiation.js',
   './squads.js',
+  './lz-string.min.js',
   './manifest.json',
   './icon.svg'
 ];
