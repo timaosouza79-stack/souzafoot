@@ -757,17 +757,81 @@ function ensureSafeState(team, forceReset = false) {
 
 function calculateSalary(player) {
     if (!player) return 0;
-    const base = 500;
-    const strengthFactor = Math.pow(player.strength || 60, 1.5);
+    const ovr = player.strength || 60;
     
-    // Fator de idade: pico de salário entre 27-30 anos
+    // Fator de idade
     const age = player.age || 25;
     let ageFactor = 1.0;
     if (age >= 24 && age <= 26) ageFactor = 1.2;
     else if (age >= 27 && age <= 30) ageFactor = 1.4;
     else if (age > 30) ageFactor = 1.1 - ((age - 30) * 0.05);
+
+    // Valores anuais (considerando ~40 jogos por ano para achar o valor por partida)
+    const matchesPerYear = 40;
+    let annualSalary = 0;
+
+    if (ovr < 75) {
+        const minVal = 50000;
+        const maxVal = 1000000;
+        const ratio = Math.max(0, (ovr - 50) / 24);
+        annualSalary = minVal + ratio * (maxVal - minVal);
+    } else if (ovr <= 84) {
+        const minVal = 1500000;
+        const maxVal = 5000000;
+        const ratio = (ovr - 75) / 9;
+        annualSalary = minVal + ratio * (maxVal - minVal);
+    } else if (ovr <= 89) {
+        const minVal = 6000000;
+        const maxVal = 15000000;
+        const ratio = (ovr - 85) / 4;
+        annualSalary = minVal + ratio * (maxVal - minVal);
+    } else {
+        const minVal = 20000000;
+        const maxVal = 40000000;
+        const ratio = (ovr - 90) / 9;
+        annualSalary = minVal + Math.pow(ratio, 2) * (maxVal - minVal);
+    }
+
+    const matchSalary = Math.round((annualSalary * ageFactor) / matchesPerYear);
+    return Math.max(500, matchSalary);
+}
+
+function calculatePlayerMarketValue(player) {
+    if (!player) return 0;
+    const ovr = player.strength || 60;
     
-    return Math.round((base + strengthFactor) * ageFactor);
+    // Fator de idade para valor de mercado
+    const age = player.age || 25;
+    let ageFactor = 1.0;
+    if (age <= 21) ageFactor = 1.5;
+    else if (age <= 24) ageFactor = 1.2;
+    else if (age >= 30 && age <= 32) ageFactor = 0.8;
+    else if (age > 32) ageFactor = 0.5;
+
+    let base = 0;
+    if (ovr < 75) {
+        const minVal = 1000000;
+        const maxVal = 15000000;
+        const ratio = Math.max(0, (ovr - 50) / 24);
+        base = minVal + ratio * (maxVal - minVal);
+    } else if (ovr <= 84) {
+        const minVal = 20000000;
+        const maxVal = 60000000;
+        const ratio = (ovr - 75) / 9;
+        base = minVal + ratio * (maxVal - minVal);
+    } else if (ovr <= 89) {
+        const minVal = 80000000;
+        const maxVal = 140000000;
+        const ratio = (ovr - 85) / 4;
+        base = minVal + ratio * (maxVal - minVal);
+    } else {
+        const minVal = 200000000;
+        const maxVal = 400000000;
+        const ratio = (ovr - 90) / 9;
+        base = minVal + Math.pow(ratio, 2) * (maxVal - minVal);
+    }
+    
+    return Math.round(base * ageFactor);
 }
 
 // Gera uma idade consistente com base no nome do jogador (seed pseudo-aleatória)
@@ -6265,7 +6329,7 @@ function viewOpponentSquad(teamId) {
         });
 
         sortedSquad.forEach(player => {
-            const price = Math.pow(player.strength, 2) * 14000;
+            const price = calculatePlayerMarketValue(player);
             const priceFormatted = `R$ ${(price/1000000).toFixed(1)}M`;
             const isStarterLabel = player.isStarter ? '<span style="font-size: 0.7em; background: #4CAF50; padding: 2px 4px; border-radius: 4px;">Titular</span>' : '<span style="font-size: 0.7em; background: #666; padding: 2px 4px; border-radius: 4px;">Reserva</span>';
 
@@ -6444,7 +6508,7 @@ function renderMarket() {
     }
 
     displayPlayers.forEach(player => {
-        const price = Math.pow(player.strength, 2) * 14000; // Multiplicador ajustado para aumentar o preço
+        const price = calculatePlayerMarketValue(player);
         const item = document.createElement('div');
         item.className = 'player-item market-item';
         item.innerHTML = `
@@ -6634,7 +6698,7 @@ function sellPlayer(playerId) {
         return;
     }
 
-    const marketPrice = Math.pow(player.strength, 2) * 14000; // Multiplicador ajustado para aumentar o preço
+    const marketPrice = calculatePlayerMarketValue(player);
     const offerMultiplier = 0.85 + (Math.random() * 0.35); // Proposta entre 85% e 120% do valor de mercado
     const offerValue = Math.round(marketPrice * offerMultiplier);
     
@@ -6701,7 +6765,7 @@ function checkForIncomingBids() {
     const buyer = potentialBuyers[Math.floor(Math.random() * Math.min(potentialBuyers.length, 10))]; // Pega um dos 10 mais ricos
 
     // Cálculo do valor da proposta baseado em overall e idade
-    const basePrice = Math.pow(targetPlayer.strength, 2) * 14000;
+    const basePrice = calculatePlayerMarketValue(targetPlayer);
     const ageFactor = targetPlayer.age < 24 ? 1.6 : (targetPlayer.age < 29 ? 1.2 : (targetPlayer.age < 33 ? 0.9 : 0.6));
     const marketPrice = basePrice * ageFactor;
     
@@ -7320,7 +7384,7 @@ function generateScoutReport() {
         if (p.strength <= starters[0].strength) return false;
         
         // O preço deve ser realista (até 60% do nosso saldo)
-        const price = Math.pow(p.strength, 2) * 14000;
+        const price = calculatePlayerMarketValue(p);
         if (price > myTeam.balance * 0.6) return false;
 
         return true;
@@ -7359,7 +7423,7 @@ function showScoutReport() {
         listEl.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nossos olheiros não encontraram alvos adequados no momento. Tente novamente mais tarde.</p>';
     } else {
         suggestions.forEach(player => {
-            const price = Math.pow(player.strength, 2) * 14000;
+            const price = calculatePlayerMarketValue(player);
             listEl.innerHTML += `
                 <div class="market-item" style="background: rgba(0,0,0,0.2); border-radius: 12px;">
                     <div class="market-item-top">
