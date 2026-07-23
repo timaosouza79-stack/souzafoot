@@ -1,4 +1,4 @@
-const CACHE_NAME = 'souzafoot-v11';
+const CACHE_NAME = 'souzafoot-v12';
 const STATIC_ASSETS = [
   './',
   './index.html',

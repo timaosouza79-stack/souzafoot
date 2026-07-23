@@ -6769,7 +6769,7 @@ function renderMarket() {
 }
 
 // Função que executa a transferência de fato após sucesso na negociação
-function executeTransfer(playerId, fromTeamId, price) {
+function executeTransfer(playerId, fromTeamId, price, contractYears = 3) {
     const fromTeam = allTeams.find(t => String(t.id) === String(fromTeamId));
     const pIdx = fromTeam.squad.findIndex(p => String(p.id) === String(playerId));
     const player = fromTeam.squad[pIdx];
@@ -6778,6 +6778,7 @@ function executeTransfer(playerId, fromTeamId, price) {
     fromTeam.balance += price; // Clube vendedor recebe o dinheiro
 
     player.isStarter = false;
+    player.contractYears = parseInt(contractYears) || 3;
     myTeam.squad.push(player);
     fromTeam.squad.splice(pIdx, 1);
 

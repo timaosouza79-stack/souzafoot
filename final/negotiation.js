@@ -44,6 +44,15 @@ function openMasterNegotiation(playerId, fromTeamId) {
     document.getElementById('neg-club-name').innerText = fromTeam.name;
     document.getElementById('neg-player-age').innerText = player.age;
 
+    // Inicializar e popular dados de contrato
+    if (!player.contractYears) player.contractYears = Math.floor(Math.random() * 5) + 1; // 1 a 5 anos
+    if (!player.salario) player.salario = calculateSalary(player);
+
+    document.getElementById('neg-current-wage-display').innerText = "R$ " + (player.salario / 1000000).toFixed(1) + "M/ano";
+    document.getElementById('neg-contract-years-display').innerText = player.contractYears + (player.contractYears > 1 ? " anos" : " ano");
+    
+    const reqWage = calculateSalary(player) / 1000000;
+    document.getElementById('neg-requested-wage-display').innerText = "R$ " + reqWage.toFixed(1) + "M/ano";
     const marketValue = calculatePlayerMarketValue(player);
     document.getElementById('neg-market-value').innerText = "R$ " + (marketValue / 1000000).toFixed(1) + "M";
 
@@ -184,8 +193,13 @@ function recalcProb() {
         bigClubPremium = 1.4; // 40% acima do valor de mercado
     }
     
+    // Multiplicador de Tempo de Contrato
+    let contractMultiplier = 1.0;
+    if (currentNegPlayer.contractYears <= 1) contractMultiplier = 0.6; // Desconto de 40% se está em fim de contrato
+    else if (currentNegPlayer.contractYears >= 3) contractMultiplier = 1.15; // Prêmium de 15% por contrato longo
+
     // Fatores
-    const transferFactor = offerTransfer / (marketValue * bigClubPremium);
+    const transferFactor = offerTransfer / (marketValue * bigClubPremium * contractMultiplier);
     const wageFactor = offerWage / currentWage;
     
     // Reputação vs Ego
@@ -241,7 +255,11 @@ function submitMasterOffer() {
     if (currentNegPlayer.strength >= 87 && typeof currentNegTeam !== 'undefined' && currentNegTeam && bigClubs.includes(currentNegTeam.id)) {
         bigClubPremium = 1.4;
     }
-    const transferFactor = offerTransfer / (marketValue * bigClubPremium);
+    let contractMultiplier = 1.0;
+    if (currentNegPlayer.contractYears <= 1) contractMultiplier = 0.6;
+    else if (currentNegPlayer.contractYears >= 3) contractMultiplier = 1.15;
+
+    const transferFactor = offerTransfer / (marketValue * bigClubPremium * contractMultiplier);
 
     // Regra de Superestrelas (OVR 90+): O clube se recusa a vender por qualquer valor menor que a multa
     if (currentNegPlayer.strength >= 90) {
@@ -282,9 +300,10 @@ function submitMasterOffer() {
         
         // Efetivar transferência
         setTimeout(() => {
-            // Apply new wage to player object (optional, depends on how the game handles it later)
+            const contractYears = document.getElementById('neg-contract-years').value;
             currentNegPlayer.salario = parseFloat(document.getElementById('neg-wage-input').value) * 1000000;
-            executeTransfer(currentNegPlayer.id, currentNegTeam.id, offerTransfer);
+            currentNegPlayer.contractYears = parseInt(contractYears);
+            executeTransfer(currentNegPlayer.id, currentNegTeam.id, offerTransfer, contractYears);
             closeMasterNegotiation();
         }, 2000);
     } else {
@@ -315,8 +334,10 @@ function payReleaseClause() {
     if (confirm(`Deseja acionar a multa rescisória de R$ ${(releaseClause/1000000).toFixed(1)}M?\nIsso ignora qualquer recusa do clube vendedor.`)) {
         setDialogue(`"O quê?! Acionaram a cláusula de rescisão... Não há nada que possamos fazer para impedir. Ele é vosso."`);
         setTimeout(() => {
+            const contractYears = document.getElementById('neg-contract-years').value;
             currentNegPlayer.salario = parseFloat(document.getElementById('neg-wage-input').value) * 1000000;
-            executeTransfer(currentNegPlayer.id, currentNegTeam.id, releaseClause);
+            currentNegPlayer.contractYears = parseInt(contractYears);
+            executeTransfer(currentNegPlayer.id, currentNegTeam.id, releaseClause, contractYears);
             closeMasterNegotiation();
         }, 2000);
     }
