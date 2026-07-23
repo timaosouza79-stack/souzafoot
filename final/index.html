@@ -131,8 +131,8 @@
                     <button class="btn btn-secondary" onclick="showScreen('screen-standings'); renderStandings();"><i class="fas fa-list-ol"></i> Ver Classificação</button>
                     <button class="btn btn-secondary" onclick="showScreen('screen-stats'); populateStatsCompetitions();"><i class="fas fa-chart-bar"></i> Estatísticas & Artilharia</button>
                     <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="manualSave()" style="border-color: #4CAF50;"><i class="fas fa-save" style="color: #4CAF50;"></i> Salvar Jogo</button>
-                        <button class="btn btn-secondary" onclick="showSaveSettings()" style="border-color: #2196F3;"><i class="fas fa-cog" style="color: #2196F3;"></i> Opções de Salvar</button>
+                        <button id="btnSaveGame" class="btn btn-secondary" style="border-color: #4CAF50;"><i class="fas fa-save" style="color: #4CAF50;"></i> Salvar Jogo</button>
+                        <button id="btnSaveOptions" class="btn btn-secondary" style="border-color: #2196F3;"><i class="fas fa-cog" style="color: #2196F3;"></i> Opções de Salvar</button>
                         <button class="btn btn-secondary" onclick="confirmReset()" style="border-color: #f44336;"><i class="fas fa-power-off" style="color: #f44336;"></i> Reiniciar Jogo</button>
                     </div>
                     <button class="btn btn-secondary" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair da Conta</button>
@@ -820,10 +820,10 @@
                 <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#FF9800;" onclick="closeMobileMore(); showScreen('screen-trophies'); renderTrophies();">
                     <i class="fas fa-medal" style="font-size:1.2rem; color:#FF9800;"></i> Sala de Troféus
                 </button>
-                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#4CAF50;" onclick="closeMobileMore(); manualSave();">
+                <button id="btnSaveGameMobile" class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#4CAF50;">
                     <i class="fas fa-save" style="font-size:1.2rem; color:#4CAF50;"></i> Salvar Jogo
                 </button>
-                <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#2196F3;" onclick="closeMobileMore(); showSaveSettings();">
+                <button id="btnSaveOptionsMobile" class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#2196F3;">
                     <i class="fas fa-cog" style="font-size:1.2rem; color:#2196F3;"></i> Opções de Salvar
                 </button>
                 <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px; border-color:#f44336;" onclick="closeMobileMore(); confirmReset();">
@@ -1158,33 +1158,39 @@
         </div>
     </div>
 
-    <!-- Modal Save Settings -->
+    <!-- Modal Save Options -->
     <div id="modal-save-settings" class="modal">
-        <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-content" style="max-width: 450px;">
             <div class="modal-header">
-                <h2>Configurações de Salvamento</h2>
-                <button class="close-modal" onclick="closeModal('modal-save-settings')"><i class="fas fa-times"></i></button>
+                <h2>Opções de Salvar</h2>
+                <button id="btnCloseSaveOptions" class="close-modal"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-body">
-                <div style="margin-bottom: 20px;">
-                    <label style="display: flex; align-items: center; cursor: pointer;">
-                        <input type="checkbox" id="toggle-autosave" style="width: 20px; height: 20px; margin-right: 10px;">
-                        <span style="font-size: 1.1rem;">Salvamento Automático</span>
-                    </label>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; margin-left: 30px;">
-                        Salva o jogo a cada 5 minutos e após diversas interações. Desative se o jogo estiver travando com frequência ao jogar.
-                    </p>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="flex: 1; font-weight: bold;"><i class="fas fa-hdd"></i> Slot 1</span>
+                        <button class="btn btn-primary" onclick="saveToSlot(1)" style="padding: 5px 15px;"><i class="fas fa-save"></i> Salvar</button>
+                        <button class="btn btn-secondary" onclick="loadFromSlot(1)" style="padding: 5px 15px;"><i class="fas fa-folder-open"></i> Carregar</button>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="flex: 1; font-weight: bold;"><i class="fas fa-hdd"></i> Slot 2</span>
+                        <button class="btn btn-primary" onclick="saveToSlot(2)" style="padding: 5px 15px;"><i class="fas fa-save"></i> Salvar</button>
+                        <button class="btn btn-secondary" onclick="loadFromSlot(2)" style="padding: 5px 15px;"><i class="fas fa-folder-open"></i> Carregar</button>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="flex: 1; font-weight: bold;"><i class="fas fa-hdd"></i> Slot 3</span>
+                        <button class="btn btn-primary" onclick="saveToSlot(3)" style="padding: 5px 15px;"><i class="fas fa-save"></i> Salvar</button>
+                        <button class="btn btn-secondary" onclick="loadFromSlot(3)" style="padding: 5px 15px;"><i class="fas fa-folder-open"></i> Carregar</button>
+                    </div>
                 </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: flex; align-items: center; cursor: pointer;">
-                        <input type="checkbox" id="toggle-save-per-game" style="width: 20px; height: 20px; margin-right: 10px;">
-                        <span style="font-size: 1.1rem;">Salvar a Cada Jogo</span>
+                <hr style="border-color: #333; margin: 5px 0;">
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnExportSave" class="btn btn-secondary" style="flex: 1; border-color: #4CAF50; color: #4CAF50;"><i class="fas fa-download"></i> Exportar (.json)</button>
+                    <label for="importSaveInput" class="btn btn-secondary" style="flex: 1; border-color: #FF9800; color: #FF9800; text-align: center; cursor: pointer;">
+                        <i class="fas fa-upload"></i> Importar Save
                     </label>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; margin-left: 30px;">
-                        Garante que o jogo seja salvo automaticamente toda vez que sua equipe joga uma partida.
-                    </p>
+                    <input type="file" id="importSaveInput" accept=".json" style="display: none;">
                 </div>
-                <button class="btn btn-primary" onclick="saveSettingsConfig()" style="width: 100%;"><i class="fas fa-check"></i> Concluir</button>
             </div>
         </div>
     </div>
@@ -1192,6 +1198,7 @@
     <script src="rest_world.js"></script>
     <script src="squads.js"></script>
     <script src="continental.js?v=2"></script>
+    <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999;"></div>
     <script src="script.js?v=108"></script>
     <script src="negotiation.js?v=8"></script>
     <script>

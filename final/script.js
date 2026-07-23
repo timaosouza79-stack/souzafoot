@@ -524,7 +524,8 @@ function updateSoundButtonUI() {
 let currentUser = null;
 let users = (function() {
     try {
-        const saved = localStorage.getItem('brasfoot_users');
+        let saved = localStorage.getItem('souzafoot_current_save');
+        if (!saved) saved = localStorage.getItem('brasfoot_users'); // Fallback to old save data
         if (saved) {
             if (saved.startsWith('{')) {
                 return JSON.parse(saved);
@@ -601,7 +602,7 @@ function handleLogin(event) {
                 gameState: null 
             };
             try {
-                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                localStorage.setItem('souzafoot_current_save', typeof LZString !== 'undefined' ? LZString.compressToUTF16(JSON.stringify(users)) : JSON.stringify(users));
             } catch (e) {
                 console.warn("localStorage indisponível. Usando sessão em memória.", e);
             }
@@ -623,7 +624,7 @@ function handleLogin(event) {
             if (savedPassword === undefined) {
                 users[user].password = password;
                 try {
-                    localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                    localStorage.setItem('souzafoot_current_save', typeof LZString !== 'undefined' ? LZString.compressToUTF16(JSON.stringify(users)) : JSON.stringify(users));
                 } catch (e) {
                     console.warn("localStorage indisponível. Usando sessão em memória.", e);
                 }
@@ -642,7 +643,7 @@ function handleLogin(event) {
         if (users[user]) {
             users[user].gameState = null;
             try {
-                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                localStorage.setItem('souzafoot_current_save', typeof LZString !== 'undefined' ? LZString.compressToUTF16(JSON.stringify(users)) : JSON.stringify(users));
             } catch (lsError) {
                 console.warn("localStorage indisponível. Usando sessão em memória.", lsError);
             }
@@ -713,41 +714,142 @@ function saveGame(force = false) {
     try {
         const jsonString = JSON.stringify(users);
         const compressed = typeof LZString !== 'undefined' ? LZString.compressToUTF16(jsonString) : jsonString;
-        localStorage.setItem('brasfoot_users', compressed);
+        localStorage.setItem('souzafoot_current_save', compressed);
     } catch (e) {
         console.error("Erro ao salvar no localStorage (espaço insuficiente?):", e);
     }
 }
 
+function showToast(message) {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) return;
+    const toast = document.createElement('div');
+    toast.style.background = 'rgba(0,0,0,0.8)';
+    toast.style.color = '#fff';
+    toast.style.padding = '10px 20px';
+    toast.style.borderRadius = '5px';
+    toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.5)';
+    toast.innerText = message;
+    toastContainer.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
 function manualSave() {
     saveGame(true);
-    alert("Jogo salvo com sucesso! Você pode continuar de onde parou na próxima vez que entrar.");
+    showToast("Jogo salvo com sucesso!");
 }
 
 function showSaveSettings() {
-    const settings = (users[currentUser] && users[currentUser].settings) || { autoSave: true, savePerGame: true };
-    document.getElementById('toggle-autosave').checked = settings.autoSave;
-    document.getElementById('toggle-save-per-game').checked = settings.savePerGame;
     document.getElementById('modal-save-settings').style.display = 'flex';
 }
 
-function saveSettingsConfig() {
-    if (!currentUser || !users[currentUser]) return;
-    if (!users[currentUser].settings) users[currentUser].settings = {};
-    
-    users[currentUser].settings.autoSave = document.getElementById('toggle-autosave').checked;
-    users[currentUser].settings.savePerGame = document.getElementById('toggle-save-per-game').checked;
-    
-    document.getElementById('modal-save-settings').style.display = 'none';
+function saveToSlot(slotIndex) {
+    if (!currentUser) return;
     saveGame(true);
+    const key = `souzafoot_slot_${slotIndex}`;
+    const jsonString = JSON.stringify(users);
+    const compressed = typeof LZString !== 'undefined' ? LZString.compressToUTF16(jsonString) : jsonString;
+    try {
+        localStorage.setItem(key, compressed);
+        showToast(`Jogo salvo no Slot ${slotIndex} com sucesso!`);
+    } catch (e) {
+        alert("Erro ao salvar no slot (espaço insuficiente?).");
+    }
 }
+
+function loadFromSlot(slotIndex) {
+    const key = `souzafoot_slot_${slotIndex}`;
+    const saved = localStorage.getItem(key);
+    if (!saved) {
+        return alert("Nenhum jogo salvo neste slot.");
+    }
+    if (confirm(`Tem certeza que deseja carregar o Slot ${slotIndex}? Seu progresso atual será sobrescrito.`)) {
+        try {
+            let decompressed = saved;
+            if (!saved.startsWith('{') && typeof LZString !== 'undefined') {
+                decompressed = LZString.decompressFromUTF16(saved);
+            }
+            if (decompressed) {
+                users = JSON.parse(decompressed);
+                localStorage.setItem('souzafoot_current_save', saved);
+                currentUser = null;
+                alert(`Slot ${slotIndex} carregado com sucesso. Faça login novamente para continuar.`);
+                location.reload();
+            }
+        } catch (e) {
+            alert("Erro ao ler dados do slot.");
+        }
+    }
+}
+
+function exportSave() {
+    saveGame(true);
+    const jsonString = JSON.stringify(users);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `souzafoot_save_${new Date().getTime()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast("Save exportado com sucesso!");
+}
+
+function importSave(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (typeof data === 'object') {
+                users = data;
+                saveGame(true);
+                alert("Save importado com sucesso! A página será recarregada.");
+                location.reload();
+            } else {
+                throw new Error("Formato inválido");
+            }
+        } catch (err) {
+            alert("Erro ao importar save. Arquivo inválido ou corrompido.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnSaveGame = document.getElementById('btnSaveGame');
+    if (btnSaveGame) btnSaveGame.addEventListener('click', manualSave);
+    
+    const btnSaveOptions = document.getElementById('btnSaveOptions');
+    if (btnSaveOptions) btnSaveOptions.addEventListener('click', showSaveSettings);
+
+    const btnSaveGameMobile = document.getElementById('btnSaveGameMobile');
+    if (btnSaveGameMobile) btnSaveGameMobile.addEventListener('click', () => { closeMobileMore(); manualSave(); });
+
+    const btnSaveOptionsMobile = document.getElementById('btnSaveOptionsMobile');
+    if (btnSaveOptionsMobile) btnSaveOptionsMobile.addEventListener('click', () => { closeMobileMore(); showSaveSettings(); });
+
+    const btnCloseSaveOptions = document.getElementById('btnCloseSaveOptions');
+    if (btnCloseSaveOptions) btnCloseSaveOptions.addEventListener('click', () => closeModal('modal-save-settings'));
+
+    const btnExportSave = document.getElementById('btnExportSave');
+    if (btnExportSave) btnExportSave.addEventListener('click', exportSave);
+
+    const importSaveInput = document.getElementById('importSaveInput');
+    if (importSaveInput) importSaveInput.addEventListener('change', importSave);
+});
 
 function confirmReset() {
     if (confirm("Deseja realmente apagar seu progresso atual e voltar para a seleção de times? Isso resetará todos os elencos para o estado original.")) {
         if (currentUser && users[currentUser]) {
             users[currentUser].gameState = null; // Limpa o save do usuário
             try {
-                localStorage.setItem('brasfoot_users', JSON.stringify(users));
+                localStorage.setItem('souzafoot_current_save', typeof LZString !== 'undefined' ? LZString.compressToUTF16(JSON.stringify(users)) : JSON.stringify(users));
             } catch (e) {
                 console.warn("localStorage indisponível. Usando sessão em memória.", e);
             }
@@ -3402,7 +3504,7 @@ function deleteUser(name) {
     if (confirm(`Deseja apagar o usuário "${name}"?`)) {
         delete users[name];
         try {
-            localStorage.setItem('brasfoot_users', JSON.stringify(users));
+            localStorage.setItem('souzafoot_current_save', typeof LZString !== 'undefined' ? LZString.compressToUTF16(JSON.stringify(users)) : JSON.stringify(users));
         } catch (e) {
             console.warn("localStorage indisponível. Usando sessão em memória.", e);
         }
