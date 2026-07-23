@@ -1659,9 +1659,15 @@ document.getElementById('league-select').addEventListener('change', function() {
 // Troca as telas
 let currentActiveScreen = 'screen-main';
 function showScreen(screenId) {
+    let el = document.getElementById(screenId);
+    if (!el) {
+        console.warn("Tela não encontrada:", screenId);
+        screenId = 'screen-main';
+        el = document.getElementById('screen-main');
+    }
     currentActiveScreen = screenId;
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    if (el) el.classList.add('active');
 }
 
 function getCompetitionNames(leagueId) {
