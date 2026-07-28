@@ -841,6 +841,51 @@ input, textarea, select {
     font-size: 1.1rem;
 }
 
+/* Modais Gerais do Jogo */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: var(--bg-base);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 24px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    box-sizing: border-box;
+    position: relative;
+    animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    z-index: 10010;
+}
+.close-modal:hover {
+    color: var(--primary-color);
+}
+
 /* Modals */
 .live-modal {
     position: fixed;
@@ -2110,4 +2155,46 @@ body.login-active .manager-header,
 body.login-active #mobile-more-modal,
 body.login-active .mobile-nav {
     display: none !important;
+}
+
+/* ============================================================
+   SUPORTE RESPONSIVO COMPLETO — OVERRIDES ADICIONAIS MOBILE (≤ 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Força modais genéricas a utilizarem 100% de largura disponível sem estouros */
+    .modal-content {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 16px !important;
+        border-radius: 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Lista de elenco do oponente */
+    #opponent-squad-list {
+        grid-template-columns: 1fr !important;
+        max-height: 380px !important;
+    }
+
+    /* Evita estouro de flexboxes inline e containers com gaps fixos */
+    .modal-content div[style*="display: flex; gap: 15px;"],
+    .modal-content div[style*="display: flex; gap: 20px;"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    /* Garante que botões e elementos de input dentro das modais expandam até 100% */
+    .modal-content button,
+    .modal-content .btn,
+    .modal-content select,
+    .modal-content input {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Ajuste para imagens grandes ou escudos que possam extrapolar ecrãs pequenos */
+    .modal-content img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
 }
