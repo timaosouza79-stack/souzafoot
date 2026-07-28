@@ -30,6 +30,46 @@
     <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body class="login-active">
+    <!-- Overlay de Instalação PWA Amigável para Crianças -->
+    <div id="pwa-install-overlay" class="pwa-install-overlay">
+        <div class="pwa-logo-container">
+            <img src="icon.svg" alt="Souzafoot Logo" onerror="this.outerHTML='<span class=\'pwa-fallback-logo\'>⚽</span>'">
+        </div>
+        <h1 class="pwa-title">Souzafoot</h1>
+        <p class="pwa-subtitle">O teu jogo de futebol preferido! ⚽🏆</p>
+        
+        <button onclick="triggerPWAInstallFlow()" class="btn-pwa-install-giant">
+            BAIXAR JOGO AGORA ⚽
+        </button>
+        
+        <button onclick="dismissPWAOverlay()" class="btn-pwa-skip">
+            Jogar no Navegador 🌐
+        </button>
+    </div>
+
+    <!-- Modal iOS com Instruções Visuais de 2 Passos -->
+    <div id="pwa-ios-instructions" class="pwa-ios-instructions" onclick="dismissPWAiOS()">
+        <div class="pwa-ios-card" onclick="event.stopPropagation()">
+            <h3>Instalar o Souzafoot 📱</h3>
+            <p style="font-size: 0.9rem; color: #a0aec0; margin-bottom: 20px;">Adiciona o jogo ao ecrã do teu telemóvel em apenas 2 passos!</p>
+            
+            <div class="pwa-ios-step">
+                <span class="pwa-ios-number">1</span>
+                <span class="pwa-ios-text">Clica no botão de <strong>Partilhar</strong> na barra do teu Safari.</span>
+                <span class="pwa-ios-icon-draw"><i class="fas fa-share-square" style="color:#3182ce;"></i></span>
+                <span class="pwa-ios-arrow">↓</span>
+            </div>
+            
+            <div class="pwa-ios-step" style="margin-bottom: 25px;">
+                <span class="pwa-ios-number">2</span>
+                <span class="pwa-ios-text">Escolhe a opção <strong>Adicionar ao Ecrã Principal</strong>.</span>
+                <span class="pwa-ios-icon-draw"><i class="far fa-plus-square"></i></span>
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; border-radius: 12px; background: #38a169; border: none; font-weight: bold;" onclick="dismissPWAiOS()">Entendido! 👍</button>
+        </div>
+    </div>
+
     <div id="dynamic-bg" class="dynamic-background"></div>
     <div class="app-container">
         
@@ -1266,6 +1306,63 @@
         }
 
         let deferredPrompt;
+        
+        // Verifica se o aplicativo está rodando como app instalado (standalone)
+        function isAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+        }
+
+        // Mostra a overlay do PWA apenas se não estiver instalado e não tiver sido pulado nesta sessão
+        function checkPWAInstallOverlay() {
+            if (isAppInstalled()) {
+                console.log('Souzafoot aberto como App Instalado. Escondendo overlay de instalação.');
+                dismissPWAOverlay();
+                return;
+            }
+            
+            // Se já foi pulado nesta sessão de navegação, não incomoda a criança
+            if (sessionStorage.getItem('pwa_overlay_dismissed') === 'true') {
+                dismissPWAOverlay();
+                return;
+            }
+            
+            // Exibe a tela de instalação
+            const overlay = document.getElementById('pwa-install-overlay');
+            if (overlay) overlay.style.display = 'flex';
+        }
+
+        function dismissPWAOverlay() {
+            const overlay = document.getElementById('pwa-install-overlay');
+            if (overlay) overlay.style.display = 'none';
+            sessionStorage.setItem('pwa_overlay_dismissed', 'true');
+        }
+
+        function dismissPWAiOS() {
+            const iosInst = document.getElementById('pwa-ios-instructions');
+            if (iosInst) iosInst.style.display = 'none';
+            dismissPWAOverlay();
+        }
+
+        // Fluxo de decisão ao clicar no botão GIGANTE
+        function triggerPWAInstallFlow() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (isIOS) {
+                // Se for iPhone, mostra as instruções de 2 passos com setas
+                const iosInst = document.getElementById('pwa-ios-instructions');
+                if (iosInst) iosInst.style.display = 'flex';
+            } else {
+                // Se for Android/PC e tivermos o trigger do prompt
+                if (deferredPrompt) {
+                    triggerInstallPWA();
+                } else {
+                    // Se o prompt não disparou ou não é compatível, apenas pula para o jogo direto
+                    alert("A carregar Souzafoot... Bom jogo! ⚽");
+                    dismissPWAOverlay();
+                }
+            }
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             // Impede que o infobar do navegador apareça
             e.preventDefault();
@@ -1287,6 +1384,7 @@
             deferredPrompt.userChoice.then((choiceResult) => {
                 if (choiceResult.outcome === 'accepted') {
                     console.log('Usuário aceitou a instalação do Souzafoot');
+                    dismissPWAOverlay();
                 } else {
                     console.log('Usuário recusou a instalação do Souzafoot');
                 }
@@ -1301,6 +1399,10 @@
 
         window.addEventListener('load', function() {
             populateStatsCompetitions();
+            
+            // Verifica e gerencia a exibição da tela de instalação/boas-vindas
+            checkPWAInstallOverlay();
+
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js')
                     .then(reg => console.log('Service Worker registrado com sucesso!', reg))
