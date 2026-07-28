@@ -1,17 +1,17 @@
-const CACHE_NAME = 'souzafoot-v23';
+const CACHE_NAME = 'souzafoot-v24';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/negotiation.js',
-  '/squads.js',
-  '/mundial.js',
-  '/continental_tournaments.js',
-  '/mundial_integration.js',
-  '/lz-string.min.js',
-  '/manifest.json',
-  '/icon.svg'
+  './',
+  './index.html',
+  './style.css',
+  './script.js',
+  './negotiation.js',
+  './squads.js',
+  './mundial.js',
+  './continental_tournaments.js',
+  './mundial_integration.js',
+  './lz-string.min.js',
+  './manifest.json',
+  './icon.svg'
 ];
 
 // Instalação do Service Worker e Caching dos arquivos estáticos

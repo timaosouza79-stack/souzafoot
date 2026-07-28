@@ -1,6 +1,6 @@
 {
-  "short_name": "Souza Foot",
-  "name": "Souza Foot - Manager de Futebol",
+  "short_name": "Souzafoot",
+  "name": "Souzafoot",
   "description": "Gerencie seu time, contrate jogadores e dispute campeonatos nacionais e continentais 100% offline.",
   "icons": [
     {
@@ -18,7 +18,7 @@
   ],
   "start_url": "./index.html",
   "background_color": "#0a0f18",
-  "theme_color": "#4CAF50",
+  "theme_color": "#1e5a3c",
   "display": "standalone",
   "orientation": "portrait"
 }

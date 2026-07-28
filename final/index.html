@@ -51,9 +51,12 @@
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;" id="btn-login-action"><i class="fas fa-sign-in-alt"></i> Entrar</button>
                     </form>
-                    <p style="text-align: center; margin-top: 15px; font-size: 0.9rem;">
+                    <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; margin-bottom: 0;">
                         Não tem conta? <a href="#" onclick="toggleLoginMode(event)" id="toggle-link" style="color: var(--primary-color);">Criar conta</a>
                     </p>
+                    <button id="btn-install-pwa-login" class="btn btn-secondary" style="display:none; width: 100%; margin-top: 15px; border-color:#9b59b6; gap:8px;" onclick="triggerInstallPWA()">
+                        <i class="fas fa-download" style="color:#9b59b6;"></i> Instalar Aplicativo (PWA)
+                    </button>
 
                     <div id="user-list-container" style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
                         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; font-weight: 600;">Usuários Salvos:</p>
@@ -835,6 +838,9 @@
                 <button class="btn btn-secondary" style="min-height:64px; flex-direction:column; gap:6px;" onclick="closeMobileMore(); logout();">
                     <i class="fas fa-sign-out-alt" style="font-size:1.2rem;"></i> Sair
                 </button>
+                <button id="btn-install-pwa" class="btn btn-secondary" style="display:none; min-height:64px; flex-direction:column; gap:6px; border-color:#9b59b6; grid-column: span 2;" onclick="triggerInstallPWA(); closeMobileMore();">
+                    <i class="fas fa-download" style="font-size:1.2rem; color:#9b59b6;"></i> Instalar Aplicativo
+                </button>
             </div>
         </div>
     </div>
@@ -1257,6 +1263,40 @@
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) modal.style.display = 'none';
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Impede que o infobar do navegador apareça
+            e.preventDefault();
+            // Salva o evento para uso posterior
+            deferredPrompt = e;
+            // Exibe os botões de instalação na interface
+            const installBtn = document.getElementById('btn-install-pwa');
+            const installBtnLogin = document.getElementById('btn-install-pwa-login');
+            if (installBtn) installBtn.style.display = 'flex';
+            if (installBtnLogin) installBtnLogin.style.display = 'inline-flex';
+            console.log('beforeinstallprompt disparado!');
+        });
+
+        function triggerInstallPWA() {
+            if (!deferredPrompt) return;
+            // Mostra o prompt de instalação
+            deferredPrompt.prompt();
+            // Aguarda a resposta do usuário
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuário aceitou a instalação do Souzafoot');
+                } else {
+                    console.log('Usuário recusou a instalação do Souzafoot');
+                }
+                deferredPrompt = null;
+                // Oculta os botões
+                const installBtn = document.getElementById('btn-install-pwa');
+                const installBtnLogin = document.getElementById('btn-install-pwa-login');
+                if (installBtn) installBtn.style.display = 'none';
+                if (installBtnLogin) installBtnLogin.style.display = 'none';
+            });
         }
 
         window.addEventListener('load', function() {
