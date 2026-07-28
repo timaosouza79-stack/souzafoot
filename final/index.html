@@ -3,17 +3,20 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Souza Foot - Manager</title>
     <!-- Configurações PWA e Mobile -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0a0f18">
+    <!-- App Mobile Nativa: impede recarregamento, zoom e gestos indesejados -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Souza Foot">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Souza Foot">
     <meta name="msapplication-TileColor" content="#0a0f18">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="format-detection" content="telephone=no">
     <meta name="description" content="Souza Foot - Seu gerenciador de futebol online">
     <link rel="apple-touch-icon" href="icon.svg">
     <link rel="apple-touch-startup-image" href="icon.svg">
@@ -24,7 +27,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Compressão para Save (Offline Suportado) -->
     <script src="lz-string.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body class="login-active">
     <div id="dynamic-bg" class="dynamic-background"></div>
@@ -1199,7 +1202,7 @@
     <script src="squads.js"></script>
     <script src="continental.js?v=2"></script>
     <div id="toast-container" style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 9999;"></div>
-    <script src="script.js?v=109"></script>
+    <script src="script.js?v=110"></script>
     <script src="negotiation.js?v=8"></script>
     <script>
         // Popula o seletor de competições dinamicamente após os scripts carregarem

@@ -17,6 +17,57 @@ if (typeof window !== 'undefined' && typeof window.nameGenerator === 'undefined'
 }
 var nameGenerator = window.nameGenerator;
 
+// === BLOQUEIO DE GESTOS INDESEJADOS DO BROWSER (APP MOBILE NATIVA) ===
+// Impede pull-to-refresh no Chrome Android e scroll elástico no iOS Safari.
+// O CSS overscroll-behavior nem sempre é suficiente em dispositivos/browsers antigos.
+(function blockNativeBrowserGestures() {
+    var lastTouchY = 0;
+    var touchStartHandler = function(e) {
+        if (e.touches.length === 1) {
+            lastTouchY = e.touches[0].clientY;
+        }
+    };
+    var touchMoveHandler = function(e) {
+        var touchY = e.touches[0].clientY;
+        var touchYDelta = touchY - lastTouchY;
+        lastTouchY = touchY;
+
+        // Se estamos a fazer scroll para cima (puxar para baixo) e o elemento
+        // no topo do DOM não é um container scrollável, bloqueia o evento.
+        var target = e.target;
+        var isScrollable = false;
+        while (target && target !== document.body) {
+            var style = window.getComputedStyle(target);
+            var overflowY = style.overflowY;
+            var canScroll = (overflowY === 'auto' || overflowY === 'scroll');
+            if (canScroll && target.scrollHeight > target.clientHeight) {
+                // Permite scroll para cima apenas se ainda há conteúdo acima
+                if (touchYDelta > 0 && target.scrollTop === 0) {
+                    isScrollable = false;
+                    break;
+                }
+                // Permite scroll para baixo apenas se ainda há conteúdo abaixo
+                if (touchYDelta < 0 && target.scrollTop + target.clientHeight >= target.scrollHeight) {
+                    isScrollable = false;
+                    break;
+                }
+                isScrollable = true;
+                break;
+            }
+            target = target.parentElement;
+        }
+
+        if (!isScrollable) {
+            e.preventDefault();
+        }
+    };
+
+    document.addEventListener('touchstart', touchStartHandler, { passive: true });
+    document.addEventListener('touchmove', touchMoveHandler, { passive: false });
+})();
+
+// === FIM DO BLOQUEIO DE GESTOS ===
+
 // --- BASE DE DADOS DE PATROCINADORES ---
 const sponsorBrands = {
     level1: [

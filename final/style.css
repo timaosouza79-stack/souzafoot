@@ -64,6 +64,19 @@ body.theme-libertadores {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* Impede gestos indesejados do browser (swipe-to-navigate, pull-to-refresh) */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* === APP MOBILE NATIVA: tela travada e sem recarregamento acidental === */
+html {
+    width: 100%;
+    height: 100%;
+    /* Bloqueia scroll elástico e pull-to-refresh em iOS Safari */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+    overflow: hidden;
+    touch-action: pan-x pan-y;
 }
 
 body {
@@ -71,24 +84,53 @@ body {
     background-color: var(--bg-base);
     color: var(--text-main);
     line-height: 1.6;
-    min-height: 100vh;
-    overflow-x: hidden;
+    /* Usa dvh para altura real da viewport no mobile (exclui barra de endereços) */
+    width: 100%;
+    height: 100dvh;
+    height: 100vh; /* fallback para browsers sem suporte a dvh */
+    /* Sem overflow global — só elementos específicos fazem scroll */
+    overflow: hidden;
+    /* Bloqueia pull-to-refresh e swipe-to-navigate nativos */
+    overscroll-behavior: none;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: auto;
+    touch-action: pan-x pan-y;
+    /* Impede seleção acidental de texto durante o toque */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Impede destaque azul ao tocar elementos no Chrome/Android */
+    -webkit-tap-highlight-color: transparent;
 }
 
 h1, h2, h3, h4, h5, h6, .brand-font {
     font-family: 'Outfit', sans-serif;
 }
 
-/* Scrollbar Premium */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+/* Permite seleção de texto apenas em inputs e áreas de texto */
+input, textarea, select {
+    -webkit-user-select: auto;
+    user-select: auto;
+    touch-action: manipulation;
+}
+
+/* Scrollbar Premium — visível apenas em listas internas */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
 
+/* === CONTAINER PRINCIPAL: ocupa toda a altura visível da tela === */
 .app-container {
     max-width: 1280px;
     margin: 0 auto;
     padding: 2vh 4vw;
+    /* Em mobile, o app-container vira o wrapper de scroll principal das telas */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    /* Permite que listas internas não propaguem o scroll para o body */
+    height: 100%;
 }
 
 /* Glass Panels */
@@ -1119,6 +1161,8 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Em mobile: limita a altura para caber no ecrã junto com a nav e o header */
+    flex-shrink: 0;
 }
 
 .squad-pitch {
@@ -1274,8 +1318,12 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    /* Scroll interno na lista do banco de suplentes — não propaga para o body */
     max-height: 480px;
     overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     padding-right: 4px;
 }
 
@@ -1481,11 +1529,28 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 @media (max-width: 768px) {
 
     /* ---- Base ---- */
-    body { font-size: 0.92rem; -webkit-text-size-adjust: 100%; }
+    body {
+        font-size: 0.92rem;
+        -webkit-text-size-adjust: 100%;
+        /* Garante que o body ocupa exatamente a tela visível no mobile */
+        height: 100dvh;
+        height: 100vh;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        /* Bloqueia qualquer scroll elástico (rubber-banding) no iOS */
+        overscroll-behavior: none;
+    }
 
     .app-container {
+        /* Scroll principal das telas fica aqui — usa altura real sem a nav bar */
         padding: 12px 10px;
-        padding-bottom: 80px; /* Espaço para a nav bar */
+        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* ---- Mostrar nav bar mobile ---- */
@@ -1644,6 +1709,41 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     .squad-content-split {
         grid-template-columns: 1fr;
         gap: 16px;
+    }
+
+    /* ---- Campo: ajusta para caber na tela sem cortar menu ou nav bar ---- */
+    .squad-pitch-container {
+        padding: 10px;
+        border-radius: 14px;
+    }
+
+    .squad-pitch {
+        /* Limita a altura máxima do campo para garantir que caiba na tela
+           (descontando: header ~80px + tabs ~48px + nav ~70px + padding ~30px) */
+        max-height: calc(100dvh - 228px);
+        max-height: calc(100vh - 228px);
+        /* Mantém proporção sem ultrapassar o limite vertical */
+        aspect-ratio: 3 / 4;
+        max-width: 100%;
+        width: auto;
+        height: auto;
+    }
+
+    /* ---- Banco de Suplentes: scroll interno limitado ---- */
+    .squad-reserves-list {
+        max-height: calc(100dvh - 280px);
+        max-height: calc(100vh - 280px);
+    }
+
+    /* ---- Mercado de Transferências: lista com scroll interno ---- */
+    #screen-market .manager-content,
+    .market-list {
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        max-height: calc(100dvh - 180px);
+        max-height: calc(100vh - 180px);
     }
 
     .player-item {
@@ -1891,6 +1991,8 @@ h1, h2, h3, h4, h5, h6, .brand-font {
     .app-container {
         padding-left: max(10px, env(safe-area-inset-left, 0px));
         padding-right: max(10px, env(safe-area-inset-right, 0px));
+        /* Padding extra inferior para não sobrepor a nav bar em safe areas */
+        padding-bottom: max(calc(80px + env(safe-area-inset-bottom, 0px)), 80px);
     }
 }
 
