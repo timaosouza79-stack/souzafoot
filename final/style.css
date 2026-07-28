@@ -1150,6 +1150,7 @@ input, textarea, select {
     grid-template-columns: 1.2fr 1fr;
     gap: 20px;
     align-items: start;
+    padding: 0 15px 20px;
 }
 
 .squad-pitch-container {
@@ -1161,7 +1162,8 @@ input, textarea, select {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Em mobile: limita a altura para caber no ecrã junto com a nav e o header */
+    /* Garante que o container nunca colapse para altura zero */
+    min-height: 200px;
     flex-shrink: 0;
 }
 

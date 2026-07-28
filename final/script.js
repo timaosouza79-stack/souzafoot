@@ -1487,6 +1487,10 @@ function loadGame() {
         else if (targetScreen === 'screen-squad') {
             var squadBtn = document.getElementById('mnav-squad');
             if (squadBtn) squadBtn.classList.add('active');
+            // Garante que o relvado e os jogadores são renderizados ao restaurar a tela de escalação
+            if (typeof renderSquad === 'function') {
+                setTimeout(function() { renderSquad(); }, 50);
+            }
         }
         updateDashboardUI();
         updateDynamicBackground(myTeam.id);
@@ -5682,6 +5686,17 @@ function showPlayerMoodMessage(playerId) {
 
 function renderSquad() {
     if (!myTeam) return;
+    if (!myTeam.squad || myTeam.squad.length === 0) return;
+
+    // Garante que o tab de jogadores (relvado) está ativo e visível
+    const tabPlayers = document.getElementById('squad-tab-players');
+    const tabPlayersBtn = document.getElementById('tab-players-btn');
+    if (tabPlayers && !tabPlayers.classList.contains('active')) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        tabPlayers.classList.add('active');
+        if (tabPlayersBtn) tabPlayersBtn.classList.add('active');
+    }
 
     document.getElementById('squad-team-name').innerText = myTeam.name;
     document.getElementById('squad-team-strength').innerText = myTeam.strength;
@@ -5694,7 +5709,7 @@ function renderSquad() {
 
     // Ordenar por posição: GOL, ZAG, LAT, MEI, ATA
     const posOrder = { 'GOL': 1, 'ZAG': 2, 'LAT': 3, 'MEI': 4, 'ATA': 5 };
-    myTeam.squad.sort((a, b) => posOrder[a.position] - posOrder[b.position]);
+    myTeam.squad.sort((a, b) => (posOrder[a.position] || 9) - (posOrder[b.position] || 9));
 
     const starters = myTeam.squad.filter(p => p.isStarter);
     const reserves = myTeam.squad.filter(p => !p.isStarter);
