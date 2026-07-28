@@ -1,3 +1,22 @@
+// --- STUB COMPATIBILIDADE LEGADA: nameGenerator ---
+// Garante que qualquer referência a nameGenerator (de saves/scripts antigos) não quebre.
+// O gerador real de nomes está integrado inline em generateYouthIntake() e outros locais.
+if (typeof window !== 'undefined' && typeof window.nameGenerator === 'undefined') {
+    window.nameGenerator = {
+        _firstNames: ['João', 'Pedro', 'Lucas', 'Mateus', 'Gabriel', 'Guilherme', 'Rafael', 'Felipe', 'Gustavo', 'Arthur', 'Bruno', 'Diego', 'Thiago', 'Leonardo', 'Eduardo', 'Henrique', 'Caio', 'Vitor', 'André', 'Daniel'],
+        _lastNames: ['Silva', 'Santos', 'Oliveira', 'Souza', 'Rodrigues', 'Ferreira', 'Alves', 'Pereira', 'Lima', 'Gomes', 'Costa', 'Ribeiro', 'Martins', 'Carvalho', 'Almeida', 'Nascimento', 'Araújo', 'Barbosa', 'Cardoso', 'Moura'],
+        generate: function() {
+            const fn = this._firstNames[Math.floor(Math.random() * this._firstNames.length)];
+            const ln = this._lastNames[Math.floor(Math.random() * this._lastNames.length)];
+            return fn + ' ' + ln;
+        },
+        generateName: function() { return this.generate(); },
+        getRandomName: function() { return this.generate(); },
+        getName: function() { return this.generate(); }
+    };
+}
+var nameGenerator = window.nameGenerator;
+
 // --- BASE DE DADOS DE PATROCINADORES ---
 const sponsorBrands = {
     level1: [
@@ -1089,7 +1108,29 @@ function loadGame() {
     if (!currentUser || !users[currentUser]) return;
     console.log("loadGame: Iniciando para usuário:", currentUser);
     
+    // Garante que nameGenerator está sempre disponível (proteção contra saves legados)
+    if (typeof nameGenerator === 'undefined' || !nameGenerator) {
+        nameGenerator = window.nameGenerator;
+    }
+
     const state = users[currentUser].gameState;
+
+    // Sanitiza nomes de jogadores nos dados de save antes do processamento
+    // Evita crash caso um save antigo tenha jogadores sem nome (gerados pelo nameGenerator legado)
+    if (state && state.allTeams) {
+        state.allTeams.forEach(function(team) {
+            if (team && team.squad) {
+                team.squad.forEach(function(p) {
+                    if (p && (!p.name || typeof p.name !== 'string' || p.name.trim() === '')) {
+                        p.name = (nameGenerator && typeof nameGenerator.generate === 'function')
+                            ? nameGenerator.generate()
+                            : ('Jogador ' + (p.id || Math.floor(Math.random() * 9999)));
+                        console.warn('[loadGame] Jogador sem nome corrigido:', p);
+                    }
+                });
+            }
+        });
+    }
     
     if (state && state.myTeamId && state.allTeams && state.allTeams.length > 0) {
         allTeams = state.allTeams;
