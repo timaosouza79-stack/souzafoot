@@ -2063,6 +2063,13 @@ function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     if (el) el.classList.add('active');
 
+    // Sempre que a tela de escalação for exibida, força renderização imediata do campo
+    if (screenId === 'screen-squad') {
+        if (typeof renderSquad === 'function') {
+            requestAnimationFrame(function() { renderSquad(); });
+        }
+    }
+
     // Correção: Esconder interface vazada na tela de login
     if (screenId === 'screen-login' || screenId === 'screen-team-selection') {
         document.body.classList.add('login-active');
@@ -5685,11 +5692,18 @@ function showPlayerMoodMessage(playerId) {
 }
 
 function renderSquad() {
+    // --- Guards de segurança ---
     if (!myTeam) return;
     if (!myTeam.squad || myTeam.squad.length === 0) return;
 
-    // Garante que o tab de jogadores (relvado) está ativo e visível
-    const tabPlayers = document.getElementById('squad-tab-players');
+    // Cabeçalho
+    const nameEl = document.getElementById('squad-team-name');
+    const strEl  = document.getElementById('squad-team-strength');
+    if (nameEl) nameEl.innerText = myTeam.name;
+    if (strEl)  strEl.innerText  = myTeam.strength;
+
+    // Garante que o tab de jogadores (campo) está visível
+    const tabPlayers    = document.getElementById('squad-tab-players');
     const tabPlayersBtn = document.getElementById('tab-players-btn');
     if (tabPlayers && !tabPlayers.classList.contains('active')) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -5698,165 +5712,202 @@ function renderSquad() {
         if (tabPlayersBtn) tabPlayersBtn.classList.add('active');
     }
 
-    document.getElementById('squad-team-name').innerText = myTeam.name;
-    document.getElementById('squad-team-strength').innerText = myTeam.strength;
-
-    const pitchField = document.getElementById('squad-pitch-field');
+    const pitchField  = document.getElementById('squad-pitch-field');
     const listReserves = document.getElementById('list-reserves');
-    
-    if (pitchField) pitchField.innerHTML = '';
+
+    if (pitchField)   pitchField.innerHTML   = '';
     if (listReserves) listReserves.innerHTML = '';
 
-    // Ordenar por posição: GOL, ZAG, LAT, MEI, ATA
+    // --- Ordena e separa titulares / suplentes ---
     const posOrder = { 'GOL': 1, 'ZAG': 2, 'LAT': 3, 'MEI': 4, 'ATA': 5 };
     myTeam.squad.sort((a, b) => (posOrder[a.position] || 9) - (posOrder[b.position] || 9));
 
     const starters = myTeam.squad.filter(p => p.isStarter);
-    const reserves = myTeam.squad.filter(p => !p.isStarter);
+    const reserves  = myTeam.squad.filter(p => !p.isStarter);
 
-    // 1. RENDERIZAR O CAMPO 2D (LADO ESQUERDO)
+    // =========================================================
+    // 1. RENDERIZAR O CAMPO ESTILO PES 2021
+    // =========================================================
     if (pitchField) {
-        // Linhas de áreas do campo
-        const areaTop = document.createElement('div');
-        areaTop.className = 'pitch-area-top';
-        const areaBottom = document.createElement('div');
-        areaBottom.className = 'pitch-area-bottom';
-        pitchField.appendChild(areaTop);
-        pitchField.appendChild(areaBottom);
 
-        const formation = myTeam.tactics?.formation || myTeam.formation || '4-3-3';
-        const coords = pitchCoordinates[formation] || pitchCoordinates['4-3-3'];
+        // -- Linhas táticas via DOM (sem imagens externas) --
+        const lines = [
+            { cls: 'pitch-line-top-goal'   },
+            { cls: 'pitch-line-top-small'  },
+            { cls: 'pitch-line-bot-goal'   },
+            { cls: 'pitch-line-bot-small'  },
+            { cls: 'pitch-line-mid'        },
+            { cls: 'pitch-line-circle'     },
+            { cls: 'pitch-line-center-dot' }
+        ];
+        lines.forEach(({ cls }) => {
+            const d = document.createElement('div');
+            d.className = cls;
+            pitchField.appendChild(d);
+        });
 
-        // Algoritmo de mapeamento com memória de posições (Total Freedom)
-        let pool = [...starters];
+        // -- Formação e coordenadas --
+        const formation = (myTeam.tactics && myTeam.tactics.formation)
+            ? myTeam.tactics.formation
+            : (myTeam.formation || '4-3-3');
+        const coords = (pitchCoordinates && pitchCoordinates[formation])
+            ? pitchCoordinates[formation]
+            : pitchCoordinates['4-3-3'];
+
+        // -- Mapeamento: só use titulares reais --
+        const pool = [...starters];
         const mapping = [];
 
-        // 1. Tenta colocar quem já tem slot definido na formação atual
+        // 1ª passagem: respeita slot fixo (memória de posição)
         coords.forEach((slot, index) => {
-            const exactMatchIdx = pool.findIndex(p => p.pitchSlot === index);
-            if (exactMatchIdx !== -1) {
-                mapping.push({ slot, player: pool[exactMatchIdx], index });
-                pool.splice(exactMatchIdx, 1);
+            const exactIdx = pool.findIndex(p => p.pitchSlot === index);
+            if (exactIdx !== -1) {
+                mapping.push({ slot, player: pool.splice(exactIdx, 1)[0], index });
             } else {
                 mapping.push({ slot, player: null, index });
             }
         });
 
-        // 2. Preenche os slots vazios (novos titulares ou mudança de formação)
+        // 2ª passagem: preenche slots vazios por posição
         mapping.forEach(item => {
-            if (item.player === null && pool.length > 0) {
-                let targetPos = 'MEI';
-                if (item.slot.sector === 'gk') targetPos = 'GOL';
-                else if (item.slot.posText === 'ZC') targetPos = 'ZAG';
-                else if (item.slot.posText === 'LE' || item.slot.posText === 'LD' || item.slot.posText === 'AD' || item.slot.posText === 'AE') targetPos = 'LAT';
-                else if (item.slot.sector === 'df') targetPos = 'ZAG';
-                else if (item.slot.sector === 'fw') targetPos = 'ATA';
+            if (item.player !== null || pool.length === 0) return;
+            const s = item.slot;
+            let targetPos = 'MEI';
+            if (s.sector === 'gk') targetPos = 'GOL';
+            else if (s.sector === 'df') targetPos = 'ZAG';
+            else if (s.sector === 'fw') targetPos = 'ATA';
 
-                let matchIdx = pool.findIndex(p => p.position === targetPos);
-                if (matchIdx === -1) matchIdx = 0;
+            let idx = pool.findIndex(p => p.position === targetPos);
+            if (idx === -1) idx = 0;
 
-                item.player = pool[matchIdx];
-                item.player.pitchSlot = item.index; // Salva o slot para fixar a posição
-                pool.splice(matchIdx, 1);
-            }
+            item.player = pool.splice(idx, 1)[0];
+            if (item.player) item.player.pitchSlot = item.index;
         });
 
-        // Renderiza cada titular no campo 2D com sistema de penalização
+        // -- Renderiza cada titular no campo --
         mapping.forEach(item => {
             if (!item.player) return;
             const player = item.player;
-            const slot = item.slot;
+            const slot   = item.slot;
 
-            // Calcula a força efetiva com base na posição tática atribuída
-            const { effectiveStrength, isOutOfPosition } = calcEffectiveStrength(player, slot.posText);
-            player.effectiveStrength = effectiveStrength; // Guarda para cálculo de força do time
+            // Cálculo de força efectiva
+            let effectiveStrength = player.strength || 0;
+            let isOutOfPosition   = false;
+            if (typeof calcEffectiveStrength === 'function') {
+                const result = calcEffectiveStrength(player, slot.posText);
+                effectiveStrength      = result.effectiveStrength;
+                isOutOfPosition        = result.isOutOfPosition;
+                player.effectiveStrength = effectiveStrength;
+            }
 
-            const node = document.createElement('div');
-            node.className = `pitch-player-node ${selectedPitchPlayerId === player.id ? 'selected' : ''}`;
-            if (isOutOfPosition) node.classList.add('out-of-position');
-            node.style.left = `${slot.left}%`;
-            node.style.top = `${slot.top}%`;
-            
-            const isInjured = player.injuryRounds > 0;
+            const isInjured   = player.injuryRounds   > 0;
             const isSuspended = player.suspensionRounds > 0;
-            if (isInjured || isSuspended) node.style.opacity = "0.6";
+            const energy      = Math.round(player.energy ?? 100);
+            const energyColor = energy < 50 ? '#f44336' : energy < 80 ? '#FFEB3B' : '#4CAF50';
+            const isSelected  = (typeof selectedPitchPlayerId !== 'undefined') && selectedPitchPlayerId === player.id;
 
-            const injuryIcon = isInjured ? " 🤕" : "";
-            const suspIcon = isSuspended ? " 🚫" : "";
+            // Abreviatura do nome: apelido ou primeiros 10 chars
+            const nameParts  = (player.name || '').split(' ');
+            const shortName  = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
+            const displayName = (shortName.length > 10 ? shortName.substring(0, 10) + '…' : shortName)
+                + (isInjured ? ' 🤕' : isSuspended ? ' 🚫' : '');
 
-            // Cor da força: verde normal, amarelo penalizado
-            const strColor = isOutOfPosition ? '#ffa726' : 'var(--primary-color)';
-            const strDisplay = isOutOfPosition ? `${effectiveStrength} ⚠` : `${effectiveStrength}`;
+            // ---- Nodo do jogador ----
+            const node = document.createElement('div');
+            node.className = 'pitch-player-node'
+                + (isSelected ? ' selected' : '')
+                + (isOutOfPosition ? ' out-of-position' : '');
+            node.style.cssText = `left:${slot.left}%; top:${slot.top}%; opacity:${(isInjured || isSuspended) ? '0.6' : '1'};`;
 
+            // — Círculo de camisa (estilo PES) —
+            const shirt = document.createElement('div');
+            shirt.className = `pitch-shirt sector-${slot.sector}`;
+            shirt.innerHTML = `<span class="shirt-pos">${slot.posText}</span><span class="shirt-ovr">${effectiveStrength}${isOutOfPosition ? '⚠' : ''}</span>`;
+            node.appendChild(shirt);
+
+            // — Nome —
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'pitch-player-name';
+            nameDiv.title     = player.name + (isOutOfPosition ? ' (Fora de Posição: -15%)' : '');
+            nameDiv.textContent = displayName;
+            node.appendChild(nameDiv);
+
+            // — Barra de energia —
+            const barWrap = document.createElement('div');
+            barWrap.className = 'pitch-energy-bar-wrap';
+            const bar = document.createElement('div');
+            bar.className = 'pitch-energy-bar';
+            bar.style.cssText = `width:${energy}%; background:${energyColor};`;
+            barWrap.appendChild(bar);
+            node.appendChild(barWrap);
+
+            // — Botão treinar (aparece no hover via CSS) —
             const hasTrainedThisYear = player.ultimoAnoTreinado === currentYear;
-            const trainButtonDisabled = hasTrainedThisYear ? 'disabled' : '';
-            const trainButtonStyle = hasTrainedThisYear ? 'opacity: 0.4; cursor: not-allowed;' : 'cursor: pointer; background: rgba(0,0,0,0.4);';
+            const trainBtn = document.createElement('button');
+            trainBtn.className = 'pitch-train-btn';
+            trainBtn.textContent = 'Treinar';
+            if (hasTrainedThisYear) {
+                trainBtn.disabled = true;
+                trainBtn.style.opacity = '0.4';
+                trainBtn.style.cursor  = 'not-allowed';
+            }
+            trainBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (typeof trainPlayer === 'function') trainPlayer(player.id);
+            };
+            node.appendChild(trainBtn);
 
+            // — Eventos de clique e drag & drop —
             node.onclick = (e) => {
                 e.stopPropagation();
-                selectPitchPlayer(player.id);
+                if (typeof selectPitchPlayer === 'function') selectPitchPlayer(player.id);
             };
-
-            // Eventos Drag & Drop
             node.setAttribute('draggable', 'true');
             node.ondragstart = (e) => {
-                e.dataTransfer.setData('text/plain', player.id);
+                e.dataTransfer.setData('text/plain', String(player.id));
                 e.dataTransfer.effectAllowed = 'move';
-                setTimeout(() => node.style.opacity = '0.5', 0);
+                setTimeout(() => { node.style.opacity = '0.4'; }, 0);
             };
             node.ondragend = () => {
-                node.style.opacity = isInjured || isSuspended ? '0.6' : '1';
+                node.style.opacity = (isInjured || isSuspended) ? '0.6' : '1';
             };
             node.ondragover = (e) => {
                 e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                node.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.8)';
+                shirt.style.boxShadow = '0 0 0 3px #ffffff';
             };
-            node.ondragleave = () => {
-                node.style.boxShadow = '';
-            };
+            node.ondragleave = () => { shirt.style.boxShadow = ''; };
             node.ondrop = (e) => {
                 e.preventDefault();
-                node.style.boxShadow = '';
+                shirt.style.boxShadow = '';
                 const draggedId = e.dataTransfer.getData('text/plain');
-                if (draggedId && draggedId !== player.id) {
-                    handlePlayerSwap(draggedId, player.id);
+                if (draggedId && draggedId !== String(player.id)) {
+                    if (typeof handlePlayerSwap === 'function') handlePlayerSwap(Number(draggedId), player.id);
                 }
             };
 
-            node.innerHTML = `
-                <div class="pitch-player-badge${isOutOfPosition ? ' penalty-badge' : ''}">
-                    <span class="pitch-pos-box sector-${slot.sector}" title="Salário: R$ ${((player.salario || player.strength * 1000)).toLocaleString('pt-BR')}">${slot.posText}</span>
-                    <span class="pitch-str-box" style="color: ${strColor}">${strDisplay}</span>
-                </div>
-                <div class="pitch-player-name" title="${player.name}${isOutOfPosition ? ' (Fora de Posição: -15%)' : ''}">${player.name}${injuryIcon}${suspIcon}</div>
-                <div style="display: flex; gap: 5px; justify-content: center; margin-top: 1px; align-items: center;">
-                    <div class="pitch-player-energy" style="font-size: 0.7rem; color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⚡ ${Math.round(player.energy || 100)}%</div>
-                    <div onclick="event.stopPropagation(); showPlayerMoodMessage(${player.id})" style="cursor: pointer; font-size: 0.7rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'" title="Ver mensagem do jogador">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))} <span style="color: var(--text-muted); font-weight: normal;">i${player.age}</span></div>
-                </div>
-                <button onclick="event.stopPropagation(); trainPlayer(${player.id})" style="margin-top: 3px; padding: 2px 6px; font-size: 0.65rem; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; font-weight: bold; transition: background 0.2s; ${trainButtonStyle}" onmouseover="if(!this.disabled) this.style.background='rgba(76,175,80,0.2)';" onmouseout="if(!this.disabled) this.style.background='rgba(0,0,0,0.4)';" ${trainButtonDisabled}>Treinar</button>
-            `;
             pitchField.appendChild(node);
         });
 
         // Recalcula a força do time com as penalizações aplicadas
-        updateTeamStrength();
+        if (typeof updateTeamStrength === 'function') updateTeamStrength();
     }
 
-    // 2. RENDERIZAR O BANCO DE RESERVAS (LADO DIREITO)
+    // =========================================================
+    // 2. RENDERIZAR O BANCO DE SUPLENTES
+    // =========================================================
     if (listReserves) {
         reserves.forEach(player => {
-            const item = document.createElement('div');
-            const isInjured = player.injuryRounds > 0;
+            const item        = document.createElement('div');
+            const isInjured   = player.injuryRounds   > 0;
             const isSuspended = player.suspensionRounds > 0;
-            item.className = `squad-reserves-item ${selectedReservePlayerId === player.id ? 'selected' : ''}`;
-            if (isInjured || isSuspended) item.style.opacity = "0.6";
+            item.className    = 'squad-reserves-item' + ((typeof selectedReservePlayerId !== 'undefined' && selectedReservePlayerId === player.id) ? ' selected' : '');
+            if (isInjured || isSuspended) item.style.opacity = '0.6';
 
-            const injuryIcon = isInjured ? " 🤕" : "";
-            const suspIcon = isSuspended ? " 🚫" : "";
+            const injuryIcon = isInjured   ? ' 🤕' : '';
+            const suspIcon   = isSuspended ? ' 🚫' : '';
 
-            let posText = player.position;
-            let sector = 'mf';
+            let posText = player.position || '?';
+            let sector  = 'mf';
             if (player.position === 'GOL') { posText = 'GO'; sector = 'gk'; }
             else if (player.position === 'ZAG') { posText = 'ZC'; sector = 'df'; }
             else if (player.position === 'LAT') { posText = 'LT'; sector = 'df'; }
@@ -5865,53 +5916,46 @@ function renderSquad() {
 
             item.onclick = (e) => {
                 e.stopPropagation();
-                if (isInjured || isSuspended) {
-                    alert("Este jogador não está em condições de jogo!");
-                    return;
-                }
-                selectReservePlayer(player.id);
+                if (isInjured || isSuspended) { alert('Este jogador não está em condições de jogo!'); return; }
+                if (typeof selectReservePlayer === 'function') selectReservePlayer(player.id);
             };
 
-            // Eventos Drag & Drop
             item.setAttribute('draggable', 'true');
             item.ondragstart = (e) => {
                 e.dataTransfer.setData('text/plain', String(player.id));
                 e.dataTransfer.effectAllowed = 'move';
                 setTimeout(() => item.classList.add('dragging'), 0);
             };
-            item.ondragend = () => {
-                item.classList.remove('dragging');
-            };
-            item.ondragover = (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                item.classList.add('drag-over');
-            };
-            item.ondragleave = () => {
-                item.classList.remove('drag-over');
-            };
-            item.ondrop = (e) => {
+            item.ondragend   = () => item.classList.remove('dragging');
+            item.ondragover  = (e) => { e.preventDefault(); item.classList.add('drag-over'); };
+            item.ondragleave = () => item.classList.remove('drag-over');
+            item.ondrop      = (e) => {
                 e.preventDefault();
                 item.classList.remove('drag-over');
                 const draggedId = e.dataTransfer.getData('text/plain');
                 if (draggedId && Number(draggedId) !== player.id) {
-                    handlePlayerSwap(Number(draggedId), player.id);
+                    if (typeof handlePlayerSwap === 'function') handlePlayerSwap(Number(draggedId), player.id);
                 }
             };
 
+            const energy      = Math.round(player.energy ?? 100);
+            const energyColor = energy < 50 ? '#f44336' : energy < 80 ? '#FFEB3B' : '#4CAF50';
+            const mood        = player.emoji || ((player.morale ?? 100) >= 80 ? '😊' : (player.morale ?? 100) >= 50 ? '😐' : '😢');
+            const trained     = player.ultimoAnoTreinado === currentYear;
+
             item.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
                     <span class="reserve-pos-box sector-${sector}">${posText}</span>
                     <span class="reserve-player-name">${player.name}${injuryIcon}${suspIcon}</span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="reserve-player-energy" style="color: ${(player.energy||100) < 50 ? '#f44336' : ((player.energy||100) < 80 ? '#FFEB3B' : '#4CAF50')}; font-size: 0.75rem; min-width: 40px; font-weight: bold;">⚡ ${Math.round(player.energy || 100)}%</span>
-                    <span onclick="event.stopPropagation(); showPlayerMoodMessage(${player.id})" style="cursor: pointer; font-size: 0.8rem; margin-right: 5px; transition: transform 0.2s; display: inline-block;" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'" title="Ver mensagem do jogador">${player.emoji || ((player.morale||100) >= 80 ? '😊' : ((player.morale||100) >= 50 ? '😐' : '😢'))}</span>
-                    <span class="reserve-player-str" style="min-width: 50px;">${player.strength} <span style="font-size:0.7rem; color: var(--text-muted); font-weight: normal;">i${player.age}</span></span>
-                    <button class="btn btn-train-mini" onclick="event.stopPropagation(); trainPlayer(${player.id})" title="Treino Profissional" style="padding: 2px 6px; font-size: 0.7rem; color: #4CAF50; border: 1px solid #4CAF50; background: transparent; border-radius: 4px; font-weight: bold; margin-right: 2px; transition: background 0.2s; ${player.ultimoAnoTreinado === currentYear ? 'opacity: 0.4; cursor: not-allowed;' : 'cursor: pointer;'}" onmouseover="if(!this.disabled) this.style.backgroundColor='rgba(76,175,80,0.1)';" onmouseout="if(!this.disabled) this.style.backgroundColor='transparent';" ${player.ultimoAnoTreinado === currentYear ? 'disabled' : ''}>Treinar</button>
-                    <button class="btn btn-sell-mini" onclick="event.stopPropagation(); sellPlayer(${player.id})" title="Vender Jogador" style="padding: 2px 6px; font-size: 0.7rem; color: #f44336; border-color: #f44336; background: transparent; border-radius: 4px; border: 1px solid var(--border-color);">Vender</button>
-                </div>
-            `;
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                    <span style="color:${energyColor};font-size:0.72rem;font-weight:bold;">&#9889; ${energy}%</span>
+                    <span onclick="event.stopPropagation();showPlayerMoodMessage(${player.id})" style="cursor:pointer;font-size:0.8rem;" title="Ver mensagem">${mood}</span>
+                    <span class="reserve-player-str">${player.strength} <span style="font-size:0.65rem;color:var(--text-muted);font-weight:normal;">i${player.age}</span></span>
+                    <button onclick="event.stopPropagation();trainPlayer(${player.id})" style="padding:2px 6px;font-size:0.68rem;color:#4CAF50;border:1px solid #4CAF50;background:transparent;border-radius:4px;font-weight:bold;${trained ? 'opacity:0.4;cursor:not-allowed;' : ''}" ${trained ? 'disabled' : ''}>Treinar</button>
+                    <button onclick="event.stopPropagation();sellPlayer(${player.id})" style="padding:2px 6px;font-size:0.68rem;color:#f44336;border:1px solid #f44336;background:transparent;border-radius:4px;">Vender</button>
+                </div>`;
+
             listReserves.appendChild(item);
         });
     }
