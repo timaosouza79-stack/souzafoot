@@ -754,7 +754,16 @@ function saveGame(force = false) {
         currentYear,
         myTeamId: myTeam ? myTeam.id : null,
         currentRound,
-        activeScreen: typeof currentActiveScreen !== 'undefined' ? currentActiveScreen : 'screen-main',
+        activeScreen: (function() {
+            // Apenas persiste telas principais — telas secundárias (stats, standings,
+            // calendar, cup, etc.) são sempre redirecionadas para screen-main no próximo carregamento.
+            var s = typeof currentActiveScreen !== 'undefined' ? currentActiveScreen : 'screen-main';
+            var secondaryScreens = ['screen-stats', 'screen-standings', 'screen-calendar',
+                                    'screen-cup', 'screen-libertadores', 'screen-sulamericana',
+                                    'screen-intercontinental', 'screen-champion', 'screen-job-market',
+                                    'screen-team', 'screen-match-live'];
+            return secondaryScreens.includes(s) ? 'screen-main' : s;
+        })(),
         lastRoundResults,
         matchSchedule,
         standings,
@@ -1461,10 +1470,23 @@ function loadGame() {
 
         console.log("loadGame: Exibindo tela salva.");
         ensureShields();
-        if (state.activeScreen && state.activeScreen !== 'screen-selection' && state.activeScreen !== 'screen-login') {
-            showScreen(state.activeScreen);
-        } else {
-            showScreen('screen-main');
+
+        // Telas permitidas para restauração — apenas painel principal e elenco.
+        // Stats, classificação, calendário e outras telas secundárias abrem sempre
+        // a partir do screen-main para evitar aberturas inesperadas no carregamento.
+        var allowedRestoreScreens = ['screen-main', 'screen-squad'];
+        var targetScreen = (state.activeScreen && allowedRestoreScreens.includes(state.activeScreen))
+            ? state.activeScreen
+            : 'screen-main';
+
+        showScreen(targetScreen);
+        // Garante que o botão "Home" da nav bar fica ativo na inicialização
+        document.querySelectorAll('.mobile-nav-btn').forEach(function(b) { b.classList.remove('active'); });
+        var homeBtn = document.getElementById('mnav-home');
+        if (targetScreen === 'screen-main' && homeBtn) homeBtn.classList.add('active');
+        else if (targetScreen === 'screen-squad') {
+            var squadBtn = document.getElementById('mnav-squad');
+            if (squadBtn) squadBtn.classList.add('active');
         }
         updateDashboardUI();
         updateDynamicBackground(myTeam.id);
