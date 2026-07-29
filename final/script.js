@@ -6994,7 +6994,7 @@ function renderSponsorships() {
                 <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;">
                     <div>
                         <h4 style="color: var(--accent-color); margin-bottom: 10px;">${slot}</h4>
-                        <img src="${getSponsorLogoUrl(contract.brand, contract.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 10px; border-radius: 5px; background: white; padding: 2px; display: inline-block;" onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${contract.domain || \'google.com\'}&sz=128';">
+                        <img src="${getSponsorLogoUrl(contract.brand, contract.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; margin-bottom: 10px; border-radius: 5px; background: white; padding: 2px; display: inline-block;" onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${contract.domain || 'google.com'}&sz=128';">
                         <div style="font-weight: bold; margin-bottom: 5px;">${contract.brand}</div>
                         <div style="color: #4CAF50; font-size: 0.9rem; margin-bottom: 5px;">R$ ${contract.value.toLocaleString('pt-BR')} / jogo</div>
                     </div>
@@ -7009,7 +7009,7 @@ function renderSponsorships() {
                 let proposalsHtml = slotProposals.map(p => `
                     <div style="background: rgba(255,255,255,0.05); border-radius: 4px; padding: 10px; margin-bottom: 10px; text-align: left;">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-                            <img src="${getSponsorLogoUrl(p.brand, p.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 5px; padding: 2px;" onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${p.domain || \'google.com\'}&sz=128';">
+                            <img src="${getSponsorLogoUrl(p.brand, p.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 5px; padding: 2px;" onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${p.domain || 'google.com'}&sz=128';">
                             <div>
                                 <div style="font-weight: bold; font-size: 0.9rem;">${p.brand}</div>
                                 <div style="color: #4CAF50; font-size: 0.8rem;">R$ ${p.value.toLocaleString('pt-BR')}</div>
@@ -7120,7 +7120,7 @@ function generateSponsorshipOffers(slot) {
             list.innerHTML += `
                 <div class="dashboard-card" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05); margin-bottom: 5px;">
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <img src="${getSponsorLogoUrl(brand.brand, brand.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 5px; padding: 2px;" onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${brand.domain || \'google.com\'}&sz=128';">
+                        <img src="${getSponsorLogoUrl(brand.brand, brand.domain)}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 5px; padding: 2px;" onerror="this.onerror=null; this.src='https://www.google.com/s2/favicons?domain=${brand.domain || 'google.com'}&sz=128';">
                         <div>
                             <div style="font-weight: bold; font-size: 1.1rem; color: white;">${brand.brand}</div>
                             <div style="color: #4CAF50; font-size: 0.9rem;">R$ ${value.toLocaleString('pt-BR')} / jogo</div>
