@@ -4587,6 +4587,7 @@ function finishMatchSimulation() {
                 }
             });
             sortStandings();
+            renderStandings(); // Atualização dinâmica da tabela logo após a partida
         }
 
         allTeams.forEach(team => {
@@ -5270,9 +5271,32 @@ function sortStandings() {
 }
 
 function renderStandings() {
-    sortStandings();
     const tbody = document.getElementById('standings-body');
     if (!tbody) return;
+    
+    // Feedback visual (carregamento assíncrono) se a tela estiver visível
+    const screenStandings = document.getElementById('screen-standings');
+    const isVisible = screenStandings && screenStandings.classList.contains('active');
+    
+    if (isVisible && standings.length > 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="10" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-circle-notch fa-spin fa-2x" style="color: var(--primary-color); margin-bottom: 15px;"></i>
+                    <div style="color: var(--text-muted); font-weight: bold;">Carregando dados das equipas...</div>
+                </td>
+            </tr>
+        `;
+        setTimeout(() => {
+            _doRenderStandings(tbody);
+        }, 300);
+    } else {
+        _doRenderStandings(tbody);
+    }
+}
+
+function _doRenderStandings(tbody) {
+    sortStandings();
     tbody.innerHTML = '';
 
     const standingsTitle = document.getElementById('standings-title');

@@ -1078,10 +1078,15 @@ input, textarea, select {
     50% { box-shadow: 0 4px 30px var(--primary-glow), 0 0 0 8px rgba(0, 230, 118, 0.1); }
 }
 
-/* ---- Live Match: layout mobile stack ---- */
-#screen-match-live {
+/* ---- Live Match & Standings: layout mobile stack ---- */
+#screen-match-live,
+#screen-standings {
     min-height: 100vh;
     overflow-y: auto;
+}
+
+#screen-standings {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .live-match-container {
