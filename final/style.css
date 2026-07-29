@@ -1079,6 +1079,11 @@ input, textarea, select {
 }
 
 /* ---- Live Match: layout mobile stack ---- */
+#screen-match-live {
+    min-height: 100vh;
+    overflow-y: auto;
+}
+
 .live-match-container {
     display: grid;
     grid-template-columns: 1fr 320px;
@@ -1929,7 +1934,7 @@ input, textarea, select {
 
     .live-controls-footer {
         padding: 10px 12px;
-        margin-bottom: 0;
+        margin-bottom: 80px;
         border-radius: 0;
         flex-direction: column;
         align-items: stretch;
